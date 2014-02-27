@@ -1,0 +1,69 @@
+<idea-plugin version="2">
+  <id>de.espend.idea.shopware</id>
+  <name>Shopware Plugin</name>
+  <version>0.1</version>
+   <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
+
+  <description><![CDATA[
+      <h1>Shopware Plugin</h1><br>
+      <br>
+      Install <a href="http://plugins.jetbrains.com/plugin/7219">Symfony2 Plugin</a> and enable it per project (ignore messageboxes for now).
+      <br/><br/>
+
+      <h2>Dependencies</h2>
+      <ul>
+        <li><a href="http://plugins.jetbrains.com/plugin/7219">Symfony2 Plugin</a></li>
+      </ul>
+
+      <h2>Features</h2>
+      <ul>
+        <li>Event and method references for subscriber events</li>
+        <li>Smarty frontend file references</li>
+      </ul>
+
+    ]]></description>
+
+  <change-notes><![CDATA[
+
+<h2>0.1</h2>
+<ul>
+    <li>Initial release with dep on <a href="http://plugins.jetbrains.com/plugin/7219">Symfony2 Plugin</a></li>
+    <li>Event and method references for subscriber events</li>
+    <li>Smarty frontend file references</li>
+</ul>
+
+    ]]>
+  </change-notes>
+
+  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="131"/>
+
+  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <extensions defaultExtensionNs="com.intellij">
+      <psi.referenceContributor implementation="de.espend.idea.shopware.reference.EventSubscriberReferenceContributor"/>
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyFileGoToDeclarationHandler"/>
+      <completion.contributor language="Smarty" implementationClass="de.espend.idea.shopware.completion.SmartyFileCompletionProvider"/>
+  </extensions>
+
+    <depends>com.jetbrains.php</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>fr.adrienbrault.idea.symfony2plugin</depends>
+
+  <application-components>
+    <!-- Add your application components here -->
+  </application-components>
+
+  <project-components>
+    <!-- Add your project components here -->
+  </project-components>
+
+  <actions>
+    <!-- Add your actions here -->
+  </actions>
+
+</idea-plugin>
