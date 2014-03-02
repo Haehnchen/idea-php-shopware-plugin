@@ -47,6 +47,7 @@
   <extensions defaultExtensionNs="com.intellij">
       <psi.referenceContributor implementation="de.espend.idea.shopware.reference.EventSubscriberReferenceContributor"/>
       <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyFileGoToDeclarationHandler"/>
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyBlockGoToHandler"/>
       <completion.contributor language="Smarty" implementationClass="de.espend.idea.shopware.completion.SmartyFileCompletionProvider"/>
   </extensions>
 

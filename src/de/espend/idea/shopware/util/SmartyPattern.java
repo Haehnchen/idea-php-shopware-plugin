@@ -18,4 +18,24 @@ public class SmartyPattern {
         );
     }
 
+    public static PsiElementPattern.Capture<PsiElement> getBlockPattern() {
+        return PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL).withParent(
+            PlatformPatterns.psiElement(SmartyCompositeElementTypes.ATTRIBUTE_VALUE).withParent(
+                PlatformPatterns.psiElement(SmartyCompositeElementTypes.ATTRIBUTE).withText(PlatformPatterns.string().contains("name=")).withParent(
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{block"))
+                )
+            )
+        );
+    }
+
+    public static PsiElementPattern.Capture<PsiElement> getExtendPattern() {
+        return PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL).withParent(
+            PlatformPatterns.psiElement(SmartyCompositeElementTypes.ATTRIBUTE_VALUE).withParent(
+                PlatformPatterns.psiElement(SmartyCompositeElementTypes.ATTRIBUTE).withText(PlatformPatterns.string().contains("file=")).withParent(
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{extends"))
+                )
+            )
+        );
+    }
+
 }
