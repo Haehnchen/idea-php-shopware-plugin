@@ -16,6 +16,7 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.ShopwarePluginIcons;
+import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
@@ -30,6 +31,12 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
     public static MethodMatcher.CallToSignature[] EVENT_SIGNATURES = new MethodMatcher.CallToSignature[] {
         new MethodMatcher.CallToSignature("\\Shopware_Components_Plugin_Bootstrap", "subscribeEvent"),
         new MethodMatcher.CallToSignature("\\Shopware_Components_Plugin_Bootstrap", "createEvent"),
+    };
+
+    public static MethodMatcher.CallToSignature[] REPOSITORY_SIGNATURES = new MethodMatcher.CallToSignature[] {
+        new MethodMatcher.CallToSignature("\\Doctrine\\Common\\Persistence\\ManagerRegistry", "getRepository"),
+        new MethodMatcher.CallToSignature("\\Doctrine\\Common\\Persistence\\ObjectManager", "getRepository"),
+        new MethodMatcher.CallToSignature("\\Doctrine\\Common\\Persistence\\ManagerRegistry", "getManagerForClass"),
     };
 
     @Override
@@ -64,6 +71,23 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                     }
 
                     return new PsiReference[]{ new MethodReferenceProvider((StringLiteralExpression) psiElement) };
+
+                }
+            }
+        );
+
+        psiReferenceRegistrar.registerReferenceProvider(
+            PlatformPatterns.psiElement(StringLiteralExpression.class).withLanguage(PhpLanguage.INSTANCE),
+            new PsiReferenceProvider() {
+                @NotNull
+                @Override
+                public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
+
+                    if (MethodMatcher.getMatchedSignatureWithDepth(psiElement, REPOSITORY_SIGNATURES) == null) {
+                        return new PsiReference[0];
+                    }
+
+                    return new PsiReference[]{ new ShopwareModelReferenceProvider((StringLiteralExpression) psiElement) };
 
                 }
             }
@@ -160,6 +184,46 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                     lookupElements.add(LookupElementBuilder.create(value).withIcon(ShopwarePluginIcons.SHOPWARE));
                 }
             });
+
+            return lookupElements.toArray();
+        }
+    }
+
+    public static class ShopwareModelReferenceProvider extends PsiPolyVariantReferenceBase<PsiElement> {
+
+        final private String valueName;
+
+        public ShopwareModelReferenceProvider(@NotNull StringLiteralExpression element) {
+            super(element);
+            this.valueName = element.getContents();
+        }
+
+        @NotNull
+        @Override
+        public ResolveResult[] multiResolve(boolean incompleteCode) {
+            List<ResolveResult> results = new ArrayList<ResolveResult>();
+
+            for(PhpClass phpClass: PhpIndex.getInstance(getElement().getProject()).getAllSubclasses("\\Shopware\\Components\\Model\\ModelEntity")) {
+                if(this.valueName.equals(phpClass.getPresentableFQN())) {
+                    results.add(new PsiElementResolveResult(phpClass));
+                }
+            }
+
+            return results.toArray(new ResolveResult[results.size()]);
+
+        }
+
+        @NotNull
+        @Override
+        public Object[] getVariants() {
+
+            final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
+
+            for(PhpClass phpClass: PhpIndex.getInstance(getElement().getProject()).getAllSubclasses("\\Shopware\\Components\\Model\\ModelEntity")) {
+                if(phpClass.getPresentableFQN() != null) {
+                    lookupElements.add(LookupElementBuilder.create(phpClass.getPresentableFQN()).withIcon(Symfony2Icons.DOCTRINE));
+                }
+            }
 
             return lookupElements.toArray();
         }
