@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.1</version>
+  <version>0.2</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -24,6 +24,12 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.2</h2>
+<ul>
+    <li>Add doctrine model repository references provider</li>
+    <li>Add smarty block goto and completion</li>
+</ul>
 
 <h2>0.1</h2>
 <ul>
