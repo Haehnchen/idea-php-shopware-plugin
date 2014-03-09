@@ -4,12 +4,28 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.intellij.psi.PsiDirectory;
+import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 public class TemplateUtil {
 
-    public static void collectFiles(Project project, final SmartyTemplateVisitor smartyTemplateVisitor) {
+    public static void collectFiles(Project project, SmartyTemplateVisitor smartyTemplateVisitor) {
+        collectFiles(project, smartyTemplateVisitor, "tpl");
+    }
+
+    public static void collectFiles(Project project, final SmartyTemplateVisitor smartyTemplateVisitor, String... extensions) {
+
+        final List<String> exts = Arrays.asList(extensions);
+
+        collectPluginTemplates(project, smartyTemplateVisitor, exts);
 
         final VirtualFile baseDir = project.getBaseDir();
         final VirtualFile templateDir = VfsUtil.findRelativeFile("templates", baseDir);
@@ -22,7 +38,7 @@ public class TemplateUtil {
             @Override
             public boolean visitFile(@NotNull VirtualFile virtualFile) {
 
-                if(virtualFile.isDirectory() || !virtualFile.getName().endsWith(".tpl")) {
+                if(!isValidTemplateFile(virtualFile, exts)) {
                     return true;
                 }
 
@@ -51,6 +67,51 @@ public class TemplateUtil {
                 return true;
             }
         });
+    }
+
+    private static void collectPluginTemplates(Project project, final SmartyTemplateVisitor smartyTemplateVisitor, final List<String> exts) {
+        Collection<PhpClass> phpClasses = PhpIndex.getInstance(project).getAllSubclasses("\\Shopware_Components_Plugin_Bootstrap");
+        for(PhpClass phpClass: phpClasses) {
+
+            PsiDirectory psiDirectory = phpClass.getContainingFile().getContainingDirectory();
+            final VirtualFile virtualViewDir = VfsUtil.findRelativeFile("Views", psiDirectory.getVirtualFile());
+            if(virtualViewDir != null) {
+                VfsUtil.visitChildrenRecursively(virtualViewDir, new VirtualFileVisitor() {
+                    @Override
+                    public boolean visitFile(@NotNull VirtualFile file) {
+
+                        if(!isValidTemplateFile(file, exts)) {
+                            return true;
+                        }
+
+                        String frontendName = VfsUtil.getRelativePath(file, virtualViewDir, '/');
+                        if(frontendName == null) {
+                            return true;
+                        }
+
+                        smartyTemplateVisitor.visitFile(file, frontendName);
+
+                        return true;
+                    }
+                });
+            }
+
+        }
+    }
+
+    private static boolean isValidTemplateFile(VirtualFile virtualFile, List<String> extensions) {
+
+        if(virtualFile.isDirectory()) {
+            return false;
+        }
+        String filename = virtualFile.getName();
+        for(String ext: extensions) {
+            if(filename.endsWith(ext)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public interface SmartyTemplateVisitor {

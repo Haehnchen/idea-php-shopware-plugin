@@ -3,6 +3,7 @@ package de.espend.idea.shopware.reference;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiElementFilter;
@@ -16,6 +17,8 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.ShopwarePluginIcons;
+import de.espend.idea.shopware.reference.provider.SmartyTemplateProvider;
+import de.espend.idea.shopware.util.TemplateUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
@@ -37,6 +40,10 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         new MethodMatcher.CallToSignature("\\Doctrine\\Common\\Persistence\\ManagerRegistry", "getRepository"),
         new MethodMatcher.CallToSignature("\\Doctrine\\Common\\Persistence\\ObjectManager", "getRepository"),
         new MethodMatcher.CallToSignature("\\Doctrine\\Common\\Persistence\\ManagerRegistry", "getManagerForClass"),
+    };
+
+    public static MethodMatcher.CallToSignature[] TEMPLATE = new MethodMatcher.CallToSignature[] {
+        new MethodMatcher.CallToSignature("\\Enlight_Template_Default", "extendsTemplate"),
     };
 
     @Override
@@ -88,6 +95,23 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                     }
 
                     return new PsiReference[]{ new ShopwareModelReferenceProvider((StringLiteralExpression) psiElement) };
+
+                }
+            }
+        );
+
+        psiReferenceRegistrar.registerReferenceProvider(
+            PlatformPatterns.psiElement(StringLiteralExpression.class).withLanguage(PhpLanguage.INSTANCE),
+            new PsiReferenceProvider() {
+                @NotNull
+                @Override
+                public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
+
+                    if (MethodMatcher.getMatchedSignatureWithDepth(psiElement, TEMPLATE) == null) {
+                        return new PsiReference[0];
+                    }
+
+                    return new PsiReference[]{ new SmartyTemplateProvider((StringLiteralExpression) psiElement) };
 
                 }
             }

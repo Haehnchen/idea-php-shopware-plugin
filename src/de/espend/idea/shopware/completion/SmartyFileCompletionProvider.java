@@ -1,7 +1,9 @@
 package de.espend.idea.shopware.completion;
 
 import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -10,6 +12,7 @@ import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import de.espend.idea.shopware.ShopwarePluginIcons;
+import de.espend.idea.shopware.lookup.TemplateLookupElement;
 import de.espend.idea.shopware.util.SmartyBlockUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
@@ -40,28 +43,30 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
-
-                    final Map<VirtualFile, String> map = new HashMap<VirtualFile, String>();
-
-                    TemplateUtil.collectFiles(parameters.getPosition().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
-                        @Override
-                        public void visitFile(VirtualFile virtualFile, String fileName) {
-                            map.put(virtualFile, fileName);
-                        }
-                    });
-
-                    List<SmartyBlockUtil.SmartyBlock> blockNameSet = new ArrayList<SmartyBlockUtil.SmartyBlock>();
-                    SmartyBlockUtil.collectFileBlocks(parameters.getOriginalFile(), map, blockNameSet, 0);
-
-                    for(SmartyBlockUtil.SmartyBlock smartyBlock: blockNameSet) {
-                        result.addElement(LookupElementBuilder.create(smartyBlock.getName()).withTypeText(smartyBlock.getElement().getContainingFile().getName()));
-                    }
-
+                    result.addAllElements(getTemplateCompletion(parameters.getPosition().getProject(), "tpl"));
                 }
             }
         );
 
 
+    }
+
+    public static List<LookupElement> getTemplateCompletion(Project project, String... extensions) {
+
+        final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
+        final Set<String> uniqueList = new HashSet<String>();
+
+        TemplateUtil.collectFiles(project, new TemplateUtil.SmartyTemplateVisitor() {
+            @Override
+            public void visitFile(VirtualFile virtualFile, String fileName) {
+                if(!uniqueList.contains(fileName)) {
+                    lookupElements.add(new TemplateLookupElement(fileName));
+                    uniqueList.add(fileName);
+                }
+            }
+        }, extensions);
+
+        return lookupElements;
     }
 
 
