@@ -56,6 +56,7 @@
       <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyBlockGoToHandler"/>
       <completion.contributor language="Smarty" implementationClass="de.espend.idea.shopware.completion.SmartyFileCompletionProvider"/>
       <codeInsight.lineMarkerProvider language="Smarty" implementationClass="de.espend.idea.shopware.navigation.SmartyTemplateLineMarkerProvider"/>
+      <codeInsight.lineMarkerProvider language="PHP" implementationClass="de.espend.idea.shopware.navigation.PhpActionTemplateLineMarkerProvider"/>
   </extensions>
 
     <depends>com.jetbrains.php</depends>
