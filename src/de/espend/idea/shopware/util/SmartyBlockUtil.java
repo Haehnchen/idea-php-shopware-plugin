@@ -22,6 +22,9 @@ public class SmartyBlockUtil {
 
                 if (SmartyPattern.getExtendPattern().accepts(element)) {
                     String extendsName = element.getText();
+                    if(extendsName.startsWith("parent:")) {
+                        extendsName = extendsName.substring(7);
+                    }
                     for (Map.Entry<VirtualFile, String> entry : map.entrySet()) {
                         if (entry.getValue().equals(extendsName)) {
                             virtualFiles.add(entry.getKey());

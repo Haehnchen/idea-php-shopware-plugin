@@ -27,11 +27,11 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             CompletionType.BASIC, SmartyPattern.getFilePattern(),
             new CompletionProvider<CompletionParameters>() {
                 @Override
-                protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
                     TemplateUtil.collectFiles(parameters.getPosition().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
                         @Override
                         public void visitFile(VirtualFile virtualFile, String fileName) {
-                            result.addElement(LookupElementBuilder.create(fileName).withIcon(ShopwarePluginIcons.SHOPWARE_SMARTY));
+                            result.addAllElements(getTemplateCompletion(parameters.getPosition().getProject(), "tpl"));
                         }
                     });
                 }
@@ -43,7 +43,22 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
-                    result.addAllElements(getTemplateCompletion(parameters.getPosition().getProject(), "tpl"));
+                    final Map<VirtualFile, String> map = new HashMap<VirtualFile, String>();
+
+                    TemplateUtil.collectFiles(parameters.getPosition().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
+                        @Override
+                        public void visitFile(VirtualFile virtualFile, String fileName) {
+                            map.put(virtualFile, fileName);
+                        }
+                    });
+
+                    List<SmartyBlockUtil.SmartyBlock> blockNameSet = new ArrayList<SmartyBlockUtil.SmartyBlock>();
+                    SmartyBlockUtil.collectFileBlocks(parameters.getOriginalFile(), map, blockNameSet, 0);
+
+                    for(SmartyBlockUtil.SmartyBlock smartyBlock: blockNameSet) {
+                        result.addElement(LookupElementBuilder.create(smartyBlock.getName()).withTypeText(smartyBlock.getElement().getContainingFile().getName()).withIcon(ShopwarePluginIcons.SHOPWARE));
+                    }
+
                 }
             }
         );
