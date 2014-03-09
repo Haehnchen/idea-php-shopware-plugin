@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EventSubscriberReferenceContributor extends PsiReferenceContributor {
 
@@ -253,7 +255,39 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         }
     }
 
+    public static void collectControllerEvents(Project project, Collector collector) {
+
+        PhpIndex phpIndex = PhpIndex.getInstance(project);
+
+        Collection<PhpClass> phpClasses = phpIndex.getAllSubclasses("\\Enlight_Controller_Action");
+
+        Pattern pattern = Pattern.compile(".*_(Frontend|Backend|Core)_(\\w+)");
+
+
+        for (PhpClass phpClass : phpClasses) {
+
+            String className = phpClass.getName();
+            Matcher matcher = pattern.matcher(className);
+
+            if(matcher.find()) {
+                String moduleName = matcher.group(1);
+                String controller = matcher.group(2);
+
+
+                // http://wiki.shopware.de/Shopware-4-Event-Auflistung-System-Events_detail_988.html
+                // http://wiki.shopware.de/Shopware-4.1-Upgrade-Guide-fuer-Entwickler_detail_1297.html
+                collector.collect(phpClass, String.format("Enlight_Controller_Action_PostDispatch_%s_%s", moduleName, controller));
+                collector.collect(phpClass, String.format("Enlight_Controller_Action_PostDispatchSecure_%s_%s", moduleName, controller));
+                collector.collect(phpClass, String.format("Enlight_Controller_Action_PreDispatch_%s_%s", moduleName, controller));
+
+                collector.collect(phpClass, String.format("Enlight_Controller_Dispatcher_ControllerPath_%s_%s", moduleName, controller));
+            }
+
+        }
+    }
+
     public static void collectEvents(Project project, Collector collector) {
+        collectControllerEvents(project, collector);
 
         PhpIndex phpIndex = PhpIndex.getInstance(project);
 
