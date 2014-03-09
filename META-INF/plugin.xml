@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.2</version>
+  <version>0.3</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -19,11 +19,20 @@
       <ul>
         <li>Event and method references for subscriber events</li>
         <li>Smarty frontend file references</li>
+        <li>Template controller references for php and smarty</li>
+        <li>Event name generator for common controller</li>
       </ul>
 
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.3</h2>
+<ul>
+    <li>Add template action linemarker</li>
+    <li>Add smarty controller linemaker</li>
+    <li>Add event generator on controller classes</li>
+</ul>
 
 <h2>0.2</h2>
 <ul>
