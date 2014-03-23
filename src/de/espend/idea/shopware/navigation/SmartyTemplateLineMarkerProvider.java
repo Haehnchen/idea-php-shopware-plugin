@@ -85,7 +85,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
 
     }
 
-    private String toCamelCase(String value, boolean startWithLowerCase) {
+    public static String toCamelCase(String value, boolean startWithLowerCase) {
         String[] strings = StringUtils.split(value.toLowerCase(), "_");
         for (int i = startWithLowerCase ? 1 : 0; i < strings.length; i++){
             strings[i] = StringUtils.capitalize(strings[i]);

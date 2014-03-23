@@ -10,7 +10,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIcons;
-import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.lookup.TemplateLookupElement;
@@ -21,8 +21,6 @@ import de.espend.idea.shopware.util.TemplateUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SmartyFileCompletionProvider extends CompletionContributor  {
 
@@ -97,8 +95,27 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
                     ShopwareUtil.collectControllerClass(psiElement.getProject(), new ShopwareUtil.ControllerClassVisitor() {
                         @Override
-                        public void visitFile(PhpClass phpClass, String moduleName, String controllerName) {
+                        public void visitClass(PhpClass phpClass, String moduleName, String controllerName) {
                             result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON));
+                        }
+                    });
+
+                }
+            }
+        );
+
+        extend(
+            CompletionType.BASIC, SmartyPattern.getControllerActionPattern(),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    PsiElement psiElement = parameters.getOriginalPosition();
+
+                    ShopwareUtil.collectControllerActionSmartyWrapper(psiElement, new ShopwareUtil.ControllerActionVisitor() {
+                        @Override
+                        public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
+                            result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName).withIcon(PhpIcons.METHOD_ICON));
                         }
                     });
 

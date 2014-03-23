@@ -8,6 +8,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
@@ -40,6 +41,11 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
             attachControllerNameGoto(sourceElement, targets);
         }
 
+        // {url controller=Account action=foobar
+        if(SmartyPattern.getControllerActionPattern().accepts(sourceElement)) {
+            attachControllerActionNameGoto(sourceElement, targets);
+        }
+
         return targets.toArray(new PsiElement[targets.size()]);
     }
 
@@ -49,8 +55,8 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
         final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
         ShopwareUtil.collectControllerClass(project, new ShopwareUtil.ControllerClassVisitor() {
             @Override
-            public void visitFile(PhpClass phpClass, String moduleName, String controllerName) {
-                if(controllerName.toLowerCase().equals(finalText)) {
+            public void visitClass(PhpClass phpClass, String moduleName, String controllerName) {
+                if (controllerName.toLowerCase().equals(finalText)) {
                     psiElements.add(phpClass);
                 }
             }
@@ -58,6 +64,19 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
 
     }
 
+    private void attachControllerActionNameGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
+
+        final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
+        ShopwareUtil.collectControllerActionSmartyWrapper(sourceElement, new ShopwareUtil.ControllerActionVisitor() {
+            @Override
+            public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
+                if(methodStripped.toLowerCase().equals(finalText)) {
+                    psiElements.add(method);
+                }
+            }
+        });
+
+    }
 
     private void attachExtendsFileGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
         final Project project = sourceElement.getProject();

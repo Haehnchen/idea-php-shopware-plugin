@@ -93,4 +93,41 @@ public class SmartyPattern {
 
     }
 
+
+    public static ElementPattern<PsiElement> getControllerActionPattern() {
+        return PlatformPatterns.or(
+
+            PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
+                .afterLeafSkipping(
+                    PlatformPatterns.or(
+                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
+                    ),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("action")
+                )
+                .withParent(
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{url"))
+                ),
+
+            PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
+                .afterLeafSkipping(
+                    PlatformPatterns.or(
+                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
+                    ),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("action")
+                )
+                .withParent(
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{url"))
+                )
+
+        );
+
+
+    }
+
 }
