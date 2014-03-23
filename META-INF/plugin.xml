@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.3</version>
+  <version>0.3.1</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -26,6 +26,11 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.3.1</h2>
+<ul>
+    <li>Basic magic method type provider</li>
+</ul>
 
 <h2>0.3</h2>
 <ul>
@@ -66,6 +71,7 @@
       <completion.contributor language="Smarty" implementationClass="de.espend.idea.shopware.completion.SmartyFileCompletionProvider"/>
       <codeInsight.lineMarkerProvider language="Smarty" implementationClass="de.espend.idea.shopware.navigation.SmartyTemplateLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="de.espend.idea.shopware.navigation.PhpActionTemplateLineMarkerProvider"/>
+      <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareMagicMethodTypeProvider"/>
   </extensions>
 
     <depends>com.jetbrains.php</depends>
@@ -76,9 +82,11 @@
     <!-- Add your application components here -->
   </application-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
+    <project-components>
+        <component>
+            <implementation-class>de.espend.idea.shopware.ShopwareProjectComponent</implementation-class>
+        </component>
+    </project-components>
 
   <actions>
     <!-- Add your actions here -->
