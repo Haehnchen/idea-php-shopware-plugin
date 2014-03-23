@@ -13,6 +13,7 @@ import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import de.espend.idea.shopware.ShopwarePluginIcons;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.lookup.TemplateLookupElement;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyBlockUtil;
@@ -30,6 +31,11 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                        return;
+                    }
+
                     TemplateUtil.collectFiles(parameters.getPosition().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
                         @Override
                         public void visitFile(VirtualFile virtualFile, String fileName) {
@@ -45,6 +51,11 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                        return;
+                    }
+
                     TemplateUtil.collectFiles(parameters.getPosition().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
                         @Override
                         public void visitFile(VirtualFile virtualFile, String fileName) {
@@ -65,6 +76,11 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                        return;
+                    }
+
                     final Map<VirtualFile, String> map = new HashMap<VirtualFile, String>();
 
                     TemplateUtil.collectFiles(parameters.getPosition().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
@@ -91,6 +107,10 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                 @Override
                 protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
 
+                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                        return;
+                    }
+
                     PsiElement psiElement = parameters.getOriginalPosition();
 
                     ShopwareUtil.collectControllerClass(psiElement.getProject(), new ShopwareUtil.ControllerClassVisitor() {
@@ -109,6 +129,10 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                        return;
+                    }
 
                     PsiElement psiElement = parameters.getOriginalPosition();
 

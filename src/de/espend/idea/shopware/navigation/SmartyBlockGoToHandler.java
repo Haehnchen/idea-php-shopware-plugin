@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.SmartyBlockUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
@@ -23,6 +24,10 @@ public class SmartyBlockGoToHandler implements GotoDeclarationHandler {
     @Nullable
     @Override
     public PsiElement[] getGotoDeclarationTargets(PsiElement sourceElement, int offset, Editor editor) {
+
+        if(!ShopwareProjectComponent.isValidForProject(sourceElement)) {
+            return new PsiElement[0];
+        }
 
         if(!SmartyPattern.getBlockPattern().accepts(sourceElement)) {
             return new PsiElement[0];

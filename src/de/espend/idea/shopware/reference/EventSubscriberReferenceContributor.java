@@ -17,6 +17,7 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.ShopwarePluginIcons;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.reference.provider.SmartyTemplateProvider;
 import de.espend.idea.shopware.util.TemplateUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
@@ -58,6 +59,10 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                 @Override
                 public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
 
+                    if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+                        return new PsiReference[0];
+                    }
+
                     if (MethodMatcher.getMatchedSignatureWithDepth(psiElement, EVENT_SIGNATURES) == null) {
                         return new PsiReference[0];
                     }
@@ -74,6 +79,10 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                 @NotNull
                 @Override
                 public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+                        return new PsiReference[0];
+                    }
 
                     if (MethodMatcher.getMatchedSignatureWithDepth(psiElement, EVENT_SIGNATURES, 1) == null) {
                         return new PsiReference[0];
@@ -92,6 +101,10 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                 @Override
                 public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
 
+                    if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+                        return new PsiReference[0];
+                    }
+
                     if (MethodMatcher.getMatchedSignatureWithDepth(psiElement, REPOSITORY_SIGNATURES) == null) {
                         return new PsiReference[0];
                     }
@@ -108,6 +121,10 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                 @NotNull
                 @Override
                 public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+                        return new PsiReference[0];
+                    }
 
                     if (MethodMatcher.getMatchedSignatureWithDepth(psiElement, TEMPLATE) == null) {
                         return new PsiReference[0];

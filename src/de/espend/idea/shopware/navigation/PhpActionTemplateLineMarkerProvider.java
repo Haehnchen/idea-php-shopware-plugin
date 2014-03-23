@@ -14,6 +14,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.smarty.SmartyFile;
 import de.espend.idea.shopware.ShopwarePluginIcons;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.TemplateUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.apache.commons.lang.StringUtils;
@@ -46,6 +47,11 @@ public class PhpActionTemplateLineMarkerProvider implements LineMarkerProvider {
     }
 
     public void attachController(Method method, Collection<LineMarkerInfo> lineMarkerInfos) {
+
+        if(!ShopwareProjectComponent.isValidForProject(method)) {
+            return;
+        }
+
         String methodName = method.getName();
         if(!methodName.endsWith("Action")) {
             return;

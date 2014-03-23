@@ -10,6 +10,7 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.smarty.SmartyFile;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.apache.commons.lang.StringUtils;
@@ -40,6 +41,10 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
     }
 
     public void attachController(SmartyFile smartyFile, Collection<LineMarkerInfo> lineMarkerInfos) {
+
+        if(!ShopwareProjectComponent.isValidForProject(smartyFile)) {
+            return;
+        }
 
         String relativeFilename = VfsUtil.getRelativePath(smartyFile.getVirtualFile(), smartyFile.getProject().getBaseDir(), '/');
         if(relativeFilename == null) {

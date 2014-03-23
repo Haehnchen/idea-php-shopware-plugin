@@ -3,9 +3,12 @@ package de.espend.idea.shopware;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.psi.PsiElement;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
+import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ShopwareProjectComponent implements ProjectComponent {
 
@@ -54,6 +57,24 @@ public class ShopwareProjectComponent implements ProjectComponent {
 
     public String getMagicFilePathname() {
         return project.getBasePath() + "/cache/" + MAGIC_FILE;
+    }
+
+    public static boolean isValidForProject(@Nullable PsiElement psiElement) {
+        if(psiElement == null) return false;
+
+        if(!Symfony2ProjectComponent.isEnabled(psiElement)) {
+            return false;
+        }
+
+        if(VfsUtil.findRelativeFile(psiElement.getProject().getBaseDir(), "engine", "Shopware", "Kernel.php") != null) {
+            return true;
+        }
+
+        if(PhpElementsUtil.getClassInterface(psiElement.getProject(), "\\Enlight_Controller_Action") != null) {
+            return true;
+        }
+
+        return false;
     }
 
 

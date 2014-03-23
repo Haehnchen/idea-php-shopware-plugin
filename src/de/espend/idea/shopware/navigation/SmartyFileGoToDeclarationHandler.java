@@ -10,6 +10,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
@@ -23,6 +24,10 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
     @Nullable
     @Override
     public PsiElement[] getGotoDeclarationTargets(PsiElement sourceElement, int offset, Editor editor) {
+
+        if(!ShopwareProjectComponent.isValidForProject(sourceElement)) {
+            return new PsiElement[0];
+        }
 
         final List<PsiElement> targets = new ArrayList<PsiElement>();
 

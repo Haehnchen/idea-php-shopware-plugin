@@ -39,6 +39,10 @@ public class ShopwareMagicMethodTypeProvider implements PhpTypeProvider2 {
             return null;
         }
 
+        if(!ShopwareProjectComponent.isValidForProject(e)) {
+            return null;
+        }
+
         // container calls are only on "get" methods
         if(!(e instanceof FunctionReferenceImpl)) {
             return null;
