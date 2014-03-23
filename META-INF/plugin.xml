@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.3.1</version>
+  <version>0.4</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -18,14 +18,26 @@
       <h2>Features</h2>
       <ul>
         <li>Event and method references for subscriber events</li>
-        <li>Smarty frontend file references</li>
+        <li>Smarty frontend references for files, controller, actions</li>
+        <li>Smarty block references on extends tag</li>
         <li>Template controller references for php and smarty</li>
         <li>Event name generator for common controller</li>
+        <li>Symfony2 container loader</li>
+        <li>Basic magic method resolving</li>
       </ul>
 
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.4</h2>
+<ul>
+    <li>Smarty: Add support for "{link file=foo" pattern</li>
+    <li>Smarty: Add controller "{url controller=Forms" support</li>
+    <li>Smarty: Add "{url controller=index action=index}"</li>
+    <li>Symfony: Add symfony2 container file loader extension</li>
+    <li>Secure all plugin extension calls, so that they only invalid inside a Shopware project</li>
+</ul>
 
 <h2>0.3.1</h2>
 <ul>
