@@ -5,11 +5,8 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.PsiElementProcessor;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.lookup.TemplateLookupElement;
@@ -34,6 +31,26 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                             result.addAllElements(getTemplateCompletion(parameters.getPosition().getProject(), "tpl"));
                         }
                     });
+                }
+            }
+        );
+
+        extend(
+            CompletionType.BASIC, SmartyPattern.getLinkFilePattern(),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+                    TemplateUtil.collectFiles(parameters.getPosition().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
+                        @Override
+                        public void visitFile(VirtualFile virtualFile, String fileName) {
+                            PsiFile psiFile = PsiManager.getInstance(parameters.getPosition().getProject()).findFile(virtualFile);
+                            LookupElementBuilder lookupElementBuilder = LookupElementBuilder.create(fileName);
+                            if(psiFile != null) {
+                                lookupElementBuilder.withIcon(psiFile.getFileType().getIcon());
+                            }
+                            result.addElement(lookupElementBuilder);
+                        }
+                    }, SmartyPattern.TAG_LINK_FILE_EXTENSIONS);
                 }
             }
         );

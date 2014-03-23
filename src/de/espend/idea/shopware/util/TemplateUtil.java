@@ -106,7 +106,7 @@ public class TemplateUtil {
         }
         String filename = virtualFile.getName();
         for(String ext: extensions) {
-            if(filename.endsWith(ext)) {
+            if(filename.toLowerCase().endsWith(ext.toLowerCase())) {
                 return true;
             }
         }

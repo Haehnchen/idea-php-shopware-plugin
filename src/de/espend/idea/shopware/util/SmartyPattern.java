@@ -9,6 +9,8 @@ import com.jetbrains.smarty.lang.psi.SmartyCompositeElementTypes;
 
 public class SmartyPattern {
 
+    public static String[] TAG_LINK_FILE_EXTENSIONS = {"css", "js", "jpg", "jpeg", "gif", "png", "less", "sass"};
+
     public static PsiElementPattern.Capture<PsiElement> getFilePattern() {
         // getName dont work
         return PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL).withParent(
@@ -36,6 +38,22 @@ public class SmartyPattern {
                 )
             )
         );
+    }
+
+    public static PsiElementPattern.Capture<PsiElement> getLinkFilePattern() {
+        return PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
+            .afterLeafSkipping(
+                PlatformPatterns.or(
+                    PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
+                ),
+                PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("file")
+            )
+            .withParent(
+                PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{link"))
+            );
     }
 
 }
