@@ -2,6 +2,7 @@ package de.espend.idea.shopware;
 
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VfsUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,10 @@ public class ShopwareProjectComponent implements ProjectComponent {
     public void projectOpened() {
 
         if(!Symfony2ProjectComponent.isEnabled(project)) {
+            return;
+        }
+
+        if(VfsUtil.findRelativeFile(this.project.getBaseDir(), "engine", "Shopware", "Kernel.php") == null) {
             return;
         }
 
