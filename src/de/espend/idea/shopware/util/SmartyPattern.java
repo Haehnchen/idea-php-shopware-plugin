@@ -1,5 +1,6 @@
 package de.espend.idea.shopware.util;
 
+import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
@@ -54,6 +55,42 @@ public class SmartyPattern {
             .withParent(
                 PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{link"))
             );
+    }
+
+    public static ElementPattern<PsiElement> getControllerPattern() {
+        return PlatformPatterns.or(
+
+            PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
+                .afterLeafSkipping(
+                    PlatformPatterns.or(
+                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
+                    ),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("controller")
+                )
+                .withParent(
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{url"))
+                ),
+
+            PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
+                .afterLeafSkipping(
+                    PlatformPatterns.or(
+                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
+                    ),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("controller")
+                )
+                .withParent(
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{url"))
+                )
+
+        );
+
+
     }
 
 }

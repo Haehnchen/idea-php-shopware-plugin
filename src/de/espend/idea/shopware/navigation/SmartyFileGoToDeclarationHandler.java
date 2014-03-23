@@ -8,6 +8,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
 import org.jetbrains.annotations.Nullable;
@@ -33,8 +35,30 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
             attachExtendsFileGoto(sourceElement, targets);
         }
 
+        // {url controller=Account
+        if(SmartyPattern.getControllerPattern().accepts(sourceElement)) {
+            attachControllerNameGoto(sourceElement, targets);
+        }
+
         return targets.toArray(new PsiElement[targets.size()]);
     }
+
+    private void attachControllerNameGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
+        final Project project = sourceElement.getProject();
+
+        final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
+        ShopwareUtil.collectControllerClass(project, new ShopwareUtil.ControllerClassVisitor() {
+            @Override
+            public void visitFile(PhpClass phpClass, String moduleName, String controllerName) {
+                if(controllerName.toLowerCase().equals(finalText)) {
+                    psiElements.add(phpClass);
+                }
+            }
+        });
+
+    }
+
+
     private void attachExtendsFileGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
         final Project project = sourceElement.getProject();
 

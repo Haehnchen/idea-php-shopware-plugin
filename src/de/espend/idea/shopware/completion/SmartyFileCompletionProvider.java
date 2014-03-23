@@ -5,17 +5,24 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.util.ProcessingContext;
+import com.jetbrains.php.PhpIcons;
+import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.lookup.TemplateLookupElement;
+import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyBlockUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SmartyFileCompletionProvider extends CompletionContributor  {
 
@@ -80,6 +87,24 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             }
         );
 
+        extend(
+            CompletionType.BASIC, SmartyPattern.getControllerPattern(),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    PsiElement psiElement = parameters.getOriginalPosition();
+
+                    ShopwareUtil.collectControllerClass(psiElement.getProject(), new ShopwareUtil.ControllerClassVisitor() {
+                        @Override
+                        public void visitFile(PhpClass phpClass, String moduleName, String controllerName) {
+                            result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON));
+                        }
+                    });
+
+                }
+            }
+        );
 
     }
 
@@ -100,6 +125,8 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
         return lookupElements;
     }
+
+
 
 
 }
