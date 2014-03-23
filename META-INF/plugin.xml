@@ -74,6 +74,10 @@
       <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareMagicMethodTypeProvider"/>
   </extensions>
 
+    <extensions defaultExtensionNs="fr.adrienbrault.idea.symfony2plugin.extension">
+        <ServiceContainerLoader implementation="de.espend.idea.shopware.symfony.ShopwareServiceContainerLoader"/>
+    </extensions>
+
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>fr.adrienbrault.idea.symfony2plugin</depends>
