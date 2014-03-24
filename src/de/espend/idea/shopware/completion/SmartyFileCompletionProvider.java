@@ -36,12 +36,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                         return;
                     }
 
-                    TemplateUtil.collectFiles(parameters.getPosition().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
-                        @Override
-                        public void visitFile(VirtualFile virtualFile, String fileName) {
-                            result.addAllElements(getTemplateCompletion(parameters.getPosition().getProject(), "tpl"));
-                        }
-                    });
+                    result.addAllElements(getTemplateCompletion(parameters.getPosition().getProject(), "tpl"));
                 }
             }
         );
