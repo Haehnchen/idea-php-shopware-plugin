@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.4</version>
+  <version>0.4.1</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -29,6 +29,11 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.4.1</h2>
+<ul>
+    <li>Fix possible recursive calls in file completion collector</li>
+</ul>
 
 <h2>0.4</h2>
 <ul>
