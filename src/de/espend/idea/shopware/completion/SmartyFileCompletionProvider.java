@@ -8,10 +8,13 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.util.IconUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
+import com.jetbrains.smarty.SmartyFile;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.lookup.TemplateLookupElement;
@@ -19,7 +22,9 @@ import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyBlockUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
+import fr.adrienbrault.idea.symfony2plugin.templating.util.TwigTypeResolveUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -135,6 +140,47 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                         @Override
                         public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
                             result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName).withIcon(PhpIcons.METHOD_ICON));
+                        }
+                    });
+
+                }
+            }
+        );
+
+        extend(
+            CompletionType.BASIC, SmartyPattern.getVariableReference(),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                        return;
+                    }
+
+                    PsiElement psiElement = parameters.getOriginalPosition();
+                    if(psiElement == null) {
+                        return;
+                    }
+
+                    final PsiFile psiFile = psiElement.getContainingFile();
+                    if(!(psiFile instanceof SmartyFile)) {
+                        return;
+                    }
+
+                    Method method = ShopwareUtil.getControllerActionOnSmartyFile((SmartyFile) psiFile);
+                    if(method == null) {
+                        return;
+                    }
+
+                    ShopwareUtil.collectControllerViewVariable(method, new ShopwareUtil.ControllerViewVariableVisitor() {
+                        @Override
+                        public void visitVariable(String variableName, @NotNull PsiElement sourceElement, @Nullable PsiElement typeElement) {
+                            if (typeElement instanceof PhpTypedElement) {
+                                result.addElement(LookupElementBuilder.create(variableName).withTypeText(TwigTypeResolveUtil.getTypeDisplayName(psiFile.getProject(), ((PhpTypedElement) typeElement).getType().getTypes())));
+                            } else {
+                                result.addElement(LookupElementBuilder.create(variableName));
+                            }
+
                         }
                     });
 

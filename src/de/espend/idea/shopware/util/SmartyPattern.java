@@ -130,4 +130,11 @@ public class SmartyPattern {
 
     }
 
+    public static PsiElementPattern.Capture<PsiElement> getVariableReference() {
+        return PlatformPatterns.psiElement().afterLeaf(
+            PlatformPatterns.psiElement(SmartyTokenTypes.DOLLAR)
+        );
+    }
+
+
 }

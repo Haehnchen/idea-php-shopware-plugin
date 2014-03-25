@@ -10,10 +10,12 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.smarty.SmartyFile;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -51,7 +53,39 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
             attachControllerActionNameGoto(sourceElement, targets);
         }
 
+        // {$foobar
+        if(SmartyPattern.getVariableReference().accepts(sourceElement)) {
+            attachControllerVariableGoto(sourceElement, targets);
+        }
+
         return targets.toArray(new PsiElement[targets.size()]);
+    }
+
+    private void attachControllerVariableGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
+
+        final String finalText = normalizeFilename(sourceElement.getText());
+
+        PsiFile psiFile = sourceElement.getContainingFile();
+        if(!(psiFile instanceof SmartyFile)) {
+            return;
+        }
+
+        Method method = ShopwareUtil.getControllerActionOnSmartyFile((SmartyFile) psiFile);
+        if(method == null) {
+            return;
+        }
+
+        ShopwareUtil.collectControllerViewVariable(method, new ShopwareUtil.ControllerViewVariableVisitor() {
+
+            @Override
+            public void visitVariable(String variableName, @NotNull PsiElement sourceType, @Nullable PsiElement typeElement) {
+                if (variableName.equals(finalText)) {
+                    psiElements.add(typeElement != null ? typeElement : sourceType);
+                }
+            }
+
+        });
+
     }
 
     private void attachControllerNameGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {

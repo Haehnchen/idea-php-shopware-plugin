@@ -6,14 +6,12 @@ import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIcons;
-import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.smarty.SmartyFile;
 import de.espend.idea.shopware.ShopwareProjectComponent;
-import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
+import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,9 +57,9 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
         }
 
         // Shopware_Controllers_Frontend_Account
-        String moduleName = toCamelCase(matcher.group(1), false);
-        String controller = toCamelCase(matcher.group(2), false);
-        String action = toCamelCase(matcher.group(3), true);
+        String moduleName = ShopwareUtil.toCamelCase(matcher.group(1), false);
+        String controller = ShopwareUtil.toCamelCase(matcher.group(2), false);
+        String action = ShopwareUtil.toCamelCase(matcher.group(3), true);
 
         // build class name
         String className = String.format("\\Shopware_Controllers_%s_%s", moduleName, controller);
@@ -89,14 +87,5 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
         lineMarkerInfos.add(builder.createLineMarkerInfo(smartyFile));
 
     }
-
-    public static String toCamelCase(String value, boolean startWithLowerCase) {
-        String[] strings = StringUtils.split(value.toLowerCase(), "_");
-        for (int i = startWithLowerCase ? 1 : 0; i < strings.length; i++){
-            strings[i] = StringUtils.capitalize(strings[i]);
-        }
-        return StringUtils.join(strings);
-    }
-
 
 }
