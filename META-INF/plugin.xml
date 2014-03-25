@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.4.1</version>
+  <version>0.4.2</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -29,6 +29,11 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.4.2</h2>
+<ul>
+    <li>Add controller view variable collector for smarty, root level only</li>
+</ul>
 
 <h2>0.4.1</h2>
 <ul>
