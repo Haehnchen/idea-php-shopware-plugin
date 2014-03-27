@@ -94,7 +94,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                     SmartyBlockUtil.collectFileBlocks(parameters.getOriginalFile(), map, blockNameSet, 0);
 
                     for(SmartyBlockUtil.SmartyBlock smartyBlock: blockNameSet) {
-                        result.addElement(LookupElementBuilder.create(smartyBlock.getName()).withTypeText(smartyBlock.getElement().getContainingFile().getName()).withIcon(ShopwarePluginIcons.SHOPWARE));
+                        result.addElement(LookupElementBuilder.create(smartyBlock.getName()).withTypeText(smartyBlock.getElement().getContainingFile().getName(), true).withIcon(ShopwarePluginIcons.SHOPWARE));
                     }
 
                 }

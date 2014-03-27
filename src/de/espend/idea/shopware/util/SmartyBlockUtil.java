@@ -1,5 +1,7 @@
 package de.espend.idea.shopware.util;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -7,12 +9,17 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class SmartyBlockUtil {
 
     public static List<SmartyBlock> collectFileBlocks(PsiFile psiFile, final Map<VirtualFile, String> map, List<SmartyBlock> blockNameSet, int depth) {
+        return collectFileBlocks(psiFile, map, blockNameSet, new ArrayList<VirtualFile>(), depth);
+    }
+
+    public static List<SmartyBlock> collectFileBlocks(PsiFile psiFile, final Map<VirtualFile, String> map, List<SmartyBlock> blockNameSet, List<VirtualFile> virtualFilesCatch, int depth) {
 
         final List<VirtualFile> virtualFiles = new ArrayList<VirtualFile>();
 
@@ -45,10 +52,13 @@ public class SmartyBlockUtil {
         List<PsiFile> parentFiles = new ArrayList<PsiFile>();
 
         for(VirtualFile virtualFile: virtualFiles) {
-            PsiFile parentPsiFile = PsiManager.getInstance(psiFile.getProject()).findFile(virtualFile);
-            if(parentPsiFile != null) {
-                parentFiles.add(parentPsiFile);
-                blockNameSet.addAll(getFileBlocks(parentPsiFile));
+            if(!virtualFilesCatch.contains(virtualFile)) {
+                virtualFilesCatch.add(virtualFile);
+                PsiFile parentPsiFile = PsiManager.getInstance(psiFile.getProject()).findFile(virtualFile);
+                if(parentPsiFile != null) {
+                    parentFiles.add(parentPsiFile);
+                    blockNameSet.addAll(getFileBlocks(parentPsiFile));
+                }
             }
         }
 
@@ -57,7 +67,7 @@ public class SmartyBlockUtil {
         }
 
         for(PsiFile parentFile: parentFiles) {
-            collectFileBlocks(parentFile, map, blockNameSet, depth);
+            collectFileBlocks(parentFile, map, blockNameSet,virtualFilesCatch, depth);
         }
 
         return blockNameSet;
