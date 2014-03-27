@@ -58,6 +58,11 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
             attachControllerVariableGoto(sourceElement, targets);
         }
 
+        // {s namespace=frontend/foo
+        if(SmartyPattern.getNamespacePattern().accepts(sourceElement)) {
+            attachNamespaceTagGoto(sourceElement, targets);
+        }
+
         return targets.toArray(new PsiElement[targets.size()]);
     }
 
@@ -135,6 +140,28 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
                 }
             }
         });
+
+    }
+
+    private void attachNamespaceTagGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
+
+        final Project project = sourceElement.getProject();
+
+        final String finalText = normalizeFilename(sourceElement.getText());
+        TemplateUtil.collectFiles(sourceElement.getProject(), new TemplateUtil.SmartyTemplateVisitor() {
+            @Override
+            public void visitFile(VirtualFile virtualFile, String fileName) {
+
+                if (!fileName.replaceFirst("[.][^.]+$", "").equals(finalText)) {
+                    return;
+                }
+
+                PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+                if (psiFile != null) {
+                    psiElements.add(psiFile);
+                }
+            }
+        }, "tpl");
 
     }
 

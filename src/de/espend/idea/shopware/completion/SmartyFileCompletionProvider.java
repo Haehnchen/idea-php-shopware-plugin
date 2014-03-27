@@ -125,6 +125,33 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
         );
 
         extend(
+            CompletionType.BASIC, SmartyPattern.getNamespacePattern(),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                        return;
+                    }
+
+                    PsiElement psiElement = parameters.getOriginalPosition();
+                    if(psiElement == null) {
+                        return;
+                    }
+
+                    TemplateUtil.collectFiles(psiElement.getProject(), new TemplateUtil.SmartyTemplateVisitor() {
+                        @Override
+                        public void visitFile(VirtualFile virtualFile, String fileName) {
+                            result.addElement(LookupElementBuilder.create(fileName.replaceFirst("[.][^.]+$", "")).withIcon(ShopwarePluginIcons.SHOPWARE));
+                        }
+                    }, "tpl");
+
+
+                }
+            }
+        );
+
+        extend(
             CompletionType.BASIC, SmartyPattern.getControllerActionPattern(),
             new CompletionProvider<CompletionParameters>() {
                 @Override

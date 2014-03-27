@@ -130,6 +130,42 @@ public class SmartyPattern {
 
     }
 
+    public static ElementPattern<PsiElement> getNamespacePattern() {
+        return PlatformPatterns.or(
+
+            PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
+                .afterLeafSkipping(
+                    PlatformPatterns.or(
+                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
+                    ),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("namespace")
+                )
+                .withParent(
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{s"))
+                ),
+
+            PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
+                .afterLeafSkipping(
+                    PlatformPatterns.or(
+                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
+                    ),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("namespace")
+                )
+                .withParent(
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{s"))
+                )
+
+        );
+
+
+    }
+
     public static PsiElementPattern.Capture<PsiElement> getVariableReference() {
         return PlatformPatterns.psiElement().afterLeaf(
             PlatformPatterns.psiElement(SmartyTokenTypes.DOLLAR)
