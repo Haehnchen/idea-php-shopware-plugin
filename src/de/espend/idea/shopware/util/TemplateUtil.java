@@ -10,10 +10,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class TemplateUtil {
 
@@ -24,6 +21,7 @@ public class TemplateUtil {
     public static void collectFiles(Project project, final SmartyTemplateVisitor smartyTemplateVisitor, String... extensions) {
 
         final List<String> exts = Arrays.asList(extensions);
+        final List<VirtualFile> uniqueVirtualFiles = new ArrayList<VirtualFile>();
 
         collectPluginTemplates(project, smartyTemplateVisitor, exts);
 
@@ -37,6 +35,12 @@ public class TemplateUtil {
         VfsUtil.visitChildrenRecursively(templateDir, new VirtualFileVisitor() {
             @Override
             public boolean visitFile(@NotNull VirtualFile virtualFile) {
+
+                if(uniqueVirtualFiles.contains(virtualFile)) {
+                    return true;
+                }
+
+                uniqueVirtualFiles.add(virtualFile);
 
                 if(!isValidTemplateFile(virtualFile, exts)) {
                     return true;

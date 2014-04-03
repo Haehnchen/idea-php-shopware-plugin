@@ -11,10 +11,12 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.smarty.SmartyFile;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ShopwareUtil;
+import de.espend.idea.shopware.util.SmartyPattern;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -32,10 +34,49 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
     public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
 
         for(PsiElement psiElement: psiElements) {
+
             if(psiElement instanceof SmartyFile) {
                 attachController((SmartyFile) psiElement, lineMarkerInfos);
             }
+
+            if(SmartyPattern.getBlockPattern().accepts(psiElement)) {
+                attachTemplateBlocks(psiElement, lineMarkerInfos);
+            }
+
         }
+    }
+
+    public void attachTemplateBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos) {
+
+        if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+            return;
+        }
+
+        SmartyBlockGoToHandler goToHandler = new SmartyBlockGoToHandler();
+        PsiElement[] gotoDeclarationTargets = goToHandler.getGotoDeclarationTargets(psiElement, 0, null);
+
+        if(gotoDeclarationTargets == null || gotoDeclarationTargets.length == 0) {
+            return;
+        }
+
+        // @TODO: bug: we have self file block index; remove it
+        List<PsiElement> psiElements = new ArrayList<PsiElement>();
+        for(PsiElement psiElement1 : gotoDeclarationTargets) {
+            if(!psiElement1.getContainingFile().getVirtualFile().equals(psiElement.getContainingFile().getVirtualFile())) {
+                psiElements.add(psiElement1);
+            }
+        }
+
+        if(psiElements.size() == 0) {
+            return;
+        }
+
+        NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(PhpIcons.OVERRIDES).
+            setTargets(psiElements).
+            setTooltipText("Navigate to block");
+
+        lineMarkerInfos.add(builder.createLineMarkerInfo(psiElement));
+
     }
 
     public void attachController(SmartyFile smartyFile, Collection<LineMarkerInfo> lineMarkerInfos) {
