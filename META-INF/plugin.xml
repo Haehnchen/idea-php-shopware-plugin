@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.5</version>
+  <version>0.6</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -31,6 +31,12 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.6</h2>
+<ul>
+    <li>Add widgets support</li>
+    <li>Add block overwrite linemarker</li>
+</ul>
 
 <h2>0.5</h2>
 <ul>
