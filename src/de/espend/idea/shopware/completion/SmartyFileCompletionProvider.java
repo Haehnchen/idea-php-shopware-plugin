@@ -215,7 +215,58 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             }
         );
 
+
+        // {action controller=Emotion action=getAvailability articleId=$sArticle.articleID}
+        extend(
+            CompletionType.BASIC, SmartyPattern.getControllerPattern("action"),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                        return;
+                    }
+
+                    PsiElement psiElement = parameters.getOriginalPosition();
+
+                    ShopwareUtil.collectControllerClass(psiElement.getProject(), new ShopwareUtil.ControllerClassVisitor() {
+                        @Override
+                        public void visitClass(PhpClass phpClass, String moduleName, String controllerName) {
+                            result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON));
+                        }
+                    }, "Widgets");
+
+                }
+            }
+        );
+
+
+        extend(
+            CompletionType.BASIC, SmartyPattern.getControllerActionPattern("action"),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                        return;
+                    }
+
+                    PsiElement psiElement = parameters.getOriginalPosition();
+
+                    ShopwareUtil.collectControllerActionSmartyWrapper(psiElement, new ShopwareUtil.ControllerActionVisitor() {
+                        @Override
+                        public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
+                            result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName).withIcon(PhpIcons.METHOD_ICON));
+                        }
+                    }, "Widgets");
+
+                }
+            }
+        );
+
     }
+
+
 
     public static List<LookupElement> getTemplateCompletion(Project project, String... extensions) {
 

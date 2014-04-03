@@ -44,11 +44,15 @@ public class ShopwareUtil {
     }
 
     public static void collectControllerClass(Project project, ControllerClassVisitor controllerClassVisitor) {
+        collectControllerClass(project, controllerClassVisitor, "Frontend" , "Backend", "Core");
+    }
+
+    public static void collectControllerClass(Project project, ControllerClassVisitor controllerClassVisitor, String... modules) {
 
         PhpIndex phpIndex = PhpIndex.getInstance(project);
         Collection<PhpClass> phpClasses = phpIndex.getAllSubclasses("\\Enlight_Controller_Action");
 
-        Pattern pattern = Pattern.compile(".*_(Frontend|Backend|Core)_(\\w+)");
+        Pattern pattern = Pattern.compile(".*_(" + Pattern.quote(StringUtils.join(modules, "|")) + ")_(\\w+)");
 
         for (PhpClass phpClass : phpClasses) {
 
@@ -70,6 +74,10 @@ public class ShopwareUtil {
     }
 
     public static void collectControllerActionSmartyWrapper(PsiElement psiElement, ControllerActionVisitor visitor) {
+        collectControllerActionSmartyWrapper(psiElement, visitor, "Frontend", "Backend", "Core");
+    }
+
+    public static void collectControllerActionSmartyWrapper(PsiElement psiElement, ControllerActionVisitor visitor, String... modules) {
 
         Pattern pattern = Pattern.compile("controller=[\"|']*(\\w+)[\"|']*");
         Matcher matcher = pattern.matcher(psiElement.getParent().getText());
@@ -78,12 +86,12 @@ public class ShopwareUtil {
         }
 
         String controllerName = toCamelCase(matcher.group(1), false);
-        collectControllerAction(psiElement.getProject(), controllerName, visitor);
+        collectControllerAction(psiElement.getProject(), controllerName, visitor, modules);
     }
 
-    public static void collectControllerAction(Project project, String controllerName, ControllerActionVisitor visitor) {
+    public static void collectControllerAction(Project project, String controllerName, ControllerActionVisitor visitor, String... modules) {
 
-        for(String moduleName: new String[] {"Frontend", "Backend", "Core"}) {
+        for(String moduleName: modules) {
             PhpClass phpClass = PhpElementsUtil.getClass(project, String.format("Shopware_Controllers_%s_%s", moduleName, controllerName));
             if(phpClass != null) {
                 for(Method method: phpClass.getMethods()) {
@@ -102,13 +110,18 @@ public class ShopwareUtil {
 
     @Nullable
     public static Method getControllerActionOnSmartyFile(SmartyFile smartyFile) {
+        return getControllerActionOnSmartyFile(smartyFile, "frontend", "backend", "core");
+    }
+
+    @Nullable
+    public static Method getControllerActionOnSmartyFile(SmartyFile smartyFile, String... modules) {
 
         String relativeFilename = VfsUtil.getRelativePath(smartyFile.getVirtualFile(), smartyFile.getProject().getBaseDir(), '/');
         if(relativeFilename == null) {
             return null;
         }
 
-        Pattern pattern = Pattern.compile(".*/(frontend|backend|core)/(\\w+)/(\\w+)\\.tpl");
+        Pattern pattern = Pattern.compile(".*/(" + Pattern.quote(StringUtils.join(modules, "|")) + ")/(\\w+)/(\\w+)\\.tpl");
         Matcher matcher = pattern.matcher(relativeFilename);
 
         if(!matcher.find()) {

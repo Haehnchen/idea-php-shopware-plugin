@@ -63,6 +63,16 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
             attachNamespaceTagGoto(sourceElement, targets);
         }
 
+        // {action controller=Account
+        if(SmartyPattern.getControllerPattern("action").accepts(sourceElement)) {
+            attachWidgetControllerNameGoto(sourceElement, targets);
+        }
+
+        // {action controller=Account action=foobar
+        if(SmartyPattern.getControllerActionPattern("action").accepts(sourceElement)) {
+            attachWidgetsControllerActionNameGoto(sourceElement, targets);
+        }
+
         return targets.toArray(new PsiElement[targets.size()]);
     }
 
@@ -108,6 +118,21 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
 
     }
 
+    private void attachWidgetControllerNameGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
+        final Project project = sourceElement.getProject();
+
+        final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
+        ShopwareUtil.collectControllerClass(project, new ShopwareUtil.ControllerClassVisitor() {
+            @Override
+            public void visitClass(PhpClass phpClass, String moduleName, String controllerName) {
+                if (controllerName.toLowerCase().equals(finalText)) {
+                    psiElements.add(phpClass);
+                }
+            }
+        }, "Widgets");
+
+    }
+
     private void attachControllerActionNameGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
 
         final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
@@ -119,6 +144,20 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
                 }
             }
         });
+
+    }
+
+    private void attachWidgetsControllerActionNameGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
+
+        final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
+        ShopwareUtil.collectControllerActionSmartyWrapper(sourceElement, new ShopwareUtil.ControllerActionVisitor() {
+            @Override
+            public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
+                if(methodStripped.toLowerCase().equals(finalText)) {
+                    psiElements.add(method);
+                }
+            }
+        }, "Widgets");
 
     }
 

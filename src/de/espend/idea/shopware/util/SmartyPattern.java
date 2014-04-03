@@ -56,8 +56,11 @@ public class SmartyPattern {
                 PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{link"))
             );
     }
-
     public static ElementPattern<PsiElement> getControllerPattern() {
+        return getControllerPattern("url");
+    }
+
+    public static ElementPattern<PsiElement> getControllerPattern(String tagName) {
         return PlatformPatterns.or(
 
             PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
@@ -71,7 +74,7 @@ public class SmartyPattern {
                     PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("controller")
                 )
                 .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{url"))
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tagName))
                 ),
 
             PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
@@ -85,7 +88,7 @@ public class SmartyPattern {
                     PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("controller")
                 )
                 .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{url"))
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tagName))
                 )
 
         );
@@ -93,8 +96,11 @@ public class SmartyPattern {
 
     }
 
-
     public static ElementPattern<PsiElement> getControllerActionPattern() {
+        return getControllerActionPattern("url");
+    }
+
+    public static ElementPattern<PsiElement> getControllerActionPattern(String tagName) {
         return PlatformPatterns.or(
 
             PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
@@ -108,7 +114,7 @@ public class SmartyPattern {
                     PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("action")
                 )
                 .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{url"))
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tagName))
                 ),
 
             PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
@@ -122,7 +128,7 @@ public class SmartyPattern {
                     PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("action")
                 )
                 .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{url"))
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{url" + tagName))
                 )
 
         );
