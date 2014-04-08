@@ -203,46 +203,6 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         }
     }
 
-    public static class ShopwareModelReferenceProvider extends PsiPolyVariantReferenceBase<PsiElement> {
-
-        final private String valueName;
-
-        public ShopwareModelReferenceProvider(@NotNull StringLiteralExpression element) {
-            super(element);
-            this.valueName = element.getContents();
-        }
-
-        @NotNull
-        @Override
-        public ResolveResult[] multiResolve(boolean incompleteCode) {
-            List<ResolveResult> results = new ArrayList<ResolveResult>();
-
-            for(PhpClass phpClass: PhpIndex.getInstance(getElement().getProject()).getAllSubclasses("\\Shopware\\Components\\Model\\ModelEntity")) {
-                if(this.valueName.equals(phpClass.getPresentableFQN())) {
-                    results.add(new PsiElementResolveResult(phpClass));
-                }
-            }
-
-            return results.toArray(new ResolveResult[results.size()]);
-
-        }
-
-        @NotNull
-        @Override
-        public Object[] getVariants() {
-
-            final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
-
-            for(PhpClass phpClass: PhpIndex.getInstance(getElement().getProject()).getAllSubclasses("\\Shopware\\Components\\Model\\ModelEntity")) {
-                if(phpClass.getPresentableFQN() != null) {
-                    lookupElements.add(LookupElementBuilder.create(phpClass.getPresentableFQN()).withIcon(Symfony2Icons.DOCTRINE));
-                }
-            }
-
-            return lookupElements.toArray();
-        }
-    }
-
     public static void collectControllerEvents(Project project, Collector collector) {
 
         PhpIndex phpIndex = PhpIndex.getInstance(project);
