@@ -3,7 +3,6 @@ package de.espend.idea.shopware.reference;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiElementFilter;
@@ -19,7 +18,6 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.reference.provider.SmartyTemplateProvider;
-import de.espend.idea.shopware.util.TemplateUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
@@ -37,12 +35,6 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
     public static MethodMatcher.CallToSignature[] EVENT_SIGNATURES = new MethodMatcher.CallToSignature[] {
         new MethodMatcher.CallToSignature("\\Shopware_Components_Plugin_Bootstrap", "subscribeEvent"),
         new MethodMatcher.CallToSignature("\\Shopware_Components_Plugin_Bootstrap", "createEvent"),
-    };
-
-    public static MethodMatcher.CallToSignature[] REPOSITORY_SIGNATURES = new MethodMatcher.CallToSignature[] {
-        new MethodMatcher.CallToSignature("\\Doctrine\\Common\\Persistence\\ManagerRegistry", "getRepository"),
-        new MethodMatcher.CallToSignature("\\Doctrine\\Common\\Persistence\\ObjectManager", "getRepository"),
-        new MethodMatcher.CallToSignature("\\Doctrine\\Common\\Persistence\\ManagerRegistry", "getManagerForClass"),
     };
 
     public static MethodMatcher.CallToSignature[] TEMPLATE = new MethodMatcher.CallToSignature[] {
@@ -89,27 +81,6 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                     }
 
                     return new PsiReference[]{ new MethodReferenceProvider((StringLiteralExpression) psiElement) };
-
-                }
-            }
-        );
-
-        psiReferenceRegistrar.registerReferenceProvider(
-            PlatformPatterns.psiElement(StringLiteralExpression.class).withLanguage(PhpLanguage.INSTANCE),
-            new PsiReferenceProvider() {
-                @NotNull
-                @Override
-                public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
-
-                    if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
-                        return new PsiReference[0];
-                    }
-
-                    if (MethodMatcher.getMatchedSignatureWithDepth(psiElement, REPOSITORY_SIGNATURES) == null) {
-                        return new PsiReference[0];
-                    }
-
-                    return new PsiReference[]{ new ShopwareModelReferenceProvider((StringLiteralExpression) psiElement) };
 
                 }
             }

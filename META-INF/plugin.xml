@@ -112,6 +112,7 @@
 
     <extensions defaultExtensionNs="fr.adrienbrault.idea.symfony2plugin.extension">
         <ServiceContainerLoader implementation="de.espend.idea.shopware.symfony.ShopwareServiceContainerLoader"/>
+        <DoctrineModelProvider implementation="de.espend.idea.shopware.symfony.ShopwareDoctrineModelProvider"/>
     </extensions>
 
     <depends>com.jetbrains.php</depends>
