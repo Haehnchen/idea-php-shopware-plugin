@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.6</version>
+  <version>0.7</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -17,20 +17,29 @@
 
       <h2>Features</h2>
       <ul>
-        <li>Event and method references for subscriber events</li>
-        <li>Smarty frontend references for files, controller, actions</li>
-        <li>Smarty block references on extends tag</li>
-        <li>Template controller references for php and smarty</li>
-        <li>Event name generator for common controller</li>
-        <li>Symfony2 container loader</li>
-        <li>Basic magic method resolving</li>
-        <li>Smarty namespace tags support</li>
-        <li>Smarty variables on controller actions</li>
+        <li>PHP: Event name generator for common controller</li>
+        <li>PHP: Type provider for Manager::getResources </li>
+        <li>PHP: Event and method references for subscriber events</li>
+        <li>PHP: Magic method type provider</li>
+        <li>Smarty: References for files, controller, actions, widgets</li>
+        <li>Smarty: Block references on extends path</li>
+        <li>Smarty: Namespace tag support</li>
+        <li>PHP/Smarty: Template controller references for php and smarty</li>
+        <li>Symfony2: Custom container loader</li>
+        <li>Doctrine: Provider for Symfony2 Plugin</li>
       </ul>
 
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.7</h2>
+<ul>
+    <li>Use Symfony2 Plugin extension to handle Doctrine models</li>
+    <li>PHP: Add api getResources type provider</li>
+    <li>Smarty: Nicer presentation for file completion</li>
+    <li>Smarty: Fix some self file visiting errors</li>
+</ul>
 
 <h2>0.6</h2>
 <ul>
