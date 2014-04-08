@@ -108,6 +108,7 @@
       <codeInsight.lineMarkerProvider language="Smarty" implementationClass="de.espend.idea.shopware.navigation.SmartyTemplateLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="de.espend.idea.shopware.navigation.PhpActionTemplateLineMarkerProvider"/>
       <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareMagicMethodTypeProvider"/>
+      <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareApiResourcesTypeProvider"/>
   </extensions>
 
     <extensions defaultExtensionNs="fr.adrienbrault.idea.symfony2plugin.extension">

@@ -18,6 +18,7 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.reference.provider.SmartyTemplateProvider;
+import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +41,10 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
 
     public static MethodMatcher.CallToSignature[] TEMPLATE = new MethodMatcher.CallToSignature[] {
         new MethodMatcher.CallToSignature("\\Enlight_Template_Default", "extendsTemplate"),
+    };
+
+    public static MethodMatcher.CallToSignature[] RESOURCE = new MethodMatcher.CallToSignature[] {
+        new MethodMatcher.CallToSignature("\\Shopware\\Components\\Api\\Manager", "getResource"),
     };
 
     @Override
@@ -102,6 +108,27 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                     }
 
                     return new PsiReference[]{ new SmartyTemplateProvider((StringLiteralExpression) psiElement) };
+
+                }
+            }
+        );
+
+        psiReferenceRegistrar.registerReferenceProvider(
+            PlatformPatterns.psiElement(StringLiteralExpression.class).withLanguage(PhpLanguage.INSTANCE),
+            new PsiReferenceProvider() {
+                @NotNull
+                @Override
+                public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+                        return new PsiReference[0];
+                    }
+
+                    if (MethodMatcher.getMatchedSignatureWithDepth(psiElement, RESOURCE) == null) {
+                        return new PsiReference[0];
+                    }
+
+                    return new PsiReference[]{ new ResourcesReference((StringLiteralExpression) psiElement) };
 
                 }
             }
@@ -198,6 +225,43 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                     lookupElements.add(LookupElementBuilder.create(value).withIcon(ShopwarePluginIcons.SHOPWARE));
                 }
             });
+
+            return lookupElements.toArray();
+        }
+    }
+
+    public static class ResourcesReference extends PsiPolyVariantReferenceBase<PsiElement> {
+
+        final private String valueName;
+
+        public ResourcesReference(@NotNull StringLiteralExpression element) {
+            super(element);
+            this.valueName = element.getContents();
+        }
+
+        @NotNull
+        @Override
+        public ResolveResult[] multiResolve(boolean incompleteCode) {
+            List<ResolveResult> results = new ArrayList<ResolveResult>();
+
+            PhpClass phpClass = ShopwareUtil.getResourceClass(getElement().getProject(), valueName);
+            if(phpClass != null) {
+                results.add(new PsiElementResolveResult(phpClass));
+            }
+
+            return results.toArray(new ResolveResult[results.size()]);
+
+        }
+
+        @NotNull
+        @Override
+        public Object[] getVariants() {
+
+            List<LookupElement> lookupElements = new ArrayList<LookupElement>();
+
+            for(Map.Entry<String, PhpClass> entry: ShopwareUtil.getResourceClasses(getElement().getProject()).entrySet()) {
+                lookupElements.add(LookupElementBuilder.createWithIcon(entry.getValue()).withLookupString(entry.getKey()).withTypeText(entry.getValue().getPresentableFQN(), true));
+            }
 
             return lookupElements.toArray();
         }

@@ -8,6 +8,7 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.AssignmentExpressionImpl;
 import com.jetbrains.smarty.SmartyFile;
+import fr.adrienbrault.idea.symfony2plugin.extension.DoctrineModelProviderParameter;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.apache.commons.lang.StringUtils;
@@ -18,6 +19,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -196,6 +199,29 @@ public class ShopwareUtil {
 
     public interface ControllerViewVariableVisitor {
         public void visitVariable(String variableName, @NotNull PsiElement sourceType, @Nullable PsiElement typeElement);
+    }
+
+    public static Map<String, PhpClass> getResourceClasses(Project project) {
+
+        Map<String, PhpClass> phpClassMap = new HashMap<String, PhpClass>();
+
+        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Api\\Resource\\Resource")) {
+            phpClassMap.put(phpClass.getName(), phpClass);
+        }
+
+        return phpClassMap;
+    }
+
+    @Nullable
+    public static PhpClass getResourceClass(Project project, String resourceName) {
+
+        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Api\\Resource\\Resource")) {
+            if(resourceName.equalsIgnoreCase(phpClass.getName())) {
+                return phpClass;
+            }
+        }
+
+        return null;
     }
 
 }
