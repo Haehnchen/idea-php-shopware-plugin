@@ -121,4 +121,22 @@ public class TemplateUtil {
     public interface SmartyTemplateVisitor {
         public void visitFile(VirtualFile virtualFile, String fileName);
     }
+
+    public static abstract class SmartyTemplatePreventSelfVisitor implements SmartyTemplateVisitor {
+
+        final VirtualFile virtualFile;
+
+        public SmartyTemplatePreventSelfVisitor(VirtualFile virtualFile) {
+            this.virtualFile = virtualFile;
+        }
+
+        public void visitFile(VirtualFile virtualFile, String fileName) {
+            if(!this.virtualFile.equals(virtualFile)) {
+                visitNonSelfFile(virtualFile, fileName);
+            }
+        }
+
+        abstract public void visitNonSelfFile(VirtualFile virtualFile, String fileName);
+    }
+
 }

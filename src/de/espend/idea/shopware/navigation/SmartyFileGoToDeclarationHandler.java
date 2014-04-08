@@ -162,12 +162,14 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
     }
 
     private void attachExtendsFileGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
+
         final Project project = sourceElement.getProject();
+        final VirtualFile currentFile = sourceElement.getContainingFile().getVirtualFile();
 
         final String finalText = normalizeFilename(sourceElement.getText());
-        TemplateUtil.collectFiles(project, new TemplateUtil.SmartyTemplateVisitor() {
+        TemplateUtil.collectFiles(project, new TemplateUtil.SmartyTemplatePreventSelfVisitor(currentFile) {
             @Override
-            public void visitFile(VirtualFile virtualFile, String fileName) {
+            public void visitNonSelfFile(VirtualFile virtualFile, String fileName) {
 
                 if (!fileName.equals(finalText)) {
                     return;
@@ -177,6 +179,7 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
                 if (psiFile != null) {
                     psiElements.add(psiFile);
                 }
+
             }
         });
 

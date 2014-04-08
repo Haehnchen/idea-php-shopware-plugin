@@ -35,9 +35,9 @@ public class SmartyBlockGoToHandler implements GotoDeclarationHandler {
 
         final Map<VirtualFile, String> map = new HashMap<VirtualFile, String>();
 
-        TemplateUtil.collectFiles(sourceElement.getProject(), new TemplateUtil.SmartyTemplateVisitor() {
+        TemplateUtil.collectFiles(sourceElement.getProject(), new TemplateUtil.SmartyTemplatePreventSelfVisitor(sourceElement.getContainingFile().getVirtualFile()) {
             @Override
-            public void visitFile(VirtualFile virtualFile, String fileName) {
+            public void visitNonSelfFile(VirtualFile virtualFile, String fileName) {
                 map.put(virtualFile, fileName);
             }
         });

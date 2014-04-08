@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -59,14 +60,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        // @TODO: bug: we have self file block index; remove it
-        List<PsiElement> psiElements = new ArrayList<PsiElement>();
-        for(PsiElement psiElement1 : gotoDeclarationTargets) {
-            if(!psiElement1.getContainingFile().getVirtualFile().equals(psiElement.getContainingFile().getVirtualFile())) {
-                psiElements.add(psiElement1);
-            }
-        }
-
+        List<PsiElement> psiElements = Arrays.asList(gotoDeclarationTargets);
         if(psiElements.size() == 0) {
             return;
         }
