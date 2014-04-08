@@ -60,10 +60,15 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                         @Override
                         public void visitFile(VirtualFile virtualFile, String fileName) {
                             PsiFile psiFile = PsiManager.getInstance(parameters.getPosition().getProject()).findFile(virtualFile);
-                            LookupElementBuilder lookupElementBuilder = LookupElementBuilder.create(fileName);
+
+                            LookupElementBuilder lookupElementBuilder;
+
                             if(psiFile != null) {
-                                lookupElementBuilder.withIcon(psiFile.getFileType().getIcon());
+                                lookupElementBuilder = LookupElementBuilder.create(psiFile, fileName).withIcon(psiFile.getIcon(0));
+                            } else {
+                                lookupElementBuilder = LookupElementBuilder.create(fileName);
                             }
+
                             result.addElement(lookupElementBuilder);
                         }
                     }, SmartyPattern.TAG_LINK_FILE_EXTENSIONS);
