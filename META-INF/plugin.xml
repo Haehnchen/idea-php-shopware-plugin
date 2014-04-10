@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.7</version>
+  <version>0.7.1</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -32,6 +32,12 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.7.1</h2>
+<ul>
+    <li>Smarty: Fix controller+action references</li>
+    <li>PHP: Add global smarty file goto </li>
+</ul>
 
 <h2>0.7</h2>
 <ul>
