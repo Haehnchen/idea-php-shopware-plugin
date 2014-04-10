@@ -23,6 +23,7 @@ import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -129,6 +130,42 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                     }
 
                     return new PsiReference[]{ new ResourcesReference((StringLiteralExpression) psiElement) };
+
+                }
+            }
+        );
+
+        // for your lazy developers to get unknown "extendsTemplate" calls
+        psiReferenceRegistrar.registerReferenceProvider(
+            PlatformPatterns.psiElement(StringLiteralExpression.class).withLanguage(PhpLanguage.INSTANCE),
+            new PsiReferenceProvider() {
+                @NotNull
+                @Override
+                public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+                        return new PsiReference[0];
+                    }
+
+                    if (!(psiElement instanceof StringLiteralExpression) || MethodMatcher.getMatchedSignatureWithDepth(psiElement, TEMPLATE) != null) {
+                        return new PsiReference[0];
+                    }
+
+                    String tplName = ((StringLiteralExpression) psiElement).getContents();
+                    if(StringUtils.isBlank(tplName) || !tplName.endsWith(".tpl")) {
+                        return new PsiReference[0];
+                    }
+
+                    tplName = tplName.toLowerCase();
+                    if(tplName.startsWith("\\")) {
+                        tplName = tplName.substring(1);
+                    }
+
+                    if(!tplName.startsWith("frontend") && !tplName.startsWith("backend") && !tplName.startsWith("widgets") && !tplName.startsWith("documents")) {
+                        return new PsiReference[0];
+                    }
+
+                    return new PsiReference[]{ new SmartyTemplateProvider((StringLiteralExpression) psiElement) };
 
                 }
             }
