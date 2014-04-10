@@ -171,7 +171,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                     ShopwareUtil.collectControllerActionSmartyWrapper(psiElement, new ShopwareUtil.ControllerActionVisitor() {
                         @Override
                         public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
-                            result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName).withIcon(PhpIcons.METHOD_ICON));
+                            result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName, true).withIcon(PhpIcons.METHOD_ICON));
                         }
                     });
 

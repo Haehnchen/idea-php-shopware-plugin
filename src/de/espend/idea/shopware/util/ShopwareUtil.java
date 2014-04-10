@@ -55,7 +55,7 @@ public class ShopwareUtil {
         PhpIndex phpIndex = PhpIndex.getInstance(project);
         Collection<PhpClass> phpClasses = phpIndex.getAllSubclasses("\\Enlight_Controller_Action");
 
-        Pattern pattern = Pattern.compile(".*_(" + Pattern.quote(StringUtils.join(modules, "|")) + ")_(\\w+)");
+        Pattern pattern = Pattern.compile(".*_(" + StringUtils.join(modules, "|") + ")_(\\w+)", Pattern.CASE_INSENSITIVE);
 
         for (PhpClass phpClass : phpClasses) {
 
@@ -124,7 +124,7 @@ public class ShopwareUtil {
             return null;
         }
 
-        Pattern pattern = Pattern.compile(".*/(" + Pattern.quote(StringUtils.join(modules, "|")) + ")/(\\w+)/(\\w+)\\.tpl");
+        Pattern pattern = Pattern.compile(".*/(" + StringUtils.join(modules, "|") + ")/(\\w+)/(\\w+)\\.tpl");
         Matcher matcher = pattern.matcher(relativeFilename);
 
         if(!matcher.find()) {

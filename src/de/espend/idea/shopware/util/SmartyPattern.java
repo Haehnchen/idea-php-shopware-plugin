@@ -128,7 +128,7 @@ public class SmartyPattern {
                     PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("action")
                 )
                 .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{url" + tagName))
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tagName))
                 )
 
         );
