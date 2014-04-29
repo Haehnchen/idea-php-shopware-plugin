@@ -9,25 +9,37 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 public class HookSubscriberUtil {
+
+    final private static Set<String> CORE_CLASSES = new HashSet<String>() {{
+        addAll(Arrays.asList("sCms", "sCore", "sAdmin", "sOrder", "sBasket", "sExport", "sSystem", "sArticles", "sMarketing", "sCategories", "sCategories", "sNewsletter", "sConfigurator", "sRewriteTable"));
+    }};
 
     public static void collectHooks(Project project, HookVisitor hookVisitor) {
 
         Collection<PhpClass> phpClasses = new ArrayList<PhpClass>();
+
+        // directly use core classes
+        PhpIndex phpIndex = PhpIndex.getInstance(project);
+        for(String coreClass: CORE_CLASSES) {
+            phpClasses.addAll(phpIndex.getClassesByName(coreClass));
+        }
+
+        // fallback: search on directory
         VirtualFile virtualFile = VfsUtil.findRelativeFile(project.getBaseDir(), "engine", "core", "class");
         if(virtualFile != null) {
             for(VirtualFile coreClassFile: VfsUtil.getChildren(virtualFile)) {
                 String name = coreClassFile.getName();
                 if(name.contains(".")) name = name.substring(0, name.lastIndexOf('.'));
-
-                phpClasses.addAll(PhpIndex.getInstance(project).getClassesByName(name));
+                if(!CORE_CLASSES.contains(name)) {
+                    phpClasses.addAll(phpIndex.getClassesByName(name));
+                }
             }
         }
 
-        phpClasses.addAll(PhpIndex.getInstance(project).getDirectSubclasses("\\Enlight_Hook"));
+        phpClasses.addAll(phpIndex.getDirectSubclasses("\\Enlight_Hook"));
 
         for(PhpClass phpClass: phpClasses) {
             for(Method method: phpClass.getMethods()) {
