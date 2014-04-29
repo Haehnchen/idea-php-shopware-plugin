@@ -3,6 +3,8 @@ package de.espend.idea.shopware.reference;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiElementFilter;
@@ -25,6 +27,7 @@ import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -216,7 +219,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
 
             for(Method method: phpClass.getMethods()) {
                 if(method.getModifier().isPublic() && !method.getName().startsWith("_")) {
-                    lookupElements.add(LookupElementBuilder.create(method.getName()).withIcon(PhpIcons.METHOD));
+                    lookupElements.add(LookupElementBuilder.create(method.getName()).withIcon(PhpIcons.METHOD).withTypeText("Method", true));
                 }
             }
 
@@ -259,7 +262,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
             collectEvents(getElement().getProject(), new Collector() {
                 @Override
                 public void collect(PsiElement psiElement, String value) {
-                    lookupElements.add(LookupElementBuilder.create(value).withIcon(ShopwarePluginIcons.SHOPWARE));
+                    lookupElements.add(LookupElementBuilder.create(value).withIcon(ShopwarePluginIcons.SHOPWARE).withTypeText("Event", true));
                 }
             });
 
@@ -310,7 +313,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
 
         Collection<PhpClass> phpClasses = phpIndex.getAllSubclasses("\\Enlight_Controller_Action");
 
-        Pattern pattern = Pattern.compile(".*_(Frontend|Backend|Core)_(\\w+)");
+        Pattern pattern = Pattern.compile(".*_(Frontend|Backend|Core|Widget)_(\\w+)");
 
 
         for (PhpClass phpClass : phpClasses) {

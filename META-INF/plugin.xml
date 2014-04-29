@@ -119,7 +119,11 @@
       <psi.referenceContributor implementation="de.espend.idea.shopware.reference.EventSubscriberReferenceContributor"/>
       <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyFileGoToDeclarationHandler"/>
       <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyBlockGoToHandler"/>
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.reference.LazySubscriberReferenceProvider"/>
+
       <completion.contributor language="Smarty" implementationClass="de.espend.idea.shopware.completion.SmartyFileCompletionProvider"/>
+      <completion.contributor language="PHP" implementationClass="de.espend.idea.shopware.reference.LazySubscriberReferenceProvider"/>
+
       <codeInsight.lineMarkerProvider language="Smarty" implementationClass="de.espend.idea.shopware.navigation.SmartyTemplateLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="de.espend.idea.shopware.navigation.PhpActionTemplateLineMarkerProvider"/>
       <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareMagicMethodTypeProvider"/>
