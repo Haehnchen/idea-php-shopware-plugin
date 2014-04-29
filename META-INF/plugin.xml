@@ -1,24 +1,25 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.7.1</version>
+  <version>0.8</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
       <h1>Shopware Plugin</h1><br>
       <br>
-      Install <a href="http://plugins.jetbrains.com/plugin/7219">Symfony2 Plugin</a> and enable it per project (ignore messageboxes for now).
+      Install <a href="http://plugins.jetbrains.com/plugin/7219">Symfony2 Plugin</a> and enable it per project
       <br/><br/>
 
       <h2>Dependencies</h2>
       <ul>
         <li><a href="http://plugins.jetbrains.com/plugin/7219">Symfony2 Plugin</a></li>
+        <li>(Optional) Improve Doctrine support <a href="http://plugins.jetbrains.com/plugin/7320">PHP Annotations</a></li>
       </ul>
 
       <h2>Features</h2>
       <ul>
-        <li>PHP: Event name generator for common controller</li>
-        <li>PHP: Type provider for Manager::getResources </li>
+        <li>PHP: Subscriber name completion for controller/hooks/events</li>
+        <li>PHP: Type provider for Manager::getResources</li>
         <li>PHP: Event and method references for subscriber events</li>
         <li>PHP: Magic method type provider</li>
         <li>Smarty: References for files, controller, actions, widgets</li>
@@ -26,12 +27,18 @@
         <li>Smarty: Namespace tag support</li>
         <li>PHP/Smarty: Template controller references for php and smarty</li>
         <li>Symfony2: Custom container loader</li>
-        <li>Doctrine: Provider for Symfony2 Plugin</li>
+        <li>Doctrine: Extension for Symfony2 Plugin</li>
+        <li>Doctrine: Lifecycle event completion for subscriber</li>
       </ul>
 
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.8</h2>
+<ul>
+    <li>Add subscriber completions for doctrine lifecycle events and hook implementations</li>
+</ul>
 
 <h2>0.7.1</h2>
 <ul>
