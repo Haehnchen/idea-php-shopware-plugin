@@ -45,6 +45,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
 
     public static MethodMatcher.CallToSignature[] TEMPLATE = new MethodMatcher.CallToSignature[] {
         new MethodMatcher.CallToSignature("\\Enlight_Template_Default", "extendsTemplate"),
+        new MethodMatcher.CallToSignature("\\Enlight_View_Default", "loadTemplate"),
     };
 
     public static MethodMatcher.CallToSignature[] RESOURCE = new MethodMatcher.CallToSignature[] {
