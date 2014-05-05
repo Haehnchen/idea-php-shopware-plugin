@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.8</version>
+  <version>0.8.1</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -34,6 +34,12 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.8.1</h2>
+<ul>
+    <li>Add some backend files references</li>
+    <li>Add Enlight_View_Default::loadTemplate to template whitelist</li>
+</ul>
 
 <h2>0.8</h2>
 <ul>
