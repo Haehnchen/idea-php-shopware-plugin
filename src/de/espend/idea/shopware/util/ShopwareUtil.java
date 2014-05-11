@@ -8,7 +8,6 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.AssignmentExpressionImpl;
 import com.jetbrains.smarty.SmartyFile;
-import fr.adrienbrault.idea.symfony2plugin.extension.DoctrineModelProviderParameter;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +24,34 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ShopwareUtil {
+
+    final public static String[] PLUGIN_CONFIG_TYPES = new String[] {
+        "text", "color", "datetime", "html", "interval", "mediaselection", "number", "select", "combo", "textarea", "time"
+    };
+
+    final public static String[] PLUGIN_CONFIG_OPTIONS = new String[] {
+        "label", "value", "scope", "description", "required", "attributes", "store"
+    };
+
+    final public static String[] PLUGIN_INFO = new String[] {
+        "version", "author", "label", "license", "copyright", "support", "link"
+    };
+
+    // @TODO: hell not here; we can get them from models!
+    final public static String[] MODEL_STATIC_ATTRIBUTES = new String[] {
+        "s_user_attributes", "s_articles_downloads_attributes", "s_articles_esd_attributes", "s_articles_img_attributes",
+        "s_articles_information_attributes", "s_articles_prices_attributes", "s_articles_supplier_attributes", "s_article_configurator_templates_attributes",
+        "s_article_configurator_template_prices_attributes", "s_blog_attributes", "s_categories_attributes", "s_cms_static_attributes",
+        "s_cms_support_attributes", "s_core_auth_attributes", "s_core_config_mails_attributes", "s_core_countries_attributes", "s_core_countries_states_attributes",
+        "s_core_customergroups_attributes", "s_core_paymentmeans_attributes", "s_emarketing_banners_attributes", "s_emarketing_vouchers_attributes",
+        "s_emotion_attributes", "s_export_attributes", "s_filter_attributes", "s_media_attributes", "s_order_attributes", "s_order_basket_attributes",
+        "s_order_billingaddress_attributes", "s_order_details_attributes", "s_order_documents_attributes", "s_order_shippingaddress_attributes", "s_premium_dispatch_attributes",
+        "s_user_attributes", "s_user_billingaddress_attributes", "s_user_shippingaddress_attributes"
+    };
+
+    final public static String[] MODEL_STATIC_ATTRIBUTE_TYPES = new String[] {
+        "int(11)", "int(1)", "varchar(255)", "datetime", "mediumtext", "date", "decimal(10,2)", "double", "text"
+    };
 
     public static void writeShopwareMagicFile(String outputString, String outputPath) {
 

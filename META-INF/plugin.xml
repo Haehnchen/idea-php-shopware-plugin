@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.8.1</version>
+  <version>0.9</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -22,6 +22,7 @@
         <li>PHP: Type provider for Manager::getResources</li>
         <li>PHP: Event and method references for subscriber events</li>
         <li>PHP: Magic method type provider</li>
+        <li>PHP: Bootstrap::getInfo, ModelManager::addAttribute/generateAttributeModels</li>
         <li>Smarty: References for files, controller, actions, widgets</li>
         <li>Smarty: Block references on extends path</li>
         <li>Smarty: Namespace tag support</li>
@@ -29,11 +30,22 @@
         <li>Symfony2: Custom container loader</li>
         <li>Doctrine: Extension for Symfony2 Plugin</li>
         <li>Doctrine: Lifecycle event completion for subscriber</li>
+        <li>ExtJs: Doctrine Model and controller targets</li>
+        <li>ExtJs: Controller action linemarker and goto</li>
       </ul>
 
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.9</h2>
+<ul>
+    <li>Add completion for attribute related stuff of ModelManager::addAttribute/generateAttributeModels parameter</li>
+    <li>Add static completion for Form::setElement parameter</li>
+    <li>Add static completion for Bootstrap::getInfo array keys</li>
+    <li>Add linemarker and goto for ExtJs controller/action strings</li>
+    <li>Add ExtJS controller and model linemarker for define statement</li>
+</ul>
 
 <h2>0.8.1</h2>
 <ul>
@@ -130,17 +142,28 @@
 
   <extensions defaultExtensionNs="com.intellij">
       <psi.referenceContributor implementation="de.espend.idea.shopware.reference.EventSubscriberReferenceContributor"/>
+
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.ExtJsGoToDeclarationHandler"/>
       <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyFileGoToDeclarationHandler"/>
       <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyBlockGoToHandler"/>
       <gotoDeclarationHandler implementation="de.espend.idea.shopware.reference.LazySubscriberReferenceProvider"/>
 
       <completion.contributor language="Smarty" implementationClass="de.espend.idea.shopware.completion.SmartyFileCompletionProvider"/>
       <completion.contributor language="PHP" implementationClass="de.espend.idea.shopware.reference.LazySubscriberReferenceProvider"/>
+      <completion.contributor language="PHP" implementationClass="de.espend.idea.shopware.completion.ShopwarePhpCompletion"/>
 
+      <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="de.espend.idea.shopware.navigation.ExtJsTemplateLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="Smarty" implementationClass="de.espend.idea.shopware.navigation.SmartyTemplateLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="de.espend.idea.shopware.navigation.PhpActionTemplateLineMarkerProvider"/>
+
       <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareMagicMethodTypeProvider"/>
       <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareApiResourcesTypeProvider"/>
+
+      <localInspection groupPath="Shopware" shortName="Shopware" displayName="Boostrap"
+                       groupName="Shopware"
+                       enabledByDefault="true" level="WARNING"
+                       implementationClass="de.espend.idea.shopware.inspection.ShopwareBoostrapInspection"/>
+
   </extensions>
 
     <extensions defaultExtensionNs="fr.adrienbrault.idea.symfony2plugin.extension">
@@ -151,6 +174,7 @@
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>fr.adrienbrault.idea.symfony2plugin</depends>
+    <depends>JavaScript</depends>
 
   <application-components>
     <!-- Add your application components here -->
