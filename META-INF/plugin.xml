@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.9</version>
+  <version>0.9.1</version>
    <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
 
   <description><![CDATA[
@@ -37,6 +37,11 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.9.1</h2>
+<ul>
+    <li>Better custom model detection in ExtJs</li>
+</ul>
 
 <h2>0.9</h2>
 <ul>

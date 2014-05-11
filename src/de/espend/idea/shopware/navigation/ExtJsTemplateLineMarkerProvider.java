@@ -5,21 +5,20 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.util.containers.ArrayListSet;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ExtJsUtil;
+import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
 
@@ -35,18 +34,21 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
         for(PsiElement psiElement: psiElements) {
 
             if(ExtJsUtil.getStringApp().accepts(psiElement)) {
-                attachDefineTargets(psiElement, lineMarkerInfos);
+                attachDefineTargets(psiElement, lineMarkerInfos, true);
             }
 
             if(ExtJsUtil.getStringLiteralPattern().accepts(psiElement)) {
                 attachControllerAction(psiElement, lineMarkerInfos);
             }
 
+            if(ExtJsUtil.getStringProperty().accepts(psiElement)) {
+                attachDefineTargets(psiElement, lineMarkerInfos, false);
+            }
+
         }
     }
 
-    private void attachDefineTargets(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos) {
-
+    private void attachDefineTargets(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos, boolean attachController) {
         if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
             return;
         }
@@ -63,7 +65,10 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
 
         List<PsiElement> psiElementList = new ArrayList<PsiElement>();
 
-        attachController(psiElement.getProject(), namespaces, psiElementList);
+        if(attachController) {
+            attachController(psiElement.getProject(), namespaces, psiElementList);
+        }
+
         attachModels(psiElement.getProject(), namespaces, psiElementList);
 
         if(psiElementList.size() == 0) {
@@ -75,7 +80,6 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
             setTooltipText("Navigate");
 
         lineMarkerInfos.add(builder.createLineMarkerInfo(psiElement));
-
     }
 
     private void attachModels(Project project, String[] namespaces, List<PsiElement> targets) {
@@ -89,13 +93,17 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        String classNameCore = String.format("Shopware\\Models\\%s\\%s", namespaces[2], namespaces[4]);
+        Set<String> classMap = new HashSet<String>(Arrays.asList(
+            String.format("Shopware\\Models\\%s\\%s", namespaces[2], ShopwareUtil.toCamelCase(namespaces[4], false)).toLowerCase(),
+            String.format("Shopware\\CustomModels\\%s\\%s", namespaces[2], ShopwareUtil.toCamelCase(namespaces[4], false)).toLowerCase()
+        ));
+
+        addCustomModelNames(namespaces, classMap);
 
         for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Model\\ModelEntity")) {
 
             String className = phpClass.getPresentableFQN();
-
-            if(className != null && className.equalsIgnoreCase(classNameCore)) {
+            if(className != null && classMap.contains(className.toLowerCase())) {
                 targets.add(phpClass);
             }
 
@@ -144,6 +152,19 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
             }
         }
 
+    }
+
+    private void addCustomModelNames(String[] namespaces, Set<String> classMap) {
+        String phpClassName = StringUtils.join(namespaces, "\\").toLowerCase();
+        int model = phpClassName.lastIndexOf("model");
+        if(model > 0 && phpClassName.length() > 6) {
+            String test = phpClassName.substring(model + 6);
+            List<String> set = new ArrayList<String>();
+            for(String foo: StringUtils.split(test, "\\")) {
+                set.add(ShopwareUtil.toCamelCase(foo, false));
+            }
+            classMap.add(String.format("Shopware\\CustomModels\\%s", StringUtils.join(set, "\\")).toLowerCase());
+        }
     }
 
 }

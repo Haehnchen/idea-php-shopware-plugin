@@ -2,6 +2,7 @@ package de.espend.idea.shopware.util;
 
 import com.intellij.lang.javascript.psi.impl.JSArgumentListImpl;
 import com.intellij.lang.javascript.psi.impl.JSLiteralExpressionImpl;
+import com.intellij.lang.javascript.psi.impl.JSPropertyImpl;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.PsiElementPattern;
@@ -25,6 +26,14 @@ public class ExtJsUtil {
         return PlatformPatterns.psiElement().withParent(
             PlatformPatterns.psiElement(JSLiteralExpressionImpl.class).withParent(
                 PlatformPatterns.psiElement(JSArgumentListImpl.class)
+            )
+        );
+    }
+
+    public static PsiElementPattern.Capture<PsiElement> getStringProperty() {
+        return PlatformPatterns.psiElement().withParent(
+            PlatformPatterns.psiElement(JSLiteralExpressionImpl.class).withParent(
+                PlatformPatterns.psiElement(JSPropertyImpl.class)
             )
         );
     }
