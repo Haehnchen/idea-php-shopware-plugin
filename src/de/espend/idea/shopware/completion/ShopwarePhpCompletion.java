@@ -2,16 +2,25 @@ package de.espend.idea.shopware.completion;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
+import com.intellij.util.Processor;
+import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
+import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class ShopwarePhpCompletion extends CompletionContributor{
@@ -69,9 +78,9 @@ public class ShopwarePhpCompletion extends CompletionContributor{
 
         extend(
             CompletionType.BASIC, PlatformPatterns.psiElement().withParent(
-                PlatformPatterns.psiElement(StringLiteralExpression.class).withParent(
-                    PlatformPatterns.psiElement(PhpElementTypes.ARRAY_KEY).inside(
-                        PlatformPatterns.psiElement(PhpReturn.class)
+            PlatformPatterns.psiElement(StringLiteralExpression.class).withParent(
+                PlatformPatterns.psiElement(PhpElementTypes.ARRAY_KEY).inside(
+                    PlatformPatterns.psiElement(PhpReturn.class)
                 )
             )
         ),
@@ -106,6 +115,36 @@ public class ShopwarePhpCompletion extends CompletionContributor{
                         }
 
                     }
+
+                }
+            }
+        );
+
+        extend(CompletionType.BASIC, ShopwareUtil.getBootstrapPathPattern(),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    PsiElement originalPosition = parameters.getOriginalPosition();
+                    if(originalPosition == null || !ShopwareProjectComponent.isValidForProject(originalPosition)) {
+                        return;
+                    }
+
+                    PsiElement parent = originalPosition.getParent();
+                    if(!(parent instanceof StringLiteralExpression)) {
+                        return;
+                    }
+
+                    ShopwareUtil.collectBootstrapFiles((StringLiteralExpression) parent, new ShopwareUtil.BootstrapFileVisitor() {
+                        @Override
+                        public void visitVariable(VirtualFile virtualFile, String relativePath) {
+                            if (virtualFile.isDirectory()) {
+                                result.addElement(LookupElementBuilder.create(relativePath + "/").withIcon(PhpIcons.FILE_ICON));
+                            } else if ("php".equalsIgnoreCase(virtualFile.getExtension())) {
+                                result.addElement(LookupElementBuilder.create(relativePath).withIcon(PhpIcons.PHP_FILE));
+                            }
+                        }
+                    });
 
                 }
             }

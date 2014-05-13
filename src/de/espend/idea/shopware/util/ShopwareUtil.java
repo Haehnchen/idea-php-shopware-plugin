@@ -1,9 +1,19 @@
 package de.espend.idea.shopware.util;
 
+import com.intellij.codeInsight.completion.CompletionType;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.patterns.PlatformPatterns;
+import com.intellij.patterns.PsiElementPattern;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Processor;
+import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.AssignmentExpressionImpl;
@@ -249,6 +259,49 @@ public class ShopwareUtil {
         }
 
         return null;
+    }
+
+    public static PsiElementPattern.Capture<PsiElement> getBootstrapPathPattern() {
+        // @TODO add method reference filter
+        return PlatformPatterns.psiElement().withParent(
+            PlatformPatterns.psiElement(StringLiteralExpression.class).afterLeafSkipping(
+                PlatformPatterns.psiElement(PsiWhiteSpace.class),
+                PlatformPatterns.psiElement().withText(".")
+            )
+        );
+    }
+
+    public static void collectBootstrapFiles(StringLiteralExpression literalExpression, final BootstrapFileVisitor visitor) {
+
+        MethodReference methodReference = PsiElementUtils.getPrevSiblingOfType(literalExpression, PlatformPatterns.psiElement(MethodReference.class).withText(PlatformPatterns.string().contains("Path()")));
+        if(methodReference == null) {
+            return;
+        }
+
+        PsiFile currentFile = literalExpression.getContainingFile();
+        final PsiDirectory psiDirectory = currentFile.getParent();
+        if(psiDirectory == null) {
+            return;
+        }
+
+        VfsUtil.processFilesRecursively(psiDirectory.getVirtualFile(), new Processor<VirtualFile>() {
+            @Override
+            public boolean process(VirtualFile virtualFile) {
+
+                if(virtualFile.isDirectory() || "php".equalsIgnoreCase(virtualFile.getExtension())) {
+                    String relativePath = VfsUtil.getRelativePath(virtualFile, psiDirectory.getVirtualFile(), '/');
+                    if(StringUtils.isNotBlank(relativePath)) {
+                        visitor.visitVariable(virtualFile, relativePath);
+                    }
+                }
+
+                return true;
+            }
+        });
+    }
+
+    public interface BootstrapFileVisitor {
+        public void visitVariable(VirtualFile virtualFile, String relativePath);
     }
 
 }
