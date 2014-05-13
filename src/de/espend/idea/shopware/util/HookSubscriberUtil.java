@@ -37,7 +37,7 @@ public class HookSubscriberUtil {
             }
         }
 
-        phpClasses.addAll(phpIndex.getDirectSubclasses("\\Enlight_Hook"));
+        phpClasses.addAll(phpIndex.getAllSubclasses("\\Enlight_Hook"));
 
         for(PhpClass phpClass: phpClasses) {
             for(Method method: phpClass.getMethods()) {

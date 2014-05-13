@@ -55,7 +55,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                         @Override
                         public boolean visitHook(PhpClass phpClass, Method method) {
                             for (String hookName : new String[]{"after", "before", "replace"}) {
-                                result.addElement(LookupElementBuilder.create(String.format("%s:%s:%s", phpClass.getPresentableFQN(), method.getName(), hookName)).withIcon(PhpIcons.METHOD_ICON).withTypeText("Hook", true));
+                                result.addElement(LookupElementBuilder.create(String.format("%s::%s::%s", phpClass.getPresentableFQN(), method.getName(), hookName)).withIcon(PhpIcons.METHOD_ICON).withTypeText("Hook", true));
                             }
 
                             return true;
@@ -113,7 +113,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                 if (!isEqualHookClass(phpClass, hookNamePreFilter)) return true;
 
                 for (String hookName : new String[]{"after", "before", "replace"}) {
-                    if (String.format("%s:%s:%s", phpClass.getPresentableFQN(), method.getName(), hookName).equals(hookNameContent)) {
+                    if (String.format("%s::%s::%s", phpClass.getPresentableFQN(), method.getName(), hookName).equals(hookNameContent) || String.format("%s:%s:%s", phpClass.getPresentableFQN(), method.getName(), hookName).equals(hookNameContent)) {
                         psiElements.add(method);
                         return false;
                     }
