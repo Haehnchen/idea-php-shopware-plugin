@@ -52,7 +52,7 @@ public class TemplateUtil {
                 }
 
                 String[] pathSplits = StringUtils.split(frontendName, "/");
-                if(pathSplits.length < 2 || (!"frontend".equals(pathSplits[1]) && !"backend".equals(pathSplits[1]))) {
+                if(pathSplits.length < 2 || (!"frontend".equals(pathSplits[1]) && !"backend".equals(pathSplits[1])) && !"widgets".equals(pathSplits[1])) {
                     return true;
                 }
 
