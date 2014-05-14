@@ -63,6 +63,10 @@ public class ShopwareUtil {
         "int(11)", "int(1)", "varchar(255)", "datetime", "mediumtext", "date", "decimal(10,2)", "double", "text"
     };
 
+    final public static String[] ROUTE_ASSEMBLE = new String[] {
+        "module", "controller", "appendSession", "action", "fullPath", "module"
+    };
+
     public static void writeShopwareMagicFile(String outputString, String outputPath) {
 
         File file = new File(outputPath);

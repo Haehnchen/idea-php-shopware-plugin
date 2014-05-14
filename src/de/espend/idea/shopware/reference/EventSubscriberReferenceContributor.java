@@ -3,8 +3,6 @@ package de.espend.idea.shopware.reference;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiElementFilter;
@@ -13,21 +11,22 @@ import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.PhpLanguage;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.psi.PhpPsiUtil;
+import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
+import de.espend.idea.shopware.reference.provider.ControllerActionReferenceProvider;
+import de.espend.idea.shopware.reference.provider.ControllerReferenceProvider;
 import de.espend.idea.shopware.reference.provider.SmartyTemplateProvider;
+import de.espend.idea.shopware.reference.provider.StringReferenceProvider;
 import de.espend.idea.shopware.util.ShopwareUtil;
-import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
+import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -175,8 +174,88 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
             }
         );
 
-    }
+        // for your lazy developers to get unknown "extendsTemplate" calls
+        psiReferenceRegistrar.registerReferenceProvider(
+                PlatformPatterns.psiElement(StringLiteralExpression.class).inside(
+                    PlatformPatterns.psiElement(ParameterList.class)
+                )
+            ,
+            new PsiReferenceProvider() {
+                @NotNull
+                @Override
+                public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
 
+                    if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+                        return new PsiReference[0];
+                    }
+
+                    if(!(psiElement instanceof StringLiteralExpression)) {
+                        return new PsiReference[0];
+                    }
+
+                    ParameterList parameterList = PsiTreeUtil.getParentOfType(psiElement, ParameterList.class);
+                    if (parameterList == null) {
+                        return new PsiReference[0];
+                    }
+
+                    if(!(parameterList.getContext() instanceof MethodReference)) {
+                        return new PsiReference[0];
+                    }
+
+                    if(!new Symfony2InterfacesUtil().isCallTo((MethodReference) parameterList.getContext(), "\\Enlight_Controller_Router", "assemble")) {
+                        return new PsiReference[0];
+                    }
+
+                    ArrayCreationExpression arrayCreation = PsiTreeUtil.getParentOfType(psiElement, ArrayCreationExpression.class);
+
+                    if(arrayCreation != null) {
+                        PsiElement arrayValue = psiElement.getParent();
+                        if(PhpPsiUtil.isOfType(arrayValue, PhpElementTypes.ARRAY_VALUE)) {
+                            PsiElement arrayHashElement = arrayValue.getParent();
+                            if(arrayHashElement instanceof ArrayHashElement) {
+                                PhpPsiElement key = ((ArrayHashElement) arrayHashElement).getKey();
+                                if(key instanceof StringLiteralExpression) {
+                                    String contents = ((StringLiteralExpression) key).getContents();
+
+                                    if("controller".equals(contents)) {
+                                        PsiElement arrayCreationElement = arrayHashElement.getParent();
+                                        String module = null;
+                                        if(arrayCreationElement instanceof ArrayCreationExpression) {
+                                            module = PhpElementsUtil.getArrayHashValue((ArrayCreationExpression) arrayCreationElement, "module");
+                                        }
+
+                                        return new PsiReference[] { new ControllerReferenceProvider((StringLiteralExpression) psiElement, module) };
+                                    }
+
+                                    if("action".equals(contents)) {
+
+                                        PsiElement arrayCreationElement = arrayHashElement.getParent();
+                                        if(arrayCreationElement instanceof ArrayCreationExpression) {
+                                            String controller = PhpElementsUtil.getArrayHashValue((ArrayCreationExpression) arrayCreationElement, "controller");
+                                            String module = PhpElementsUtil.getArrayHashValue((ArrayCreationExpression) arrayCreationElement, "module");
+                                            if(controller != null) {
+                                                return new PsiReference[] { new ControllerActionReferenceProvider((StringLiteralExpression) psiElement, controller, module) };
+                                            }
+                                        }
+                                    }
+
+                                    if("module".equals(contents)) {
+                                        return new PsiReference[] { new StringReferenceProvider((StringLiteralExpression) psiElement, "backend", "frontend", "widgets") };
+                                    }
+
+                                }
+                            }
+                        }
+
+                        return new PsiReference[0];
+                    }
+
+                    return new PsiReference[0];
+                }
+            }
+        );
+
+    }
 
     public static class MethodReferenceProvider extends PsiPolyVariantReferenceBase<PsiElement> {
 
