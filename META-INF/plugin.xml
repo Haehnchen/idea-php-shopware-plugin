@@ -1,8 +1,8 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.9.2</version>
-   <vendor email="daniel@espendiller.net" url="http://espend.de">espend</vendor>
+  <version>0.9.3</version>
+  <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
       <h1>Shopware Plugin</h1><br>
@@ -22,7 +22,8 @@
         <li>PHP: Type provider for Manager::getResources</li>
         <li>PHP: Event and method references for subscriber events</li>
         <li>PHP: Magic method type provider</li>
-        <li>PHP: Bootstrap::getInfo, ModelManager::addAttribute/generateAttributeModels</li>
+        <li>PHP: Bootstrap::getInfo, Bootstrap::Path, ModelManager::addAttribute/generateAttributeModels</li>
+        <li>PHP: Enlight_Controller_Router::assemble array parameter</li>
         <li>Smarty: References for files, controller, actions, widgets</li>
         <li>Smarty: Block references on extends path</li>
         <li>Smarty: Namespace tag support</li>
@@ -37,6 +38,12 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>0.9.3</h2>
+<ul>
+    <li>Add support for Enlight_Controller_Router::assemble</li>
+    <li>Allow template resolve for "widgets" module</li>
+</ul>
 
 <h2>0.9.2</h2>
 <ul>
