@@ -40,6 +40,10 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
                 attachController((SmartyFile) psiElement, lineMarkerInfos);
             }
 
+            if(psiElement instanceof SmartyFile) {
+                attachController((SmartyFile) psiElement, lineMarkerInfos);
+            }
+
             if(SmartyPattern.getBlockPattern().accepts(psiElement)) {
                 attachTemplateBlocks(psiElement, lineMarkerInfos);
             }

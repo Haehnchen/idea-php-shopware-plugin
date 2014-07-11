@@ -9,16 +9,22 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.Processor;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.FileBasedIndexImpl;
+import com.jetbrains.smarty.SmartyFileType;
+import com.jetbrains.twig.TwigFileType;
 import de.espend.idea.shopware.ShopwareProjectComponent;
+import de.espend.idea.shopware.index.SmartyBlockStubIndex;
 import de.espend.idea.shopware.util.SmartyBlockUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
+import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.TwigExtendsStubIndex;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SmartyBlockGoToHandler implements GotoDeclarationHandler {
     @Nullable
@@ -33,9 +39,69 @@ public class SmartyBlockGoToHandler implements GotoDeclarationHandler {
             return new PsiElement[0];
         }
 
+        final List<PsiElement> psiTargets = new ArrayList<PsiElement>();
+
+        PsiFile containingFile = sourceElement.getContainingFile();
+        if(TemplateUtil.isExtendsTemplate(containingFile)) {
+            attachExtendsTemplateGoto(sourceElement, containingFile, psiTargets);
+        } else {
+            attachIncludeTemplateGoto(sourceElement, containingFile, psiTargets);
+        }
+
+        return psiTargets.toArray(new PsiElement[psiTargets.size()]);
+    }
+
+    public void attachIncludeTemplateGoto(final PsiElement sourceElement, final PsiFile psiFile, final List<PsiElement> psiTargets) {
+
+        final String text = sourceElement.getText();
+
+        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyBlockStubIndex.KEY, new HashSet<String>(Arrays.asList(text)), new Processor<VirtualFile>() {
+            @Override
+            public boolean process(VirtualFile virtualFile) {
+
+                if(psiFile.getVirtualFile().equals(virtualFile)) {
+                    return true;
+                }
+
+                PsiFile psiFile1 = PsiManager.getInstance(sourceElement.getProject()).findFile(virtualFile);
+                if(psiFile1 != null) {
+                    psiTargets.addAll(getBlockPsiElement(psiFile, text));
+                }
+
+                return true;
+            }
+        }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(psiFile.getProject()), SmartyFileType.INSTANCE));
+
+
+    }
+
+    public static List<PsiElement> getBlockPsiElement(PsiFile psiFile, final String blockName) {
+        final List<PsiElement> psiElements = new ArrayList<PsiElement>();
+
+        psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+            @Override
+            public void visitElement(PsiElement element) {
+
+                if(SmartyPattern.getBlockPattern().accepts(element)) {
+                    String text = element.getText();
+                    if(blockName.equalsIgnoreCase(text)) {
+                        psiElements.add(element);
+                    }
+
+                }
+
+                super.visitElement(element);
+            }
+        });
+
+        return psiElements;
+    }
+
+    public void attachExtendsTemplateGoto(PsiElement sourceElement, PsiFile psiFile, List<PsiElement> psiTargets) {
+
         final Map<VirtualFile, String> map = new HashMap<VirtualFile, String>();
 
-        TemplateUtil.collectFiles(sourceElement.getProject(), new TemplateUtil.SmartyTemplatePreventSelfVisitor(sourceElement.getContainingFile().getVirtualFile()) {
+        TemplateUtil.collectFiles(sourceElement.getProject(), new TemplateUtil.SmartyTemplatePreventSelfVisitor(psiFile.getVirtualFile()) {
             @Override
             public void visitNonSelfFile(VirtualFile virtualFile, String fileName) {
                 map.put(virtualFile, fileName);
@@ -46,15 +112,12 @@ public class SmartyBlockGoToHandler implements GotoDeclarationHandler {
         SmartyBlockUtil.collectFileBlocks(sourceElement.getContainingFile(), map, blockNameSet, 5);
 
 
-        final List<PsiElement> psiTargets = new ArrayList<PsiElement>();
-
         for(SmartyBlockUtil.SmartyBlock smartyBlock: blockNameSet) {
             if(smartyBlock.getName().equals(sourceElement.getText())) {
                 psiTargets.add(smartyBlock.getElement());
             }
         }
 
-        return psiTargets.toArray(new PsiElement[psiTargets.size()]);
     }
 
     @Nullable

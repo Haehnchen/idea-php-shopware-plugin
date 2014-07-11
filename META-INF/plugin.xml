@@ -178,6 +178,9 @@
       <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareMagicMethodTypeProvider"/>
       <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareApiResourcesTypeProvider"/>
 
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyBlockStubIndex"/>
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyIncludeStubIndex"/>
+
       <localInspection groupPath="Shopware" shortName="Shopware" displayName="Boostrap"
                        groupName="Shopware"
                        enabledByDefault="true" level="WARNING"

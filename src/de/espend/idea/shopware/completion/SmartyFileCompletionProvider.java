@@ -8,20 +8,28 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ProcessingContext;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.smarty.SmartyFile;
+import com.jetbrains.smarty.lang.psi.SmartyTag;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
+import de.espend.idea.shopware.index.SmartyBlockStubIndex;
 import de.espend.idea.shopware.lookup.TemplateLookupElement;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyBlockUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
+import fr.adrienbrault.idea.symfony2plugin.routing.Route;
+import fr.adrienbrault.idea.symfony2plugin.routing.RouteLookupElement;
+import fr.adrienbrault.idea.symfony2plugin.stubs.SymfonyProcessors;
+import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.YamlRoutesStubIndex;
 import fr.adrienbrault.idea.symfony2plugin.templating.util.TwigTypeResolveUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -86,9 +94,27 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                         return;
                     }
 
+                    PsiElement position = parameters.getPosition();
+                    PsiFile containingFile = position.getContainingFile();
+                    if(TemplateUtil.isExtendsTemplate(position.getContainingFile())) {
+                        collectExtendsBlockNames(containingFile.getProject(), containingFile, result);
+                        return;
+                    }
+
+                    // weak block on file include; use index here
+                    SymfonyProcessors.CollectProjectUniqueKeys ymlProjectProcessor = new SymfonyProcessors.CollectProjectUniqueKeys(containingFile.getProject(), SmartyBlockStubIndex.KEY);
+                    FileBasedIndex.getInstance().processAllKeys(SmartyBlockStubIndex.KEY, ymlProjectProcessor, containingFile.getProject());
+                    for(String s: ymlProjectProcessor.getResult()) {
+                        result.addElement(LookupElementBuilder.create(s).withIcon(ShopwarePluginIcons.SHOPWARE_WEAK));
+                    }
+
+                }
+
+                private void collectExtendsBlockNames(Project project, PsiFile psiFile, final @NotNull CompletionResultSet result) {
+
                     final Map<VirtualFile, String> map = new HashMap<VirtualFile, String>();
 
-                    TemplateUtil.collectFiles(parameters.getPosition().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
+                    TemplateUtil.collectFiles(project, new TemplateUtil.SmartyTemplateVisitor() {
                         @Override
                         public void visitFile(VirtualFile virtualFile, String fileName) {
                             map.put(virtualFile, fileName);
@@ -96,14 +122,16 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                     });
 
                     List<SmartyBlockUtil.SmartyBlock> blockNameSet = new ArrayList<SmartyBlockUtil.SmartyBlock>();
-                    SmartyBlockUtil.collectFileBlocks(parameters.getOriginalFile(), map, blockNameSet, 0);
+                    SmartyBlockUtil.collectFileBlocks(psiFile, map, blockNameSet, 0);
 
                     for(SmartyBlockUtil.SmartyBlock smartyBlock: blockNameSet) {
                         result.addElement(LookupElementBuilder.create(smartyBlock.getName()).withTypeText(smartyBlock.getElement().getContainingFile().getName(), true).withIcon(ShopwarePluginIcons.SHOPWARE));
                     }
 
                 }
+
             }
+
         );
 
         extend(

@@ -5,10 +5,14 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.smarty.lang.psi.SmartyTag;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -137,6 +141,54 @@ public class TemplateUtil {
         }
 
         abstract public void visitNonSelfFile(VirtualFile virtualFile, String fileName);
+    }
+
+    public static boolean isExtendsTemplate(PsiFile psiFile) {
+
+        for(SmartyTag smartyTag: PsiTreeUtil.getChildrenOfTypeAsList(psiFile, SmartyTag.class)) {
+            if("extends".equals(smartyTag.getName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Nullable
+    public static String getTemplateName(Project project, VirtualFile virtualFile) {
+
+        String frontendName = VfsUtil.getRelativePath(virtualFile, project.getBaseDir(), '/');
+        if(frontendName == null) {
+            return null;
+        }
+
+        return null;
+
+        /* for(String module: new String[] {"frontend", "backend", "widgets"}) {
+            int i = frontendName.indexOf(module);
+            if(i) {
+
+            }
+        }
+
+
+        String[] pathSplits = StringUtils.split(frontendName, "/");
+        if(pathSplits.length < 2 || (!"frontend".equals(pathSplits[1]) && !"backend".equals(pathSplits[1])) && !"widgets".equals(pathSplits[1])) {
+            return true;
+        }
+
+        int i = frontendName.indexOf("/");
+        if(i == -1) {
+            return true;
+        }
+
+        int n = pathSplits.length-1;
+        String[] newArray = new String[n];
+        System.arraycopy(pathSplits, 1, newArray, 0, n);
+
+        String fileName = StringUtils.join(newArray, "/");
+        smartyTemplateVisitor.visitFile(virtualFile, fileName); */
+
     }
 
 }

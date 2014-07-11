@@ -21,6 +21,16 @@ public class SmartyPattern {
         );
     }
 
+    public static PsiElementPattern.Capture<PsiElement> getFileIncludePattern() {
+        return PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL).withParent(
+            PlatformPatterns.psiElement(SmartyCompositeElementTypes.ATTRIBUTE_VALUE).withParent(
+                PlatformPatterns.psiElement(SmartyCompositeElementTypes.ATTRIBUTE).withText(PlatformPatterns.string().contains("file=")).withParent(
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.INCLUDE_TAG)
+                )
+            )
+        );
+    }
+
     public static PsiElementPattern.Capture<PsiElement> getBlockPattern() {
         return PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL).withParent(
             PlatformPatterns.psiElement(SmartyCompositeElementTypes.ATTRIBUTE_VALUE).withParent(
