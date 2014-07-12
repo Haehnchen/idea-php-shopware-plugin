@@ -4,22 +4,30 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.Processor;
+import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.smarty.SmartyFile;
+import com.jetbrains.smarty.SmartyFileType;
 import de.espend.idea.shopware.ShopwareProjectComponent;
+import de.espend.idea.shopware.index.SmartyBlockStubIndex;
+import de.espend.idea.shopware.index.SmartyIncludeStubIndex;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
+import de.espend.idea.shopware.util.TemplateUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +49,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             }
 
             if(psiElement instanceof SmartyFile) {
-                attachController((SmartyFile) psiElement, lineMarkerInfos);
+                attachInclude((SmartyFile) psiElement, lineMarkerInfos);
             }
 
             if(SmartyPattern.getBlockPattern().accepts(psiElement)) {
@@ -125,6 +133,62 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
 
         lineMarkerInfos.add(builder.createLineMarkerInfo(smartyFile));
 
+    }
+
+    public void attachInclude(final SmartyFile smartyFile, Collection<LineMarkerInfo> lineMarkerInfos) {
+
+        final String templateName = TemplateUtil.getTemplateName(smartyFile.getProject(), smartyFile.getVirtualFile());
+        if(templateName == null) {
+            return;
+        }
+
+        final List<PsiElement> targets = new ArrayList<PsiElement>();
+
+        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyIncludeStubIndex.KEY, new HashSet<String>(Arrays.asList(templateName)), new Processor<VirtualFile>() {
+            @Override
+            public boolean process(VirtualFile virtualFile) {
+
+                PsiFile psiFile = PsiManager.getInstance(smartyFile.getProject()).findFile(virtualFile);
+                if(psiFile != null) {
+                    targets.addAll(getIncludePsiElement(psiFile, templateName));
+                }
+
+                return true;
+            }
+        }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(smartyFile.getProject()), SmartyFileType.INSTANCE));
+
+        if(targets.size() == 0) {
+            return;
+        }
+
+        NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(PhpIcons.IMPLEMENTED).
+            setTargets(targets).
+            setTooltipText("Navigate to include");
+
+        lineMarkerInfos.add(builder.createLineMarkerInfo(smartyFile));
+
+    }
+
+    private static List<PsiElement> getIncludePsiElement(PsiFile psiFile, final String templateName) {
+        final List<PsiElement> psiElements = new ArrayList<PsiElement>();
+
+        psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+            @Override
+            public void visitElement(PsiElement element) {
+
+                if(SmartyPattern.getFileIncludePattern().accepts(element)) {
+                    String text = element.getText();
+                    if(templateName.equalsIgnoreCase(text)) {
+                        psiElements.add(element);
+                    }
+
+                }
+
+                super.visitElement(element);
+            }
+        });
+
+        return psiElements;
     }
 
 }

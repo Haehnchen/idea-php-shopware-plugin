@@ -94,9 +94,8 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                         return;
                     }
 
-                    PsiElement position = parameters.getPosition();
-                    PsiFile containingFile = position.getContainingFile();
-                    if(TemplateUtil.isExtendsTemplate(position.getContainingFile())) {
+                    PsiFile containingFile = parameters.getOriginalFile();
+                    if(TemplateUtil.isExtendsTemplate(containingFile)) {
                         collectExtendsBlockNames(containingFile.getProject(), containingFile, result);
                         return;
                     }

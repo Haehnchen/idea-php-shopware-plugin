@@ -162,32 +162,14 @@ public class TemplateUtil {
             return null;
         }
 
-        return null;
-
-        /* for(String module: new String[] {"frontend", "backend", "widgets"}) {
+        for(String module: new String[] {"frontend", "backend", "widgets"}) {
             int i = frontendName.indexOf(module);
-            if(i) {
-
+            if(i > 0) {
+                return frontendName.substring(i);
             }
         }
 
-
-        String[] pathSplits = StringUtils.split(frontendName, "/");
-        if(pathSplits.length < 2 || (!"frontend".equals(pathSplits[1]) && !"backend".equals(pathSplits[1])) && !"widgets".equals(pathSplits[1])) {
-            return true;
-        }
-
-        int i = frontendName.indexOf("/");
-        if(i == -1) {
-            return true;
-        }
-
-        int n = pathSplits.length-1;
-        String[] newArray = new String[n];
-        System.arraycopy(pathSplits, 1, newArray, 0, n);
-
-        String fileName = StringUtils.join(newArray, "/");
-        smartyTemplateVisitor.visitFile(virtualFile, fileName); */
+        return null;
 
     }
 

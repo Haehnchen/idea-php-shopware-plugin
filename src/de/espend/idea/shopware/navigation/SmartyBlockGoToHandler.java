@@ -65,7 +65,7 @@ public class SmartyBlockGoToHandler implements GotoDeclarationHandler {
 
                 PsiFile psiFile1 = PsiManager.getInstance(sourceElement.getProject()).findFile(virtualFile);
                 if(psiFile1 != null) {
-                    psiTargets.addAll(getBlockPsiElement(psiFile, text));
+                    psiTargets.addAll(getBlockPsiElement(psiFile1, text));
                 }
 
                 return true;
