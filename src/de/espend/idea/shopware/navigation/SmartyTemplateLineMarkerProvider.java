@@ -3,6 +3,7 @@ package de.espend.idea.shopware.navigation;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
+import com.intellij.navigation.GotoRelatedItem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -10,6 +11,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.ConstantFunction;
 import com.intellij.util.Processor;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.php.PhpIcons;
@@ -17,8 +19,8 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.smarty.SmartyFile;
 import com.jetbrains.smarty.SmartyFileType;
+import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
-import de.espend.idea.shopware.index.SmartyBlockStubIndex;
 import de.espend.idea.shopware.index.SmartyIncludeStubIndex;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
@@ -45,11 +47,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
         for(PsiElement psiElement: psiElements) {
 
             if(psiElement instanceof SmartyFile) {
-                attachController((SmartyFile) psiElement, lineMarkerInfos);
-            }
-
-            if(psiElement instanceof SmartyFile) {
-                attachInclude((SmartyFile) psiElement, lineMarkerInfos);
+                attachFileContextMaker((SmartyFile) psiElement, lineMarkerInfos);
             }
 
             if(SmartyPattern.getBlockPattern().accepts(psiElement)) {
@@ -57,6 +55,35 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             }
 
         }
+    }
+
+    private void attachFileContextMaker(SmartyFile smartyFile, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
+        List<GotoRelatedItem> gotoRelatedItems = new ArrayList<GotoRelatedItem>();
+
+        attachController(smartyFile, gotoRelatedItems);
+        attachInclude(smartyFile, gotoRelatedItems);
+
+        if(gotoRelatedItems.size() == 0) {
+            return;
+        }
+
+
+        lineMarkerInfos.add(getRelatedPopover("Related Files", "", smartyFile, gotoRelatedItems));
+
+    }
+
+    private LineMarkerInfo getRelatedPopover(String singleItemTitle, String singleItemTooltipPrefix, PsiElement lineMarkerTarget, List<GotoRelatedItem> gotoRelatedItems) {
+
+        // single item has no popup
+        String title = singleItemTitle;
+        if(gotoRelatedItems.size() == 1) {
+            String customName = gotoRelatedItems.get(0).getCustomName();
+            if(customName != null) {
+                title = String.format(singleItemTooltipPrefix, customName);
+            }
+        }
+
+        return new LineMarkerInfo<PsiElement>(lineMarkerTarget, lineMarkerTarget.getTextOffset(), ShopwarePluginIcons.SHOPWARE_LINEMARKER, 6, new ConstantFunction<PsiElement, String>(title), new fr.adrienbrault.idea.symfony2plugin.dic.RelatedPopupGotoLineMarker.NavigationHandler(gotoRelatedItems));
     }
 
     public void attachTemplateBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos) {
@@ -85,7 +112,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
 
     }
 
-    public void attachController(SmartyFile smartyFile, Collection<LineMarkerInfo> lineMarkerInfos) {
+    public void attachController(SmartyFile smartyFile, final List<GotoRelatedItem> gotoRelatedItems) {
 
         if(!ShopwareProjectComponent.isValidForProject(smartyFile)) {
             return;
@@ -117,32 +144,21 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
 
         Method method = PhpElementsUtil.getClassMethod(phpClass, action + "Action");
         if(method != null) {
-            NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(PhpIcons.METHOD).
-                setTargets(method).
-                setTooltipText("Navigate to controller");
-
-            lineMarkerInfos.add(builder.createLineMarkerInfo(smartyFile));
-
+            gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(method, null).withIcon(PhpIcons.METHOD, PhpIcons.METHOD));
             return;
         }
 
         // fallback to class
-        NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(PhpIcons.CLASS).
-            setTargets(phpClass).
-            setTooltipText("Navigate to class");
-
-        lineMarkerInfos.add(builder.createLineMarkerInfo(smartyFile));
+        gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(phpClass, null).withIcon(PhpIcons.CLASS, PhpIcons.CLASS));
 
     }
 
-    public void attachInclude(final SmartyFile smartyFile, Collection<LineMarkerInfo> lineMarkerInfos) {
+    public void attachInclude(final SmartyFile smartyFile, final List<GotoRelatedItem> gotoRelatedItems) {
 
         final String templateName = TemplateUtil.getTemplateName(smartyFile.getProject(), smartyFile.getVirtualFile());
         if(templateName == null) {
             return;
         }
-
-        final List<PsiElement> targets = new ArrayList<PsiElement>();
 
         FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyIncludeStubIndex.KEY, new HashSet<String>(Arrays.asList(templateName)), new Processor<VirtualFile>() {
             @Override
@@ -150,22 +166,16 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
 
                 PsiFile psiFile = PsiManager.getInstance(smartyFile.getProject()).findFile(virtualFile);
                 if(psiFile != null) {
-                    targets.addAll(getIncludePsiElement(psiFile, templateName));
+
+                    for(PsiElement psiElement: getIncludePsiElement(psiFile, templateName)) {
+                        gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(psiElement, null).withIcon(PhpIcons.IMPLEMENTED, PhpIcons.IMPLEMENTED));
+                    }
+
                 }
 
                 return true;
             }
         }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(smartyFile.getProject()), SmartyFileType.INSTANCE));
-
-        if(targets.size() == 0) {
-            return;
-        }
-
-        NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(PhpIcons.IMPLEMENTED).
-            setTargets(targets).
-            setTooltipText("Navigate to include");
-
-        lineMarkerInfos.add(builder.createLineMarkerInfo(smartyFile));
 
     }
 
