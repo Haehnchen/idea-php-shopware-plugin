@@ -8,6 +8,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ProcessingContext;
@@ -17,6 +18,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.smarty.SmartyFile;
+import com.jetbrains.smarty.SmartyFileType;
 import com.jetbrains.smarty.lang.psi.SmartyTag;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
@@ -33,6 +35,7 @@ import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.YamlRoutesStubIndex;
 import fr.adrienbrault.idea.symfony2plugin.templating.util.TwigTypeResolveUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.yaml.YAMLFileType;
 
 import java.util.*;
 
@@ -104,7 +107,25 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                     SymfonyProcessors.CollectProjectUniqueKeys ymlProjectProcessor = new SymfonyProcessors.CollectProjectUniqueKeys(containingFile.getProject(), SmartyBlockStubIndex.KEY);
                     FileBasedIndex.getInstance().processAllKeys(SmartyBlockStubIndex.KEY, ymlProjectProcessor, containingFile.getProject());
                     for(String s: ymlProjectProcessor.getResult()) {
-                        result.addElement(LookupElementBuilder.create(s).withIcon(ShopwarePluginIcons.SHOPWARE_WEAK));
+                        Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(SmartyBlockStubIndex.KEY, s, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(containingFile.getProject()), SmartyFileType.INSTANCE));
+
+                        LookupElementBuilder lookupElementBuilder = LookupElementBuilder.create(s).withIcon(ShopwarePluginIcons.SHOPWARE_WEAK);
+
+                        String templateName;
+                        if(files.size() > 0) {
+                            templateName = TemplateUtil.getTemplateName(containingFile.getProject(), files.iterator().next());
+                            if(templateName != null) {
+
+                                if(files.size() > 1) {
+                                    templateName = "(" + files.size() + ") " + templateName;
+                                }
+
+                                lookupElementBuilder = lookupElementBuilder.withTypeText(templateName, true);
+                            }
+
+                        }
+
+                        result.addElement(lookupElementBuilder);
                     }
 
                 }
