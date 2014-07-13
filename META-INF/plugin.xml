@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>0.9.3</version>
+  <version>1.0</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -27,6 +27,8 @@
         <li>Smarty: References for files, controller, actions, widgets</li>
         <li>Smarty: Block references on extends path</li>
         <li>Smarty: Namespace tag support</li>
+        <li>Smarty: Blockname and include indexer</li>
+        <li>Smarty: Template include linemarker</li>
         <li>PHP/Smarty: Template controller references for php and smarty</li>
         <li>Symfony2: Custom container loader</li>
         <li>Doctrine: Extension for Symfony2 Plugin</li>
@@ -38,6 +40,13 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.0</h2>
+<ul>
+    <li>Add indexer for Smarty block and include tags</li>
+    <li>Add linemarker for Smarty file includes</li>
+    <li>Add block name completion and goto for "extend less" templates</li>
+</ul>
 
 <h2>0.9.3</h2>
 <ul>
