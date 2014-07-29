@@ -156,15 +156,20 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
 
     private void addCustomModelNames(String[] namespaces, Set<String> classMap) {
         String phpClassName = StringUtils.join(namespaces, "\\").toLowerCase();
-        int model = phpClassName.lastIndexOf("model");
-        if(model > 0 && phpClassName.length() > 6) {
-            String test = phpClassName.substring(model + 6);
-            List<String> set = new ArrayList<String>();
-            for(String foo: StringUtils.split(test, "\\")) {
-                set.add(ShopwareUtil.toCamelCase(foo, false));
-            }
-            classMap.add(String.format("Shopware\\CustomModels\\%s", StringUtils.join(set, "\\")).toLowerCase());
+
+        int model = phpClassName.lastIndexOf("\\model");
+        if(model == -1 || model + "\\model".length() >= phpClassName.length()) {
+            return;
         }
+
+        String test = phpClassName.substring(model + "\\model".length() + 1);
+        List<String> set = new ArrayList<String>();
+        for(String foo: StringUtils.split(test, "\\")) {
+            set.add(ShopwareUtil.toCamelCase(foo, false));
+        }
+
+        classMap.add(String.format("Shopware\\CustomModels\\%s", StringUtils.join(set, "\\")).toLowerCase());
+
     }
 
 }
