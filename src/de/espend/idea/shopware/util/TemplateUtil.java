@@ -216,7 +216,7 @@ public class TemplateUtil {
                 return null;
             }
 
-            frontendName = path.substring(i + "/templates/".length()) + "/";
+            frontendName = path.substring(i + "/templates/".length());
         }
 
         for(String module: modules) {
