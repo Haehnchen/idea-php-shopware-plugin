@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.0</version>
+  <version>1.1</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -29,6 +29,7 @@
         <li>Smarty: Namespace tag support</li>
         <li>Smarty: Blockname and include indexer</li>
         <li>Smarty: Template include linemarker</li>
+        <li>Smarty: Support templates libraries/include paths</li>
         <li>PHP/Smarty: Template controller references for php and smarty</li>
         <li>Symfony2: Custom container loader</li>
         <li>Doctrine: Extension for Symfony2 Plugin</li>
@@ -40,6 +41,13 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.1</h2>
+<ul>
+    <li>Fix out of range exception in custom models name <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/2">#2</a></li>
+    <li>Use indexed template files as fallback for non complete project structure to support lib/include paths</li>
+    <li>Add single item linemarker condition presentation for smarty file context</li>
+</ul>
 
 <h2>1.0</h2>
 <ul>
