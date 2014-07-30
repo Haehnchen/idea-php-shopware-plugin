@@ -30,6 +30,7 @@ import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,6 +69,11 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
+        // only one item dont need popover
+        if(gotoRelatedItems.size() == 1) {
+            lineMarkerInfos.add(RelatedPopupGotoLineMarker.getSingleLineMarker(smartyFile, lineMarkerInfos, gotoRelatedItems.get(0)));
+            return;
+        }
 
         lineMarkerInfos.add(getRelatedPopover("Related Files", "", smartyFile, gotoRelatedItems));
 
@@ -145,12 +151,12 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
 
         Method method = PhpElementsUtil.getClassMethod(phpClass, action + "Action");
         if(method != null) {
-            gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(method, null).withIcon(PhpIcons.METHOD, PhpIcons.METHOD));
+            gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(method, "Navigate to action").withIcon(PhpIcons.METHOD, PhpIcons.METHOD));
             return;
         }
 
         // fallback to class
-        gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(phpClass, null).withIcon(PhpIcons.CLASS, PhpIcons.CLASS));
+        gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(phpClass, "Navigate to class").withIcon(PhpIcons.CLASS, PhpIcons.CLASS));
 
     }
 
@@ -169,7 +175,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
                 if(psiFile != null) {
 
                     for(PsiElement psiElement: getIncludePsiElement(psiFile, templateName)) {
-                        gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(psiElement, null).withIcon(PhpIcons.IMPLEMENTED, PhpIcons.IMPLEMENTED));
+                        gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(psiElement, "Navigate to include").withIcon(PhpIcons.IMPLEMENTED, PhpIcons.IMPLEMENTED));
                     }
 
                 }

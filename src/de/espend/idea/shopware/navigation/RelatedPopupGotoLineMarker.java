@@ -1,15 +1,21 @@
 package de.espend.idea.shopware.navigation;
 
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
+import com.intellij.codeInsight.daemon.LineMarkerInfo;
+import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
+import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.ide.actions.GotoRelatedFileAction;
 import com.intellij.navigation.GotoRelatedItem;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.awt.RelativePoint;
+import com.jetbrains.smarty.SmartyFile;
+import de.espend.idea.shopware.ShopwarePluginIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.MouseEvent;
+import java.util.Collection;
 import java.util.List;
 
 public class RelatedPopupGotoLineMarker {
@@ -76,5 +82,29 @@ public class RelatedPopupGotoLineMarker {
         }
 
     }
+
+    public static RelatedItemLineMarkerInfo<PsiElement> getSingleLineMarker(SmartyFile smartyFile, Collection<LineMarkerInfo> lineMarkerInfos, GotoRelatedItem gotoRelatedItem) {
+
+        // hell: find any possible small icon
+        Icon icon = null;
+        if(gotoRelatedItem instanceof RelatedPopupGotoLineMarker.PopupGotoRelatedItem) {
+            icon = ((RelatedPopupGotoLineMarker.PopupGotoRelatedItem) gotoRelatedItem).getSmallIcon();
+        }
+
+        if(icon == null) {
+            icon = ShopwarePluginIcons.SHOPWARE_LINEMARKER;
+        }
+
+        NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(icon).
+            setTargets(gotoRelatedItem.getElement());
+
+        String customName = gotoRelatedItem.getCustomName();
+        if(customName != null) {
+            builder.setTooltipText(customName);
+        }
+
+        return builder.createLineMarkerInfo(smartyFile);
+    }
+
 
 }
