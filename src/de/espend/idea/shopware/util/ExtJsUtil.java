@@ -40,7 +40,8 @@ public class ExtJsUtil {
 
     @Nullable
     public static String getControllerOnPath(PsiFile psiFile) {
-        String relativeFilename = VfsUtil.getRelativePath(psiFile.getVirtualFile(), psiFile.getProject().getBaseDir(), '/');
+
+        String relativeFilename = TemplateUtil.getTemplateName(psiFile.getProject(), psiFile.getVirtualFile(), "backend");
         if(relativeFilename == null) {
             return null;
         }

@@ -20,6 +20,7 @@ import com.jetbrains.php.lang.psi.elements.impl.AssignmentExpressionImpl;
 import com.jetbrains.smarty.SmartyFile;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
+import freemarker.template.Template;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -160,12 +161,12 @@ public class ShopwareUtil {
     @Nullable
     public static Method getControllerActionOnSmartyFile(SmartyFile smartyFile, String... modules) {
 
-        String relativeFilename = VfsUtil.getRelativePath(smartyFile.getVirtualFile(), smartyFile.getProject().getBaseDir(), '/');
+        String relativeFilename = TemplateUtil.getTemplateName(smartyFile.getProject(), smartyFile.getVirtualFile());
         if(relativeFilename == null) {
             return null;
         }
 
-        Pattern pattern = Pattern.compile(".*/(" + StringUtils.join(modules, "|") + ")/(\\w+)/(\\w+)\\.tpl");
+        Pattern pattern = Pattern.compile(".*[/]*(" + StringUtils.join(modules, "|") + ")/(\\w+)/(\\w+)\\.tpl");
         Matcher matcher = pattern.matcher(relativeFilename);
 
         if(!matcher.find()) {

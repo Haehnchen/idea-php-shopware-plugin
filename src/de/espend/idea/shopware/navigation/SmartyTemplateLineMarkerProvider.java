@@ -4,6 +4,7 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.navigation.GotoRelatedItem;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -118,12 +119,12 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        String relativeFilename = VfsUtil.getRelativePath(smartyFile.getVirtualFile(), smartyFile.getProject().getBaseDir(), '/');
+        String relativeFilename = TemplateUtil.getTemplateName(smartyFile.getProject(), smartyFile.getVirtualFile());
         if(relativeFilename == null) {
             return;
         }
 
-        Pattern pattern = Pattern.compile(".*/(frontend|backend|core)/(\\w+)/(\\w+)\\.tpl");
+        Pattern pattern = Pattern.compile(".*[/]*(frontend|backend|core)/(\\w+)/(\\w+)\\.tpl");
         Matcher matcher = pattern.matcher(relativeFilename);
 
         if(!matcher.find()) {

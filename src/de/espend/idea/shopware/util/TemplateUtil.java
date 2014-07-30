@@ -1,14 +1,23 @@
 package de.espend.idea.shopware.util;
 
+import com.intellij.lang.javascript.JavaScriptSupportLoader;
+import com.intellij.lang.javascript.psi.impl.JSFileImpl;
+import com.intellij.lang.javascript.types.JSFileElementType;
+import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.smarty.SmartyFileType;
 import com.jetbrains.smarty.lang.psi.SmartyTag;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -32,10 +41,39 @@ public class TemplateUtil {
         final VirtualFile baseDir = project.getBaseDir();
         final VirtualFile templateDir = VfsUtil.findRelativeFile("templates", baseDir);
 
+
+        // search for index files; think of lib and include path
+        List<LanguageFileType> languageFileTypes = new ArrayList<LanguageFileType>();
+
+        if(exts.contains("tpl")) {
+            languageFileTypes.add(SmartyFileType.INSTANCE);
+        }
+
+        if(exts.contains("js")) {
+            languageFileTypes.add(JavaScriptSupportLoader.JAVASCRIPT);
+        }
+
+        for(LanguageFileType fileType: languageFileTypes) {
+            for(VirtualFile virtualFile : FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SmartyFileType.INSTANCE, GlobalSearchScope.allScope(project))) {
+                if(!uniqueVirtualFiles.contains(virtualFile)) {
+                    uniqueVirtualFiles.add(virtualFile);
+
+                    String path = virtualFile.toString();
+                    int i = path.lastIndexOf("/templates/");
+                    if(i > 0) {
+                        String frontendName = path.substring(i + "/templates/".length());
+                        attachTemplates(virtualFile, frontendName, smartyTemplateVisitor);
+                    }
+                }
+            }
+        }
+
+        // wooh... not a full project, so skip it
         if(templateDir == null) {
             return;
         }
 
+        // collect on project template dir
         VfsUtil.visitChildrenRecursively(templateDir, new VirtualFileVisitor() {
             @Override
             public boolean visitFile(@NotNull VirtualFile virtualFile) {
@@ -55,26 +93,33 @@ public class TemplateUtil {
                     return true;
                 }
 
-                String[] pathSplits = StringUtils.split(frontendName, "/");
-                if(pathSplits.length < 2 || (!"frontend".equals(pathSplits[1]) && !"backend".equals(pathSplits[1])) && !"widgets".equals(pathSplits[1])) {
-                    return true;
-                }
-
-                int i = frontendName.indexOf("/");
-                if(i == -1) {
-                    return true;
-                }
-
-                int n = pathSplits.length-1;
-                String[] newArray = new String[n];
-                System.arraycopy(pathSplits, 1, newArray, 0, n);
-
-                String fileName = StringUtils.join(newArray, "/");
-                smartyTemplateVisitor.visitFile(virtualFile, fileName);
+                attachTemplates(virtualFile, frontendName, smartyTemplateVisitor);
 
                 return true;
             }
         });
+    }
+
+    private static boolean attachTemplates(VirtualFile virtualFile, String frontendName, SmartyTemplateVisitor smartyTemplateVisitor) {
+
+        String[] pathSplits = StringUtils.split(frontendName, "/");
+        if(pathSplits.length < 2 || (!"frontend".equals(pathSplits[1]) && !"backend".equals(pathSplits[1])) && !"widgets".equals(pathSplits[1])) {
+            return true;
+        }
+
+        int i = frontendName.indexOf("/");
+        if(i == -1) {
+            return true;
+        }
+
+        int n = pathSplits.length-1;
+        String[] newArray = new String[n];
+        System.arraycopy(pathSplits, 1, newArray, 0, n);
+
+        String fileName = StringUtils.join(newArray, "/");
+        smartyTemplateVisitor.visitFile(virtualFile, fileName);
+
+        return false;
     }
 
     private static void collectPluginTemplates(Project project, final SmartyTemplateVisitor smartyTemplateVisitor, final List<String> exts) {
@@ -153,16 +198,28 @@ public class TemplateUtil {
 
         return false;
     }
-
     @Nullable
     public static String getTemplateName(Project project, VirtualFile virtualFile) {
+        return getTemplateName(project, virtualFile, "frontend", "backend", "widgets");
+    }
+
+    @Nullable
+    public static String getTemplateName(Project project, VirtualFile virtualFile, String... modules) {
 
         String frontendName = VfsUtil.getRelativePath(virtualFile, project.getBaseDir(), '/');
         if(frontendName == null) {
-            return null;
+
+            // search for possible indexed files
+            String path = virtualFile.toString();
+            int i = path.lastIndexOf("/templates/");
+            if(i == -1) {
+                return null;
+            }
+
+            frontendName = path.substring(i + "/templates/".length()) + "/";
         }
 
-        for(String module: new String[] {"frontend", "backend", "widgets"}) {
+        for(String module: modules) {
             int i = frontendName.indexOf(module);
             if(i > 0) {
                 return frontendName.substring(i);
