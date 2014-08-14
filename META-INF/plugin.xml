@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.1</version>
+  <version>1.1.1</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -41,6 +41,11 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.1.1</h2>
+<ul>
+    <li>Fixed a typo in template collector</li>
+</ul>
 
 <h2>1.1</h2>
 <ul>
