@@ -54,7 +54,7 @@ public class TemplateUtil {
         }
 
         for(LanguageFileType fileType: languageFileTypes) {
-            for(VirtualFile virtualFile : FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SmartyFileType.INSTANCE, GlobalSearchScope.allScope(project))) {
+            for(VirtualFile virtualFile : FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, fileType, GlobalSearchScope.allScope(project))) {
                 if(!uniqueVirtualFiles.contains(virtualFile)) {
                     uniqueVirtualFiles.add(virtualFile);
 
