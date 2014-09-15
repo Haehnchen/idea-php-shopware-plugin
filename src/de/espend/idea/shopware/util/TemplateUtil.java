@@ -230,4 +230,17 @@ public class TemplateUtil {
 
     }
 
+    public static String cleanTemplateName(String templateName) {
+
+        if(templateName.startsWith("parent:")) {
+            templateName = templateName.substring("parent:".length());
+        }
+
+        if(templateName.startsWith("./")) {
+            templateName = templateName.substring("./".length());
+        }
+
+        return templateName;
+    }
+
 }

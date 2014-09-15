@@ -22,6 +22,7 @@ import com.jetbrains.smarty.SmartyFile;
 import com.jetbrains.smarty.SmartyFileType;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
+import de.espend.idea.shopware.index.SmartyExtendsStubIndex;
 import de.espend.idea.shopware.index.SmartyIncludeStubIndex;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
@@ -64,6 +65,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
 
         attachController(smartyFile, gotoRelatedItems);
         attachInclude(smartyFile, gotoRelatedItems);
+        attachExtends(smartyFile, gotoRelatedItems);
 
         if(gotoRelatedItems.size() == 0) {
             return;
@@ -178,6 +180,28 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
                         gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(psiElement, "Navigate to include").withIcon(PhpIcons.IMPLEMENTED, PhpIcons.IMPLEMENTED));
                     }
 
+                }
+
+                return true;
+            }
+        }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(smartyFile.getProject()), SmartyFileType.INSTANCE));
+
+    }
+
+    public void attachExtends(final SmartyFile smartyFile, final List<GotoRelatedItem> gotoRelatedItems) {
+
+        final String templateName = TemplateUtil.getTemplateName(smartyFile.getProject(), smartyFile.getVirtualFile());
+        if(templateName == null) {
+            return;
+        }
+
+        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyExtendsStubIndex.KEY, new HashSet<String>(Arrays.asList(templateName)), new Processor<VirtualFile>() {
+            @Override
+            public boolean process(VirtualFile virtualFile) {
+
+                PsiFile psiFile = PsiManager.getInstance(smartyFile.getProject()).findFile(virtualFile);
+                if(psiFile != null) {
+                    gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(psiFile, TemplateUtil.getTemplateName(psiFile.getProject(), psiFile.getVirtualFile())).withIcon(PhpIcons.IMPLEMENTED, PhpIcons.IMPLEMENTED));
                 }
 
                 return true;

@@ -18,9 +18,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class SmartyIncludeStubIndex extends FileBasedIndexExtension<String, Void> {
+public class SmartyExtendsStubIndex extends FileBasedIndexExtension<String, Void> {
 
-    public static final ID<String, Void> KEY = ID.create("de.espend.idea.shopware.smarty_includes");
+    public static final ID<String, Void> KEY = ID.create("de.espend.idea.shopware.smarty_extends");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
     @NotNull
@@ -48,7 +48,7 @@ public class SmartyIncludeStubIndex extends FileBasedIndexExtension<String, Void
                     @Override
                     public void visitElement(PsiElement element) {
 
-                        if(SmartyPattern.getFileIncludePattern().accepts(element)) {
+                        if(SmartyPattern.getExtendPattern().accepts(element)) {
                             visitBlock(element);
                         }
 
@@ -56,6 +56,7 @@ public class SmartyIncludeStubIndex extends FileBasedIndexExtension<String, Void
                     }
 
                     private void visitBlock(PsiElement element) {
+
                         String content = element.getText();
                         if(content == null || StringUtils.isBlank(content) || !content.contains("/") || !content.endsWith(".tpl")) {
                             return;
@@ -102,6 +103,6 @@ public class SmartyIncludeStubIndex extends FileBasedIndexExtension<String, Void
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 }
