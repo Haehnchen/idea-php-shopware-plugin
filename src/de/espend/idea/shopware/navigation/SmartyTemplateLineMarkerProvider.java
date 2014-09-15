@@ -5,7 +5,6 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.navigation.GotoRelatedItem;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -28,10 +27,10 @@ import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,6 +46,12 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
 
+        if(psiElements.size() == 0 || !ShopwareProjectComponent.isValidForProject(psiElements.get(0))) {
+            return;
+        }
+
+        Set<VirtualFile> extendsPathFiles = null;
+
         for(PsiElement psiElement: psiElements) {
 
             if(psiElement instanceof SmartyFile) {
@@ -57,7 +62,19 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
                 attachTemplateBlocks(psiElement, lineMarkerInfos);
             }
 
+            if(SmartyPattern.getBlockPattern().accepts(psiElement)) {
+
+                // cache template extends path
+                if(extendsPathFiles == null) {
+                    extendsPathFiles = new HashSet<VirtualFile>();
+                    getImplementedBlocks(psiElement.getProject(), psiElement.getContainingFile().getVirtualFile(), extendsPathFiles, 10);
+                }
+
+                attachImplementsBlocks(psiElement, lineMarkerInfos, extendsPathFiles);
+            }
+
         }
+
     }
 
     private void attachFileContextMaker(SmartyFile smartyFile, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
@@ -95,11 +112,83 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
         return new LineMarkerInfo<PsiElement>(lineMarkerTarget, lineMarkerTarget.getTextOffset(), ShopwarePluginIcons.SHOPWARE_LINEMARKER, 6, new ConstantFunction<PsiElement, String>(title), new fr.adrienbrault.idea.symfony2plugin.dic.RelatedPopupGotoLineMarker.NavigationHandler(gotoRelatedItems));
     }
 
-    public void attachTemplateBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos) {
+    public void attachImplementsBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos, Set<VirtualFile> virtualFiles) {
 
-        if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+        if(virtualFiles.size() == 0) {
             return;
         }
+
+        VirtualFile virtualFile = psiElement.getContainingFile().getVirtualFile();
+        if(virtualFiles.contains(virtualFile)) {
+            virtualFiles.remove(virtualFile);
+        }
+
+        final String blockName = psiElement.getText();
+        if(StringUtils.isBlank(blockName)) {
+            return;
+        }
+
+        final Collection<PsiElement> targets = new ArrayList<PsiElement>();
+
+        for(VirtualFile virtualTemplate: virtualFiles) {
+            PsiFile psiFile = PsiManager.getInstance(psiElement.getProject()).findFile(virtualTemplate);
+            if(psiFile != null) {
+                psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+                    @Override
+                    public void visitElement(PsiElement element) {
+
+                        if(SmartyPattern.getBlockPattern().accepts(element)) {
+                            String text = element.getText();
+                            if(blockName.equalsIgnoreCase(text)) {
+                                targets.add(element);
+                            }
+
+                        }
+
+                        super.visitElement(element);
+                    }
+                });
+            }
+        }
+
+        if(targets.size() == 0) {
+            return;
+        }
+
+        NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(PhpIcons.IMPLEMENTED).
+            setTargets(targets).
+            setTooltipText("Navigate to block");
+
+        lineMarkerInfos.add(builder.createLineMarkerInfo(psiElement));
+
+
+    }
+
+    private void getImplementedBlocks(final Project project, VirtualFile virtualFile, final Set<VirtualFile> templatePathFiles, int depth) {
+
+        if(templatePathFiles.contains(virtualFile) || depth-- <= 0) {
+            return;
+        }
+
+        final String templateName = TemplateUtil.getTemplateName(project, virtualFile);
+        if(templateName == null) {
+            return;
+        }
+
+        final int finalDepth = depth;
+        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyExtendsStubIndex.KEY, new HashSet<String>(Arrays.asList(templateName)), new Processor<VirtualFile>() {
+            @Override
+            public boolean process(VirtualFile virtualFile) {
+
+                templatePathFiles.add(virtualFile);
+                getImplementedBlocks(project, virtualFile, templatePathFiles, finalDepth);
+
+                return true;
+            }
+        }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(project), SmartyFileType.INSTANCE));
+    }
+
+    public void attachTemplateBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos) {
 
         SmartyBlockGoToHandler goToHandler = new SmartyBlockGoToHandler();
         PsiElement[] gotoDeclarationTargets = goToHandler.getGotoDeclarationTargets(psiElement, 0, null);
@@ -122,10 +211,6 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
     }
 
     public void attachController(SmartyFile smartyFile, final List<GotoRelatedItem> gotoRelatedItems) {
-
-        if(!ShopwareProjectComponent.isValidForProject(smartyFile)) {
-            return;
-        }
 
         String relativeFilename = TemplateUtil.getTemplateName(smartyFile.getProject(), smartyFile.getVirtualFile());
         if(relativeFilename == null) {
