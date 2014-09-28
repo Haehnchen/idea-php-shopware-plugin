@@ -21,6 +21,7 @@ import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,13 +43,13 @@ public class ShopwareProjectComponent implements ProjectComponent {
             return;
         }
 
-        if(VfsUtil.findRelativeFile(this.project.getBaseDir(), "engine", "Shopware", "Kernel.php") == null) {
-            return;
-        }
-
         DumbService.getInstance(this.project).smartInvokeLater(new Runnable() {
             @Override
             public void run() {
+
+                if(PhpElementsUtil.getClassInterface(project, "\\Enlight_Controller_Action") == null) {
+                    return;
+                }
 
                 ShopwareUtil.writeShopwareMagicFile(magicTemplate(), getMagicFilePathname());
 
@@ -59,8 +60,11 @@ public class ShopwareProjectComponent implements ProjectComponent {
                         final Set<String> events = new HashSet<String>();
                         final Set<String> configs = new HashSet<String>();
 
-                        for (final VirtualFile virtualFile : FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, PhpFileType.INSTANCE, GlobalSearchScope.allScope(project))) {
+                        Collection<VirtualFile> containingFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, PhpFileType.INSTANCE, GlobalSearchScope.allScope(project));
+                        float stepSize = (float) (1.0 / containingFiles.size());
+                        for (VirtualFile virtualFile : containingFiles) {
                             ApplicationManager.getApplication().runReadAction(new PsiParameterStorageRunnable(getProject(), virtualFile, events, configs));
+                            indicator.setFraction(indicator.getFraction() + stepSize);
                         }
 
                         HookSubscriberUtil.NOTIFY_EVENTS.clear();
