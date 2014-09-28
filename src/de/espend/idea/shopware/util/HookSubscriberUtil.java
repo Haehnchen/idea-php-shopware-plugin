@@ -6,6 +6,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
+import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 
 import java.util.*;
 
@@ -38,10 +40,18 @@ public class HookSubscriberUtil {
         }
 
         phpClasses.addAll(phpIndex.getAllSubclasses("\\Enlight_Hook"));
+        Symfony2InterfacesUtil symfony2InterfacesUtil = new Symfony2InterfacesUtil();
 
         for(PhpClass phpClass: phpClasses) {
+
+            // dont use proxy classes
+            String presentableFQN = phpClass.getPresentableFQN();
+            if(presentableFQN == null || (presentableFQN.endsWith("Proxy") && symfony2InterfacesUtil.isInstanceOf(phpClass, "\\Enlight_Hook_Proxy"))) {
+                continue;
+            }
+
             for(Method method: phpClass.getMethods()) {
-                if(!method.isStatic() && !method.isAbstract() && !method.getName().startsWith("_")) {
+                if(!method.getAccess().isPrivate() && !method.isStatic() && !method.isAbstract() && !method.getName().startsWith("_")) {
                     boolean returnValue = hookVisitor.visitHook(phpClass, method);
                     if(!returnValue) {
                         return;
