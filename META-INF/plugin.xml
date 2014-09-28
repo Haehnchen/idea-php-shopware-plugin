@@ -1,11 +1,14 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.2</version>
+  <version>1.3</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
       <h1>Shopware Plugin</h1><br>
+      <br/>
+      <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues">Issues</a>
+
       <br>
       Install <a href="http://plugins.jetbrains.com/plugin/7219">Symfony2 Plugin</a> and enable it per project
       <br/><br/>
@@ -24,6 +27,7 @@
         <li>PHP: Magic method type provider</li>
         <li>PHP: Bootstrap::getInfo, Bootstrap::Path, ModelManager::addAttribute/generateAttributeModels</li>
         <li>PHP: Enlight_Controller_Router::assemble array parameter</li>
+        <li>PHP: Custom config and event name indexer</li>
         <li>Smarty: References for files, controller, actions, widgets</li>
         <li>Smarty: Block references on extends path</li>
         <li>Smarty: Namespace tag support</li>
@@ -42,6 +46,13 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.3</h2>
+<ul>
+    <li>Add custom background indexer for config and notify events</li>
+    <li>Provide completion for config and events</li>
+    <li>Fix hook method completion displays privates</li>
+</ul>
 
 <h2>1.2</h2>
 <ul>
