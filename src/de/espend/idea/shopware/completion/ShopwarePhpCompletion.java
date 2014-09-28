@@ -17,6 +17,7 @@ import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ShopwareUtil;
+import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
@@ -39,6 +40,12 @@ public class ShopwarePhpCompletion extends CompletionContributor{
                     PsiElement originalPosition = parameters.getOriginalPosition();
                     if(originalPosition == null || !ShopwareProjectComponent.isValidForProject(originalPosition)) {
                         return;
+                    }
+
+                    if(new MethodMatcher.StringParameterRecursiveMatcher(originalPosition.getContext(), 0).withSignature("\\Shopware_Components_Config", "get").match() != null) {
+                        for(String type: ShopwareUtil.PLUGIN_CONFIGS) {
+                            result.addElement(LookupElementBuilder.create(type).withIcon(Symfony2Icons.CONFIG_VALUE));
+                        }
                     }
 
                     if(new MethodMatcher.StringParameterRecursiveMatcher(originalPosition.getContext(), 0).withSignature("\\Shopware\\Models\\Config\\Form", "setElement").match() != null) {

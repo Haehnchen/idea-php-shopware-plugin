@@ -66,6 +66,23 @@ public class SmartyPattern {
                 PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{link"))
             );
     }
+
+    public static PsiElementPattern.Capture<PsiElement> getConfigPattern() {
+        return PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
+            .afterLeafSkipping(
+                PlatformPatterns.or(
+                    PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
+                    PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
+                ),
+                PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("name")
+            )
+            .withParent(
+                PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{config"))
+            );
+    }
+
     public static ElementPattern<PsiElement> getControllerPattern() {
         return getControllerPattern("url");
     }

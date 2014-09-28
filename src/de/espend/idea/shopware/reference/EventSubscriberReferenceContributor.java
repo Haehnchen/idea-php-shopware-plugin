@@ -20,6 +20,7 @@ import de.espend.idea.shopware.reference.provider.ControllerActionReferenceProvi
 import de.espend.idea.shopware.reference.provider.ControllerReferenceProvider;
 import de.espend.idea.shopware.reference.provider.SmartyTemplateProvider;
 import de.espend.idea.shopware.reference.provider.StringReferenceProvider;
+import de.espend.idea.shopware.util.HookSubscriberUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
@@ -28,10 +29,7 @@ import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -338,13 +336,19 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         @Override
         public Object[] getVariants() {
 
+            final Set<String> events = new HashSet<String>(HookSubscriberUtil.NOTIFY_EVENTS);
+
             final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
             collectEvents(getElement().getProject(), new Collector() {
                 @Override
                 public void collect(PsiElement psiElement, String value) {
-                    lookupElements.add(LookupElementBuilder.create(value).withIcon(ShopwarePluginIcons.SHOPWARE).withTypeText("Event", true));
+                    events.add(value);
                 }
             });
+
+            for(String event: events) {
+                lookupElements.add(LookupElementBuilder.create(event).withIcon(ShopwarePluginIcons.SHOPWARE).withTypeText("Event", true));
+            }
 
             return lookupElements.toArray();
         }

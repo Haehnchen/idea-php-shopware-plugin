@@ -28,6 +28,7 @@ import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyBlockUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
+import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.routing.Route;
 import fr.adrienbrault.idea.symfony2plugin.routing.RouteLookupElement;
 import fr.adrienbrault.idea.symfony2plugin.stubs.SymfonyProcessors;
@@ -293,6 +294,25 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             }
         );
 
+
+        // {config name=Foo}
+        extend(
+            CompletionType.BASIC, SmartyPattern.getConfigPattern(),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                        return;
+                    }
+
+                    for(String config: ShopwareUtil.PLUGIN_CONFIGS) {
+                        result.addElement(LookupElementBuilder.create(config).withIcon(Symfony2Icons.CONFIG_VALUE));
+                    }
+
+                }
+            }
+        );
 
         extend(
             CompletionType.BASIC, SmartyPattern.getControllerActionPattern("action"),

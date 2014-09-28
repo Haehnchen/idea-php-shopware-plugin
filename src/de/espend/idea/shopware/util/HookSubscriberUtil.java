@@ -3,6 +3,7 @@ package de.espend.idea.shopware.util;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.containers.ConcurrentHashSet;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -12,6 +13,8 @@ import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import java.util.*;
 
 public class HookSubscriberUtil {
+
+    public static Set<String> NOTIFY_EVENTS = new ConcurrentHashSet<String>();
 
     final private static Set<String> CORE_CLASSES = new HashSet<String>() {{
         addAll(Arrays.asList("sCms", "sCore", "sAdmin", "sOrder", "sBasket", "sExport", "sSystem", "sArticles", "sMarketing", "sCategories", "sCategories", "sNewsletter", "sConfigurator", "sRewriteTable"));

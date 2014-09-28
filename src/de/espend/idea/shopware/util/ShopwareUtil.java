@@ -13,6 +13,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
+import com.intellij.util.containers.ConcurrentHashSet;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
@@ -31,10 +32,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ShopwareUtil {
+
+    public static Set<String> PLUGIN_CONFIGS = new ConcurrentHashSet<String>();
 
     final public static String[] PLUGIN_CONFIG_TYPES = new String[] {
         "text", "color", "datetime", "html", "interval", "mediaselection", "number", "select", "combo", "textarea", "time"
