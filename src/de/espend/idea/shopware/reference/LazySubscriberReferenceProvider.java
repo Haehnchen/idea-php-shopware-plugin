@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
+import com.intellij.util.Processor;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -17,6 +18,7 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
+import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,6 +71,35 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
 
                             for (String lifecycleName : new String[]{"prePersist", "postPersist", "preUpdate", "postUpdate", "preRemove", "postRemove"}) {
                                 result.addElement(LookupElementBuilder.create(String.format("%s::%s", phpClass.getPresentableFQN(), lifecycleName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("Doctrine", true));
+                            }
+
+                            return true;
+                        }
+                    });
+
+
+                    final Symfony2InterfacesUtil symfony2InterfacesUtil = new Symfony2InterfacesUtil();
+
+                    HookSubscriberUtil.visitDoctrineQueryBuilderClasses(originalPosition.getProject(), new Processor<PhpClass>() {
+                        @Override
+                        public boolean process(PhpClass phpClass) {
+
+                            for(Method method: phpClass.getOwnMethods()) {
+
+                                String presentableFQN = phpClass.getPresentableFQN();
+                                if(presentableFQN == null || (presentableFQN.endsWith("Proxy") || symfony2InterfacesUtil.isInstanceOf(phpClass, "\\Enlight_Hook_Proxy"))) {
+                                    continue;
+                                }
+
+                                if(method.getAccess().isPublic() || method.getAccess().isProtected()) {
+                                    String name = method.getName();
+                                    if(!name.startsWith("__")) {
+                                        for (String hookName : new String[]{"after", "before", "replace"}) {
+                                            System.out.println(String.format("%s::%s::%s", presentableFQN, name, hookName));
+                                            result.addElement(LookupElementBuilder.create(String.format("%s::%s::%s", presentableFQN, name, hookName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("QueryBuilder", true));
+                                        }
+                                    }
+                                }
                             }
 
                             return true;
@@ -138,6 +169,31 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                 return true;
             }
         });
+
+        final String[] splits = hookNameContent.split("::");
+
+        if(splits.length >= 2) {
+            HookSubscriberUtil.visitDoctrineQueryBuilderClasses(psiElement.getProject(), new Processor<PhpClass>() {
+                @Override
+                public boolean process(PhpClass phpClass) {
+
+                    for(Method method: phpClass.getMethods()) {
+
+                        String presentableFQN = phpClass.getPresentableFQN();
+                        if(presentableFQN == null || !presentableFQN.equals(splits[0])) {
+                            continue;
+                        }
+
+                        if((method.getAccess().isPublic() || method.getAccess().isProtected()) && splits[1].equals(method.getName())) {
+                            psiElements.add(method);
+                            return true;
+                        }
+                    }
+
+                    return true;
+                }
+            });
+        }
 
         return psiElements.toArray(new PsiElement[psiElements.size()]);
     }

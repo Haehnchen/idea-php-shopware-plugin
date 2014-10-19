@@ -3,6 +3,7 @@ package de.espend.idea.shopware.util;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.Processor;
 import com.intellij.util.containers.ConcurrentHashSet;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -68,6 +69,14 @@ public class HookSubscriberUtil {
     public static void collectDoctrineLifecycleHooks(Project project, DoctrineLifecycleHooksVisitor hookVisitor) {
         for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Model\\ModelEntity")) {
             hookVisitor.visitLifecycleHooks(phpClass);
+        }
+    }
+
+    public static void visitDoctrineQueryBuilderClasses(Project project, Processor<PhpClass> processor) {
+        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Model\\ModelRepository")) {
+            if(!processor.process(phpClass)) {
+                return;
+            }
         }
     }
 
