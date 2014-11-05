@@ -237,6 +237,11 @@
                        enabledByDefault="true" level="WARNING"
                        implementationClass="de.espend.idea.shopware.inspection.ShopwareBoostrapInspection"/>
 
+      <localInspection groupPath="Shopware" shortName="ShopwareSubscriperMethodInspection" displayName="ShopwareSubscriperMethodInspection"
+                       groupName="Shopware"
+                       enabledByDefault="true" level="WARNING"
+                       implementationClass="de.espend.idea.shopware.inspection.ShopwareSubscriperMethodInspection"/>
+
   </extensions>
 
     <extensions defaultExtensionNs="fr.adrienbrault.idea.symfony2plugin.extension">

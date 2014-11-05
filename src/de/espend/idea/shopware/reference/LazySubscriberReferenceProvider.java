@@ -15,16 +15,20 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
+import fr.adrienbrault.idea.symfony2plugin.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class LazySubscriberReferenceProvider extends CompletionContributor implements GotoDeclarationHandler {
 
@@ -106,6 +110,61 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                         }
                     });
 
+
+                }
+            }
+        );
+
+        extend(
+            CompletionType.BASIC, PlatformPatterns.psiElement().withParent(
+            PlatformPatterns.psiElement(StringLiteralExpression.class).withParent(
+                PlatformPatterns.psiElement(ParameterList.class)
+            )
+        ),
+            new CompletionProvider<CompletionParameters>() {
+
+                private String toCamelCase(String value, boolean startWithLowerCase) {
+                    String[] strings = org.apache.commons.lang.StringUtils.split(value.toLowerCase(), "_");
+                    for (int i = startWithLowerCase ? 1 : 0; i < strings.length; i++){
+                        strings[i] = org.apache.commons.lang.StringUtils.capitalize(strings[i]);
+                    }
+                    return org.apache.commons.lang.StringUtils.join(strings);
+                }
+
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    PsiElement originalPosition = parameters.getOriginalPosition();
+                    if(originalPosition == null || !ShopwareProjectComponent.isValidForProject(originalPosition)) {
+                        return;
+                    }
+
+                    MethodMatcher.MethodMatchParameter match = new MethodMatcher.StringParameterMatcher(originalPosition.getContext(), 1)
+                        .withSignature("\\Shopware_Components_Plugin_Bootstrap", "subscribeEvent")
+                        .match();
+
+                    if(match == null) {
+                        return;
+                    }
+
+                    PsiElement[] psiElements = match.getMethodReference().getParameters();
+                    if(psiElements.length < 2 || !(psiElements[0] instanceof StringLiteralExpression)) {
+                        return;
+                    }
+
+                    String contents = toCamelCase(((StringLiteralExpression) psiElements[0]).getContents().replaceAll("[:]+", "_"), false);
+                    String content = contents.replace("_", "");
+
+                    Set<String> stringSet = new HashSet<String>();
+                    stringSet.add((content));
+
+                    if(contents.startsWith("Enlight")) {
+                        stringSet.add(contents.substring("Enlight".length()));
+                    }
+
+                    for(String value: stringSet) {
+                        result.addElement(LookupElementBuilder.create("on" + value).withIcon(ShopwarePluginIcons.SHOPWARE));
+                    }
 
                 }
             }
