@@ -16,6 +16,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class SmartyTemplateProvider extends PsiPolyVariantReferenceBase<PsiElement> {
 
     final private String valueName;

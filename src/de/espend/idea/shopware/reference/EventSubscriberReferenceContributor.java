@@ -33,6 +33,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class EventSubscriberReferenceContributor extends PsiReferenceContributor {
 
     public static MethodMatcher.CallToSignature[] EVENT_SIGNATURES = new MethodMatcher.CallToSignature[] {

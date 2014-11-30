@@ -6,6 +6,9 @@ import com.intellij.icons.AllIcons;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class TemplateLookupElement extends LookupElement {
 
     final private String templateName;

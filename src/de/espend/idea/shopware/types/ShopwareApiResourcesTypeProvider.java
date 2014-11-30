@@ -22,6 +22,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class ShopwareApiResourcesTypeProvider implements PhpTypeProvider2 {
 
     final static char TRIM_KEY = '\u0195';

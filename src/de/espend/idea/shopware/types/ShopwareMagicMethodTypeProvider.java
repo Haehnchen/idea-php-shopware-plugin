@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class ShopwareMagicMethodTypeProvider implements PhpTypeProvider2 {
 
     final static char TRIM_KEY = '\u0180';

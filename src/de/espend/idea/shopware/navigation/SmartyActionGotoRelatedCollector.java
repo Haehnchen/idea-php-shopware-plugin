@@ -18,6 +18,9 @@ import java.util.regex.Pattern;
 
 import static fr.adrienbrault.idea.symfony2plugin.dic.RelatedPopupGotoLineMarker.PopupGotoRelatedItem;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class SmartyActionGotoRelatedCollector implements ControllerActionGotoRelatedCollector {
 
     public static String underscore(String str){

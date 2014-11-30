@@ -12,6 +12,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class ShopwareServiceContainerLoader implements ServiceContainerLoader {
 
     public static final List<String[]> CONTAINER_FILES = Collections.unmodifiableList(Arrays.asList(
