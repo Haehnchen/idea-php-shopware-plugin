@@ -102,7 +102,6 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                                     String name = method.getName();
                                     if(!name.startsWith("__")) {
                                         for (String hookName : new String[]{"after", "before", "replace"}) {
-                                            System.out.println(String.format("%s::%s::%s", presentableFQN, name, hookName));
                                             result.addElement(LookupElementBuilder.create(String.format("%s::%s::%s", presentableFQN, name, hookName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("QueryBuilder", true));
                                         }
                                     }
