@@ -1,17 +1,26 @@
 package de.espend.idea.shopware.util;
 
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.Processor;
 import com.intellij.util.containers.ConcurrentHashSet;
+import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import de.espend.idea.shopware.reference.EventSubscriberReferenceContributor;
+import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HookSubscriberUtil {
 
@@ -86,6 +95,26 @@ public class HookSubscriberUtil {
 
     public static interface HookVisitor {
         public boolean visitHook(PhpClass phpClass, Method method);
+    }
+
+    @NotNull
+    public static Collection<PsiElement> getAllHookTargets(Project project, final String contents) {
+
+        final Collection<PsiElement> psiElements = new HashSet<PsiElement>();
+        Collections.addAll(psiElements, LazySubscriberReferenceProvider.getHookTargets(project, contents));
+
+        // Enlight_Controller_Action_PostDispatchSecure_Frontend_Payment
+        Pattern pattern = Pattern.compile("Enlight_Controller_Action_\\w+_(Frontend|Backend|Core|Widgets)_(\\w+)");
+        Matcher matcher = pattern.matcher(contents);
+
+        if(matcher.find()) {
+            PhpClass phpClass = PhpElementsUtil.getClass(project, String.format("Shopware_Controllers_%s_%s", matcher.group(1), matcher.group(2)));
+            if(phpClass != null) {
+                psiElements.add(phpClass);
+            }
+        }
+
+        return psiElements;
     }
 
 }

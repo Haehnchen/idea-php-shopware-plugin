@@ -93,7 +93,7 @@ public class ShopwareUtil {
     }
 
     public static void collectControllerClass(Project project, ControllerClassVisitor controllerClassVisitor) {
-        collectControllerClass(project, controllerClassVisitor, "Frontend" , "Backend", "Core");
+        collectControllerClass(project, controllerClassVisitor, "Frontend" , "Backend", "Core", "Widgets");
     }
 
     public static void collectControllerClass(Project project, ControllerClassVisitor controllerClassVisitor, String... modules) {
