@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.3.2</version>
+  <version>1.4</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -28,6 +28,8 @@
         <li>PHP: Bootstrap::getInfo, Bootstrap::Path, ModelManager::addAttribute/generateAttributeModels</li>
         <li>PHP: Enlight_Controller_Router::assemble array parameter</li>
         <li>PHP: Custom config and event name indexer</li>
+        <li>PHP: Quickfix for subscriber method generation</li>
+        <li>PHP: Linemarker for subscriber methods</li>
         <li>Smarty: References for files, controller, actions, widgets</li>
         <li>Smarty: Block references on extends path</li>
         <li>Smarty: Namespace tag support</li>
@@ -46,6 +48,14 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.4</h2>
+<ul>
+    <li>Switching to MIT license</li>
+    <li>Typo fix to support also "Widgets" in subscriber</li>
+    <li>Add more quickfix template data to subscriber method template. also add cursor movement</li>
+    <li>Add lineMarkerProvider for subscriber method targets</li>
+</ul>
 
 <h2>1.3.2</h2>
 <ul>
