@@ -400,7 +400,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
 
         Collection<PhpClass> phpClasses = phpIndex.getAllSubclasses("\\Enlight_Controller_Action");
 
-        Pattern pattern = Pattern.compile(".*_(Frontend|Backend|Core|Widget)_(\\w+)");
+        Pattern pattern = Pattern.compile(".*_(Frontend|Backend|Core|Widgets)_(\\w+)");
 
 
         for (PhpClass phpClass : phpClasses) {
