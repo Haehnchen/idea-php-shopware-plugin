@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
@@ -196,10 +197,20 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
             return new PsiElement[0];
         }
 
+        return getHookTargets(psiElement.getProject(), hookNameContent);
+    }
+
+    @NotNull
+    public static PsiElement[] getHookTargets(@NotNull Project project, @NotNull final String hookNameContent) {
+
+        if(!hookNameContent.contains(":")) {
+            return new PsiElement[0];
+        }
+
         final String hookNamePreFilter = hookNameContent.substring(0, hookNameContent.indexOf(":"));
 
         final Collection<PsiElement> psiElements = new ArrayList<PsiElement>();
-        HookSubscriberUtil.collectHooks(psiElement.getProject(), new HookSubscriberUtil.HookVisitor() {
+        HookSubscriberUtil.collectHooks(project, new HookSubscriberUtil.HookVisitor() {
             @Override
             public boolean visitHook(PhpClass phpClass, Method method) {
                 if (!isEqualHookClass(phpClass, hookNamePreFilter)) return true;
@@ -215,7 +226,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
             }
         });
 
-        HookSubscriberUtil.collectDoctrineLifecycleHooks(psiElement.getProject(), new HookSubscriberUtil.DoctrineLifecycleHooksVisitor() {
+        HookSubscriberUtil.collectDoctrineLifecycleHooks(project, new HookSubscriberUtil.DoctrineLifecycleHooksVisitor() {
             @Override
             public boolean visitLifecycleHooks(PhpClass phpClass) {
                 if (!isEqualHookClass(phpClass, hookNamePreFilter)) return true;
@@ -234,7 +245,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
         final String[] splits = hookNameContent.split("::");
 
         if(splits.length >= 2) {
-            HookSubscriberUtil.visitDoctrineQueryBuilderClasses(psiElement.getProject(), new Processor<PhpClass>() {
+            HookSubscriberUtil.visitDoctrineQueryBuilderClasses(project, new Processor<PhpClass>() {
                 @Override
                 public boolean process(PhpClass phpClass) {
 
@@ -259,7 +270,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
         return psiElements.toArray(new PsiElement[psiElements.size()]);
     }
 
-    private boolean isEqualHookClass(PhpClass phpClass, String hookNamePreFilter) {
+    private static boolean isEqualHookClass(PhpClass phpClass, String hookNamePreFilter) {
         String presentableFQN = phpClass.getPresentableFQN();
         return !(presentableFQN == null || !presentableFQN.startsWith(hookNamePreFilter));
     }
