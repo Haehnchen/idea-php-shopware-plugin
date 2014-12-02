@@ -13,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.PhpCodeUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.reference.EventSubscriberReferenceContributor;
@@ -57,12 +58,19 @@ public class CreateMethodQuickFix implements LocalQuickFix {
 
         PsiElement[] parameters = methodReference.getParameters();
         String subjectDoc = null;
+        Method hookMethod = null;
         String hookName = null;
         if(parameters.length > 1 && parameters[0] instanceof StringLiteralExpression) {
             hookName = ((StringLiteralExpression) parameters[0]).getContents();
-            PhpClass phpClassSubject = getSubjectTargetOnHook(project, hookName);
-            if(phpClassSubject != null) {
-                subjectDoc = phpClassSubject.getPresentableFQN();
+            PsiElement subjectTarget = getSubjectTargetOnHook(project, hookName);
+            if(subjectTarget instanceof PhpClass) {
+                subjectDoc = ((PhpClass) subjectTarget).getPresentableFQN();
+            } else if(subjectTarget instanceof Method) {
+                hookMethod = (Method) subjectTarget;
+                PhpClass containingClass = ((Method) subjectTarget).getContainingClass();
+                if(containingClass != null) {
+                    subjectDoc = containingClass.getPresentableFQN();
+                }
             }
         }
 
@@ -85,6 +93,19 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             if(hookName != null && hookName.contains("::")) {
                 stringBuilder.append("\n");
                 stringBuilder.append("$return = $args->getReturn();\n");
+
+                // add hook parameter
+                if(hookMethod != null) {
+                    Parameter[] hookMethodParameters = hookMethod.getParameters();
+                    if(hookMethodParameters.length > 0 ) {
+                        stringBuilder.append("\n");
+                        for(Parameter parameter : hookMethodParameters) {
+                            String name = parameter.getName();
+                            stringBuilder.append("$").append(name).append(" = ").append("$args->get('").append(name).append("');\n");
+                        }
+                    }
+                }
+
                 stringBuilder.append("\n");
                 stringBuilder.append("$args->setReturn($return);\n");
             }
@@ -121,13 +142,13 @@ public class CreateMethodQuickFix implements LocalQuickFix {
     }
 
     @Nullable
-    private PhpClass getSubjectTargetOnHook(Project project, final String contents) {
+    private PsiElement getSubjectTargetOnHook(Project project, final String contents) {
 
         for(PsiElement psiElement : LazySubscriberReferenceProvider.getHookTargets(project, contents)) {
             if(psiElement instanceof Method) {
-                return ((Method) psiElement).getContainingClass();
+                return psiElement;
             } else if(psiElement instanceof PhpClass) {
-                return (PhpClass) psiElement;
+                return psiElement;
             }
         }
 
