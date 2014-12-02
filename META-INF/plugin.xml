@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.4</version>
+  <version>1.4.1</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -28,7 +28,7 @@
         <li>PHP: Bootstrap::getInfo, Bootstrap::Path, ModelManager::addAttribute/generateAttributeModels</li>
         <li>PHP: Enlight_Controller_Router::assemble array parameter</li>
         <li>PHP: Custom config and event name indexer</li>
-        <li>PHP: Quickfix for subscriber method generation</li>
+        <li>PHP: Quickfix for subscriber method generation and content</li>
         <li>PHP: Linemarker for subscriber methods</li>
         <li>Smarty: References for files, controller, actions, widgets</li>
         <li>Smarty: Block references on extends path</li>
@@ -48,6 +48,13 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.4.1</h2>
+<ul>
+    <li>Optimize performance of hook references, directly resolve them</li>
+    <li>Add smarter camelize for subscript with testing</li>
+    <li>Add hook parameter as template for method quickfix creation</li>
+</ul>
 
 <h2>1.4</h2>
 <ul>
