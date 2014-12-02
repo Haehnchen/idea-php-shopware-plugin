@@ -19,6 +19,7 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
+import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
@@ -158,18 +159,13 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                         return;
                     }
 
-                    String contents = toCamelCase(((StringLiteralExpression) psiElements[0]).getContents().replaceAll("[:]+", "_"), false);
-                    String content = contents.replace("_", "");
-
-                    Set<String> stringSet = new HashSet<String>();
-                    stringSet.add((content));
-
-                    if(contents.startsWith("Enlight")) {
-                        stringSet.add(contents.substring("Enlight".length()));
+                    String contents = ((StringLiteralExpression) psiElements[0]).getContents();
+                    if(org.apache.commons.lang.StringUtils.isBlank(contents)) {
+                        return;
                     }
 
-                    for(String value: stringSet) {
-                        result.addElement(LookupElementBuilder.create("on" + value).withIcon(ShopwarePluginIcons.SHOPWARE));
+                    for(String value: ShopwareUtil.getLookupHooks(contents)) {
+                        result.addElement(LookupElementBuilder.create(value).withIcon(ShopwarePluginIcons.SHOPWARE));
                     }
 
                 }

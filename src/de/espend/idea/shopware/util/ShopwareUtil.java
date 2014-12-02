@@ -29,10 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -311,6 +308,43 @@ public class ShopwareUtil {
 
     public interface BootstrapFileVisitor {
         public void visitVariable(VirtualFile virtualFile, String relativePath);
+    }
+
+
+    public static Set<String> getLookupHooks(String content) {
+        return getHookCompletionNameCleanup(getCamelizeHook(content));
+    }
+
+    public static String getCamelizeHook(String content) {
+
+        content = content.replaceAll("_+", "_").replaceAll(":+", "_").replaceAll("\\\\+", "_");
+
+        List<String> items = new ArrayList<String>();
+        for(String s: content.split("(?=\\p{Lu})")) {
+            if(s.length() > 1) {
+                items.add(s);
+            }
+        }
+
+        return toCamelCase(StringUtils.join(items, "_").toLowerCase(), true);
+    }
+
+    public static Set<String> getHookCompletionNameCleanup(String content) {
+
+        Set<String> set = new HashSet<String>();
+        set.add("on" + ucfirst(content));
+
+        for(String startCleanup: new String[] {"shopware", "shopwareControllers", "enlightController", "enlight", "shopwareControllers"}) {
+            if(content.startsWith(startCleanup) && content.length() - startCleanup.length() > 1) {
+                set.add("on" + ucfirst(content.substring(startCleanup.length())));
+            }
+        }
+
+        return set;
+    }
+
+    private static String ucfirst(String subject) {
+        return Character.toUpperCase(subject.charAt(0)) + subject.substring(1);
     }
 
 }
