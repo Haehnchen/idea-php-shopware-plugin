@@ -1,4 +1,4 @@
-<idea-plugin version="2">
+<idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
   <version>1.4.1</version>
