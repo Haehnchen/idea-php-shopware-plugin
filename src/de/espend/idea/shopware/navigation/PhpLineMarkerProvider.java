@@ -60,9 +60,10 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
         containingFile.accept(new PsiRecursiveElementWalkingVisitor() {
             @Override
             public void visitElement(PsiElement element) {
-                if(!(element instanceof MethodReference)) {
-                    return;
 
+                if(!(element instanceof MethodReference)) {
+                    super.visitElement(element);
+                    return;
                 }
 
                 MethodReference methodReference = (MethodReference) element;
