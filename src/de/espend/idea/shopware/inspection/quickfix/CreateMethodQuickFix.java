@@ -131,22 +131,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             }
         }
 
-        // @TODO: replace this here
-        final PhpClass[] target = new PhpClass[1];
-        EventSubscriberReferenceContributor.collectEvents(project, new EventSubscriberReferenceContributor.Collector() {
-            @Override
-            public void collect(PsiElement psiElement, String value) {
-                if (value.equals(contents)) {
-                    if(psiElement instanceof Method) {
-                        target[0] = ((Method) psiElement).getContainingClass();
-                    } else if(psiElement instanceof PhpClass) {
-                        target[0] = (PhpClass) psiElement;
-                    }
-                }
-            }
-        });
-
-        return target[0];
+        return null;
     }
 
 }

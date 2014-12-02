@@ -22,19 +22,22 @@ import de.espend.idea.shopware.util.HookSubscriberUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
+import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
  */
 public class LazySubscriberReferenceProvider extends CompletionContributor implements GotoDeclarationHandler {
+
+    public static final List<String> DOCTRINE_LIFECYCLES = Arrays.asList("prePersist", "postPersist", "preUpdate", "postUpdate", "preRemove", "postRemove");
+    private static List<String> HOOK_EVENTS = Arrays.asList("after", "before", "replace");
 
     public LazySubscriberReferenceProvider() {
 
@@ -207,64 +210,39 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
             return new PsiElement[0];
         }
 
-        final String hookNamePreFilter = hookNameContent.substring(0, hookNameContent.indexOf(":"));
-
         final Collection<PsiElement> psiElements = new ArrayList<PsiElement>();
-        HookSubscriberUtil.collectHooks(project, new HookSubscriberUtil.HookVisitor() {
-            @Override
-            public boolean visitHook(PhpClass phpClass, Method method) {
-                if (!isEqualHookClass(phpClass, hookNamePreFilter)) return true;
 
-                for (String hookName : new String[]{"after", "before", "replace"}) {
-                    if (String.format("%s::%s::%s", phpClass.getPresentableFQN(), method.getName(), hookName).equals(hookNameContent) || String.format("%s:%s:%s", phpClass.getPresentableFQN(), method.getName(), hookName).equals(hookNameContent)) {
-                        psiElements.add(method);
-                        return false;
-                    }
+        String[] parts = hookNameContent.split("::");
+
+        // Enlight_Controller_Action::dispatch::replace
+        if(parts.length == 3) {
+            if(HOOK_EVENTS.contains(parts[2])) {
+                Method method = PhpElementsUtil.getClassMethod(project, parts[0], parts[1]);
+                if(method != null) {
+                    psiElements.add(method);
                 }
-
-                return true;
             }
-        });
+        }
 
-        HookSubscriberUtil.collectDoctrineLifecycleHooks(project, new HookSubscriberUtil.DoctrineLifecycleHooksVisitor() {
-            @Override
-            public boolean visitLifecycleHooks(PhpClass phpClass) {
-                if (!isEqualHookClass(phpClass, hookNamePreFilter)) return true;
-
-                for (String lifecycleName : new String[]{"prePersist", "postPersist", "preUpdate", "postUpdate", "preRemove", "postRemove"}) {
-                    if (String.format("%s::%s", phpClass.getPresentableFQN(), lifecycleName).equals(hookNameContent)) {
-                        psiElements.add(phpClass);
-                        return false;
-                    }
+        // Shopware\Models\Attribute\Order::postRemove
+        if(parts.length == 2) {
+            if(DOCTRINE_LIFECYCLES.contains(parts[1])) {
+                PhpClass phpClass = PhpElementsUtil.getClass(project, parts[0]);
+                if(phpClass != null) {
+                    psiElements.add(phpClass);
                 }
-
-                return true;
             }
-        });
+        }
 
-        final String[] splits = hookNameContent.split("::");
+        // Enlight_Controller_Action_PostDispatchSecure_Frontend_Payment
+        Pattern pattern = Pattern.compile("Enlight_Controller_Action_\\w+_(Frontend|Backend|Core|Widgets)_(\\w+)");
+        Matcher matcher = pattern.matcher(hookNameContent);
 
-        if(splits.length >= 2) {
-            HookSubscriberUtil.visitDoctrineQueryBuilderClasses(project, new Processor<PhpClass>() {
-                @Override
-                public boolean process(PhpClass phpClass) {
-
-                    for(Method method: phpClass.getMethods()) {
-
-                        String presentableFQN = phpClass.getPresentableFQN();
-                        if(presentableFQN == null || !presentableFQN.equals(splits[0])) {
-                            continue;
-                        }
-
-                        if((method.getAccess().isPublic() || method.getAccess().isProtected()) && splits[1].equals(method.getName())) {
-                            psiElements.add(method);
-                            return true;
-                        }
-                    }
-
-                    return true;
-                }
-            });
+        if(matcher.find()) {
+            PhpClass phpClass = PhpElementsUtil.getClass(project, String.format("Shopware_Controllers_%s_%s", matcher.group(1), matcher.group(2)));
+            if(phpClass != null) {
+                psiElements.add(phpClass);
+            }
         }
 
         return psiElements.toArray(new PsiElement[psiElements.size()]);

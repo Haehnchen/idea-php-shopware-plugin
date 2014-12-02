@@ -99,22 +99,7 @@ public class HookSubscriberUtil {
 
     @NotNull
     public static Collection<PsiElement> getAllHookTargets(Project project, final String contents) {
-
-        final Collection<PsiElement> psiElements = new HashSet<PsiElement>();
-        Collections.addAll(psiElements, LazySubscriberReferenceProvider.getHookTargets(project, contents));
-
-        // Enlight_Controller_Action_PostDispatchSecure_Frontend_Payment
-        Pattern pattern = Pattern.compile("Enlight_Controller_Action_\\w+_(Frontend|Backend|Core|Widgets)_(\\w+)");
-        Matcher matcher = pattern.matcher(contents);
-
-        if(matcher.find()) {
-            PhpClass phpClass = PhpElementsUtil.getClass(project, String.format("Shopware_Controllers_%s_%s", matcher.group(1), matcher.group(2)));
-            if(phpClass != null) {
-                psiElements.add(phpClass);
-            }
-        }
-
-        return psiElements;
+        return Arrays.asList(LazySubscriberReferenceProvider.getHookTargets(project, contents));
     }
 
 }
