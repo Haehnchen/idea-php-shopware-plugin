@@ -1,0 +1,46 @@
+{
+    "name": "Plugin info",
+    "type": "object",
+    "properties": {
+        "label": {
+            "type": "object",
+            "description": "Full name of the plugin",
+            "required": true
+        },
+        "copyright": {
+            "type": "string",
+            "description": "Copyright notice",
+            "required": false
+        },
+        "license": {
+            "type": "string",
+            "description": "License notice",
+            "required": false
+        },
+        "link": {
+            "type": "string",
+            "description": "Link of the plugin",
+            "required": false
+        },
+        "author": {
+            "type": "string",
+            "description": "Author of the plugin",
+            "required": false
+        },
+        "currentVersion": {
+            "type": "string",
+            "description": "Plugin version string",
+            "required": false
+        },
+        "changelog": {
+            "type": "object",
+            "description": "changelogs",
+            "required": true
+        },
+        "compatibility": {
+            "type": "object",
+            "description": "Compatibility hints",
+            "required": false
+        }
+    }
+}
