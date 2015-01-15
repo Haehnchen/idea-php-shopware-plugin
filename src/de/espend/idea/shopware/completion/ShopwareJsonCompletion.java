@@ -87,7 +87,7 @@ public class ShopwareJsonCompletion extends CompletionContributor{
 
                     Map<String, String[]> map = new HashMap<String, String[]>();
                     map.put("compatibility", new String[] {"minimumVersion", "maximumVersion", "blacklist"});
-                    map.put("compatibility", LOCALES);
+                    map.put("label", LOCALES);
                     map.put("changelogs", LOCALES);
 
                     if(jsProperty instanceof JSPropertyImpl) {
