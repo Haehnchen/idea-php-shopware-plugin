@@ -42,6 +42,8 @@ public class ShopwareProjectComponent implements ProjectComponent {
     @Override
     public void projectOpened() {
 
+        /*
+
         if(!Symfony2ProjectComponent.isEnabled(project)) {
             return;
         }
@@ -80,6 +82,8 @@ public class ShopwareProjectComponent implements ProjectComponent {
                 }.queue();
             }
         });
+        */
+
     }
 
     @Override
