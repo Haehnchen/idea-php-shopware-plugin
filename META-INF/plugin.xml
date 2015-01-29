@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.4.2</version>
+  <version>1.4.3</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -48,6 +48,12 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.4.3</h2>
+<ul>
+    <li>Fix scrolling on method creation</li>
+    <li>Add controller path subscriber template</li>
+</ul>
 
 <h2>1.4.2</h2>
 <ul>

@@ -119,7 +119,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
 
         if(hookName != null) {
 
-            Pattern pattern = Pattern.compile("Enlight_Controller_Dispatcher_ControllerPath_(Frontend|Backend|Widget)_(\\w+)");
+            Pattern pattern = Pattern.compile("Enlight_Controller_Dispatcher_ControllerPath_(Frontend|Backend|Widget|Api)_(\\w+)");
             Matcher matcher = pattern.matcher(hookName);
 
             if(matcher.find()) {
