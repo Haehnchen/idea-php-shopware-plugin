@@ -3,6 +3,7 @@ package de.espend.idea.shopware.inspection.quickfix;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
@@ -137,6 +138,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
         Method insertedMethod = phpClass.findMethodByName(contents);
         if(insertedMethod != null) {
             editor.getCaretModel().moveToOffset(insertedMethod.getTextRange().getStartOffset());
+            editor.getScrollingModel().scrollToCaret(ScrollType.CENTER_UP);
         }
 
     }
