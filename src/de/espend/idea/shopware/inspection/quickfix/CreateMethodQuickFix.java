@@ -22,6 +22,9 @@ import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
  */
@@ -113,6 +116,20 @@ public class CreateMethodQuickFix implements LocalQuickFix {
 
             stringBuilder.append("\n");
         }
+
+        if(hookName != null) {
+
+            Pattern pattern = Pattern.compile("Enlight_Controller_Dispatcher_ControllerPath_(Frontend|Backend|Widget)_(\\w+)");
+            Matcher matcher = pattern.matcher(hookName);
+
+            if(matcher.find()) {
+                stringBuilder.append("\n");
+                stringBuilder.append(String.format("return $this->Path() . 'Controllers/%s/%s.php';", matcher.group(1), matcher.group(2)));
+                stringBuilder.append("\n");
+            }
+
+        }
+
 
         stringBuilder.append("}");
 
