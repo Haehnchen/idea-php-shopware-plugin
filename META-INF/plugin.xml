@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.4.3</version>
+  <version>1.5</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -48,6 +48,11 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.5</h2>
+<ul>
+    <li>Add basic array completion inside SubscriberInterface::getSubscribedEvents</li>
+</ul>
 
 <h2>1.4.3</h2>
 <ul>
