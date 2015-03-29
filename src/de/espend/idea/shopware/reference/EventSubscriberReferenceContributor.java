@@ -12,6 +12,7 @@ import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.PhpLanguage;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
+import com.jetbrains.php.lang.patterns.PhpPatterns;
 import com.jetbrains.php.lang.psi.PhpPsiUtil;
 import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
@@ -249,6 +250,45 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                         }
 
                         return new PsiReference[0];
+                    }
+
+                    return new PsiReference[0];
+                }
+            }
+        );
+
+        /**
+         * public static function getSubscribedEvents() {
+         *   return array('sBasket::sGetBasket::before' => '<caret>');
+         * }
+         */
+        psiReferenceRegistrar.registerReferenceProvider(
+            PlatformPatterns.psiElement(StringLiteralExpression.class).withLanguage(PhpLanguage.INSTANCE),
+            new PsiReferenceProvider() {
+                @NotNull
+                @Override
+                public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
+
+                    if(!(psiElement instanceof StringLiteralExpression) || !ShopwareProjectComponent.isValidForProject(psiElement)) {
+                        return new PsiReference[0];
+                    }
+
+                    PsiElement parent = psiElement.getParent();
+                    if(parent == null) {
+                        return new PsiReference[0];
+                    }
+
+                    if(PhpPatterns.psiElement(PhpElementTypes.ARRAY_VALUE).accepts(parent)) {
+                        PsiElement arrayHashElement = parent.getContext();
+                        if(arrayHashElement instanceof ArrayHashElement) {
+                            PhpPsiElement arrayKey = ((ArrayHashElement) arrayHashElement).getKey();
+                            if(arrayKey instanceof StringLiteralExpression) {
+                                PsiElement arrayCreationExpression = arrayHashElement.getContext();
+                                if(arrayCreationExpression instanceof ArrayCreationExpression) {
+                                    return new PsiReference[]{ new MethodReferenceProvider((StringLiteralExpression) psiElement) };
+                                }
+                            }
+                        }
                     }
 
                     return new PsiReference[0];

@@ -8,14 +8,13 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.Processor;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.ParameterList;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.patterns.PhpPatterns;
+import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
@@ -65,58 +64,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                         return;
                     }
 
-                    HookSubscriberUtil.collectHooks(originalPosition.getProject(), new HookSubscriberUtil.HookVisitor() {
-                        @Override
-                        public boolean visitHook(PhpClass phpClass, Method method) {
-                            for (String hookName : new String[]{"after", "before", "replace"}) {
-                                result.addElement(LookupElementBuilder.create(String.format("%s::%s::%s", phpClass.getPresentableFQN(), method.getName(), hookName)).withIcon(PhpIcons.METHOD_ICON).withTypeText("Hook", true));
-                            }
-
-                            return true;
-                        }
-                    });
-
-
-                    HookSubscriberUtil.collectDoctrineLifecycleHooks(originalPosition.getProject(), new HookSubscriberUtil.DoctrineLifecycleHooksVisitor() {
-                        @Override
-                        public boolean visitLifecycleHooks(PhpClass phpClass) {
-
-                            for (String lifecycleName : new String[]{"prePersist", "postPersist", "preUpdate", "postUpdate", "preRemove", "postRemove"}) {
-                                result.addElement(LookupElementBuilder.create(String.format("%s::%s", phpClass.getPresentableFQN(), lifecycleName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("Doctrine", true));
-                            }
-
-                            return true;
-                        }
-                    });
-
-
-                    final Symfony2InterfacesUtil symfony2InterfacesUtil = new Symfony2InterfacesUtil();
-
-                    HookSubscriberUtil.visitDoctrineQueryBuilderClasses(originalPosition.getProject(), new Processor<PhpClass>() {
-                        @Override
-                        public boolean process(PhpClass phpClass) {
-
-                            for(Method method: phpClass.getOwnMethods()) {
-
-                                String presentableFQN = phpClass.getPresentableFQN();
-                                if(presentableFQN == null || (presentableFQN.endsWith("Proxy") || symfony2InterfacesUtil.isInstanceOf(phpClass, "\\Enlight_Hook_Proxy"))) {
-                                    continue;
-                                }
-
-                                if(method.getAccess().isPublic() || method.getAccess().isProtected()) {
-                                    String name = method.getName();
-                                    if(!name.startsWith("__")) {
-                                        for (String hookName : new String[]{"after", "before", "replace"}) {
-                                            result.addElement(LookupElementBuilder.create(String.format("%s::%s::%s", presentableFQN, name, hookName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("QueryBuilder", true));
-                                        }
-                                    }
-                                }
-                            }
-
-                            return true;
-                        }
-                    });
-
+                    collectHookLookupElements(originalPosition.getProject(), result, false);
 
                 }
             }
@@ -172,6 +120,105 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
             }
         );
 
+        extend(
+            CompletionType.BASIC, PlatformPatterns.psiElement().withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)),
+            new CompletionProvider<CompletionParameters>() {
+
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+
+                    PsiElement originalPosition = parameters.getOriginalPosition();
+                    if(originalPosition == null || !ShopwareProjectComponent.isValidForProject(originalPosition)) {
+                        return;
+                    }
+
+                    PsiElement parent = originalPosition.getParent();
+                    if(parent == null) {
+                        return;
+                    }
+
+                    ArrayCreationExpression arrayCreationExpression = PhpElementsUtil.getCompletableArrayCreationElement(parent);
+                    if(arrayCreationExpression != null) {
+                        PsiElement returnStatement = arrayCreationExpression.getParent();
+                        if(returnStatement instanceof PhpReturn) {
+                            Method method = PsiTreeUtil.getParentOfType(returnStatement, Method.class);
+                            if(method != null) {
+                                if("getSubscribedEvents".equals(method.getName())) {
+                                    PhpClass phpClass = method.getContainingClass();
+                                    if(new Symfony2InterfacesUtil().isInstanceOf(phpClass, "\\Enlight\\Event\\SubscriberInterface")) {
+                                        collectHookLookupElements(originalPosition.getProject(), result, true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+    }
+
+    private void collectHookLookupElements(Project project, final CompletionResultSet result, boolean withReferences) {
+        HookSubscriberUtil.collectHooks(project, new HookSubscriberUtil.HookVisitor() {
+            @Override
+            public boolean visitHook(PhpClass phpClass, Method method) {
+                for (String hookName : new String[]{"after", "before", "replace"}) {
+                    result.addElement(LookupElementBuilder.create(String.format("%s::%s::%s", phpClass.getPresentableFQN(), method.getName(), hookName)).withIcon(PhpIcons.METHOD_ICON).withTypeText("Hook", true));
+                }
+
+                return true;
+            }
+        });
+
+
+        HookSubscriberUtil.collectDoctrineLifecycleHooks(project, new HookSubscriberUtil.DoctrineLifecycleHooksVisitor() {
+            @Override
+            public boolean visitLifecycleHooks(PhpClass phpClass) {
+
+                for (String lifecycleName : new String[]{"prePersist", "postPersist", "preUpdate", "postUpdate", "preRemove", "postRemove"}) {
+                    result.addElement(LookupElementBuilder.create(String.format("%s::%s", phpClass.getPresentableFQN(), lifecycleName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("Doctrine", true));
+                }
+
+                return true;
+            }
+        });
+
+
+        final Symfony2InterfacesUtil symfony2InterfacesUtil = new Symfony2InterfacesUtil();
+
+        HookSubscriberUtil.visitDoctrineQueryBuilderClasses(project, new Processor<PhpClass>() {
+            @Override
+            public boolean process(PhpClass phpClass) {
+
+                for(Method method: phpClass.getOwnMethods()) {
+
+                    String presentableFQN = phpClass.getPresentableFQN();
+                    if(presentableFQN == null || (presentableFQN.endsWith("Proxy") || symfony2InterfacesUtil.isInstanceOf(phpClass, "\\Enlight_Hook_Proxy"))) {
+                        continue;
+                    }
+
+                    if(method.getAccess().isPublic() || method.getAccess().isProtected()) {
+                        String name = method.getName();
+                        if(!name.startsWith("__")) {
+                            for (String hookName : new String[]{"after", "before", "replace"}) {
+                                result.addElement(LookupElementBuilder.create(String.format("%s::%s::%s", presentableFQN, name, hookName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("QueryBuilder", true));
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            }
+        });
+
+        if(withReferences) {
+            EventSubscriberReferenceContributor.collectEvents(project, new EventSubscriberReferenceContributor.Collector() {
+                @Override
+                public void collect(PsiElement psiElement, String value) {
+                    result.addElement(LookupElementBuilder.create(value).withIcon(ShopwarePluginIcons.SHOPWARE).withTypeText("Event", true));
+                }
+            });
+        }
 
     }
 
@@ -179,20 +226,43 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
     @Override
     public PsiElement[] getGotoDeclarationTargets(PsiElement psiElement, int i, Editor editor) {
 
-        if(psiElement == null || !(psiElement.getContext() instanceof StringLiteralExpression)) {
+        PsiElement context = psiElement.getContext();
+        if(psiElement == null || !(context instanceof StringLiteralExpression)) {
             return new PsiElement[0];
         }
 
-        MethodMatcher.MethodMatchParameter match = new MethodMatcher.StringParameterMatcher(psiElement.getContext(), 0)
-            .withSignature("\\Shopware_Components_Plugin_Bootstrap", "subscribeEvent")
-            .match();
+        String hookNameContent = null;
 
-        if(match == null) {
-            return new PsiElement[0];
+        ArrayCreationExpression arrayCreationExpression = PhpElementsUtil.getCompletableArrayCreationElement(context);
+        if(arrayCreationExpression != null) {
+
+            PsiElement returnStatement = arrayCreationExpression.getParent();
+            if(returnStatement instanceof PhpReturn) {
+                Method method = PsiTreeUtil.getParentOfType(returnStatement, Method.class);
+                if(method != null) {
+                    if("getSubscribedEvents".equals(method.getName())) {
+                        PhpClass phpClass = method.getContainingClass();
+                        if(new Symfony2InterfacesUtil().isInstanceOf(phpClass, "\\Enlight\\Event\\SubscriberInterface")) {
+                            hookNameContent = ((StringLiteralExpression) context).getContents();
+                        }
+                    }
+                }
+            }
+
+        } else  {
+
+            MethodMatcher.MethodMatchParameter match = new MethodMatcher.StringParameterMatcher(context, 0)
+                .withSignature("\\Shopware_Components_Plugin_Bootstrap", "subscribeEvent")
+                .match();
+
+            if(match == null) {
+                return new PsiElement[0];
+            }
+
+            hookNameContent = ((StringLiteralExpression) context).getContents();
         }
 
-        final String hookNameContent = ((StringLiteralExpression) psiElement.getContext()).getContents();
-        if(!hookNameContent.contains(":")) {
+        if(hookNameContent == null || !hookNameContent.contains(":")) {
             return new PsiElement[0];
         }
 
