@@ -2,6 +2,7 @@ package de.espend.idea.shopware.navigation;
 
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -14,7 +15,9 @@ import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.util.ShopwareUtil;
+import de.espend.idea.shopware.util.ThemeUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -34,7 +37,38 @@ public class PhpGoToHandler implements GotoDeclarationHandler {
             attachBootstrapFiles(psiElement, psiElements);
         }
 
+        if(ThemeUtil.getJavascriptClassFieldPattern().accepts(psiElement)){
+            attachThemeJsFieldReferences(psiElement, psiElements);
+        }
+
         return psiElements.toArray(new PsiElement[psiElements.size()]);
+    }
+
+    private void attachThemeJsFieldReferences(final PsiElement psiElement, final List<PsiElement> psiElements) {
+
+        final PsiElement parent = psiElement.getParent();
+        if(!(parent instanceof StringLiteralExpression)) {
+            return;
+        }
+
+        final String contents = ((StringLiteralExpression) parent).getContents();
+
+        ThemeUtil.collectThemeJsFieldReferences((StringLiteralExpression) parent, new ThemeUtil.ThemeAssetVisitor() {
+            @Override
+            public boolean visit(@NotNull VirtualFile virtualFile, @NotNull String path) {
+                if(path.equals(contents)) {
+                    PsiFile psiFile = PsiManager.getInstance(psiElement.getProject()).findFile(virtualFile);
+                    if(psiFile != null) {
+                        psiElements.add(psiFile);
+                    }
+
+                    return false;
+                }
+
+                return true;
+            }
+        });
+
     }
 
     private void attachBootstrapFiles(final PsiElement psiElement, final List<PsiElement> psiElements) {
