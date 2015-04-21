@@ -12,11 +12,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.PhpIcons;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.ThemeUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +45,10 @@ public class PhpGoToHandler implements GotoDeclarationHandler {
             attachThemeJsFieldReferences(psiElement, psiElements);
         }
 
+        if(ThemeUtil.getThemeExtendsPattern().accepts(psiElement)){
+            attachThemeExtend(psiElement, psiElements);
+        }
+
         return psiElements.toArray(new PsiElement[psiElements.size()]);
     }
 
@@ -52,6 +60,9 @@ public class PhpGoToHandler implements GotoDeclarationHandler {
         }
 
         final String contents = ((StringLiteralExpression) parent).getContents();
+        if(StringUtils.isBlank(contents)) {
+            return;
+        }
 
         ThemeUtil.collectThemeJsFieldReferences((StringLiteralExpression) parent, new ThemeUtil.ThemeAssetVisitor() {
             @Override
@@ -68,6 +79,26 @@ public class PhpGoToHandler implements GotoDeclarationHandler {
                 return true;
             }
         });
+
+    }
+    private void attachThemeExtend(PsiElement psiElement, List<PsiElement> psiElements) {
+
+        final PsiElement parent = psiElement.getParent();
+        if(!(parent instanceof StringLiteralExpression)) {
+            return;
+        }
+
+        final String contents = ((StringLiteralExpression) parent).getContents();
+        if(StringUtils.isBlank(contents)) {
+            return;
+        }
+
+        for(PhpClass phpClass: PhpIndex.getInstance(parent.getProject()).getAllSubclasses("\\Shopware\\Components\\Theme")) {
+            String name = phpClass.getContainingFile().getContainingDirectory().getName();
+            if(contents.equals(name)) {
+                psiElements.add(phpClass.getContainingFile().getContainingDirectory());
+            }
+        }
 
     }
 

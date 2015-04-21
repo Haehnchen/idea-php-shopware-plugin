@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIcons;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
@@ -209,7 +210,29 @@ public class ShopwarePhpCompletion extends CompletionContributor{
             }
         );
 
+        extend(CompletionType.BASIC, ThemeUtil.getThemeExtendsPattern(),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
 
+                    PsiElement originalPosition = parameters.getOriginalPosition();
+                    if(originalPosition == null || !ShopwareProjectComponent.isValidForProject(originalPosition)) {
+                        return;
+                    }
+
+                    PsiElement parent = originalPosition.getParent();
+                    if(!(parent instanceof StringLiteralExpression)) {
+                        return;
+                    }
+
+                    for(PhpClass phpClass: PhpIndex.getInstance(parent.getProject()).getAllSubclasses("\\Shopware\\Components\\Theme")) {
+                        String name = phpClass.getContainingFile().getContainingDirectory().getName();
+                        result.addElement(LookupElementBuilder.create(name).withIcon(ShopwarePluginIcons.SHOPWARE));
+                    }
+
+                }
+            }
+        );
 
     }
 

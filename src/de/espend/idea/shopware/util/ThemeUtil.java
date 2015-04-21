@@ -102,4 +102,12 @@ public class ThemeUtil {
 
     }
 
+    public static PsiElementPattern.Capture<PsiElement> getThemeExtendsPattern() {
+        return PlatformPatterns.psiElement().withParent(
+            PlatformPatterns.psiElement(StringLiteralExpression.class).withParent(
+                PlatformPatterns.psiElement(Field.class).withName("extend")
+            )
+        );
+    }
+
 }
