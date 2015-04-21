@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.5</version>
+  <version>1.6</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -37,6 +37,7 @@
         <li>Smarty: Template include, extends linemarker</li>
         <li>Smarty: Support templates libraries/include paths</li>
         <li>Smarty: Blockname implements and overwrite linemarker</li>
+        <li>Shopware: Theme and assets</li>
         <li>PHP/Smarty: Template controller references for php and smarty</li>
         <li>Symfony2: Custom container loader</li>
         <li>Doctrine: Extension for Symfony2 Plugin</li>
@@ -48,6 +49,13 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.6</h2>
+<ul>
+    <li>Shopware5: Add theme extends completion <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/5">#5</a></li>
+    <li>Shopware5: Add theme javascript assets references <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/4">#4</a></li>
+    <li>Shopware5: Add support for new theme template structure on "\Shopware\Components\Theme" class <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/6">#6</a></li>
+</ul>
 
 <h2>1.5</h2>
 <ul>
