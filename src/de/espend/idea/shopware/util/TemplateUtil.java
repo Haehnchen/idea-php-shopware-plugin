@@ -38,10 +38,6 @@ public class TemplateUtil {
 
         collectPluginTemplates(project, smartyTemplateVisitor, exts);
 
-        final VirtualFile baseDir = project.getBaseDir();
-        final VirtualFile templateDir = VfsUtil.findRelativeFile("templates", baseDir);
-
-
         // search for index files; think of lib and include path
         List<LanguageFileType> languageFileTypes = new ArrayList<LanguageFileType>();
 
@@ -53,22 +49,49 @@ public class TemplateUtil {
             languageFileTypes.add(JavaScriptSupportLoader.JAVASCRIPT);
         }
 
+        // sw5: provides parent class for themes
+        Set<VirtualFile> themes = new HashSet<VirtualFile>();
+        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Theme")) {
+            PsiDirectory parent = phpClass.getContainingFile().getParent();
+            if(parent != null) {
+                themes.add(parent.getVirtualFile());
+            }
+        }
+
         for(LanguageFileType fileType: languageFileTypes) {
             for(VirtualFile virtualFile : FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, fileType, GlobalSearchScope.allScope(project))) {
                 if(!uniqueVirtualFiles.contains(virtualFile)) {
                     uniqueVirtualFiles.add(virtualFile);
 
+                    // try to get /templates/frontend/...
                     String path = virtualFile.toString();
                     int i = path.lastIndexOf("/templates/");
                     if(i > 0) {
                         String frontendName = path.substring(i + "/templates/".length());
                         attachTemplates(virtualFile, frontendName, smartyTemplateVisitor);
+                    } else if (themes.size() > 0) {
+
+                        // sw5: check if file is somewhere inside a theme folder
+                        for(VirtualFile themeDir: themes) {
+                            if(VfsUtil.isAncestor(themeDir, virtualFile, false)) {
+                                String relativePath = VfsUtil.getRelativePath(virtualFile, themeDir, '/');
+                                if(relativePath != null) {
+                                    // we are too lazy prepend path name to simulate old behavior:
+                                    // "Bare/frontend/campaign"
+                                    attachTemplates(virtualFile, themeDir.getName() + "/" + relativePath, smartyTemplateVisitor);
+                                }
+
+                            }
+                        }
+
                     }
                 }
             }
         }
 
         // wooh... not a full project, so skip it
+        // shopware is in lib only condition
+        final VirtualFile templateDir = VfsUtil.findRelativeFile("templates", project.getBaseDir());
         if(templateDir == null) {
             return;
         }
