@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.6</version>
+  <version>1.6.1</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -49,6 +49,11 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.6.1</h2>
+<ul>
+    <li>Support Enlight_Controller_Action::get() in TypProvider <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/1">#1</a></li>
+</ul>
 
 <h2>1.6</h2>
 <ul>
@@ -297,6 +302,7 @@
         <ServiceContainerLoader implementation="de.espend.idea.shopware.symfony.ShopwareServiceContainerLoader"/>
         <DoctrineModelProvider implementation="de.espend.idea.shopware.symfony.ShopwareDoctrineModelProvider"/>
         <ControllerActionGotoRelatedCollector implementation="de.espend.idea.shopware.navigation.SmartyActionGotoRelatedCollector"/>
+        <MethodSignatureTypeProviderExtension implementation="de.espend.idea.shopware.types.EnlightTypeProviderExtension"/>
     </extensions>
 
     <depends>com.jetbrains.php</depends>
