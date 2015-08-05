@@ -1,7 +1,5 @@
 package de.espend.idea.shopware.util;
 
-import com.intellij.codeInsight.completion.CompletionType;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -13,15 +11,13 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
-import com.intellij.util.containers.ConcurrentHashSet;
-import com.jetbrains.php.PhpIcons;
+import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.AssignmentExpressionImpl;
 import com.jetbrains.smarty.SmartyFile;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
-import freemarker.template.Template;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +31,7 @@ import java.util.regex.Pattern;
 
 public class ShopwareUtil {
 
-    public static Set<String> PLUGIN_CONFIGS = new ConcurrentHashSet<String>();
+    public static Set<String> PLUGIN_CONFIGS = ContainerUtil.newHashSet();
 
     final public static String[] PLUGIN_CONFIG_TYPES = new String[] {
         "text", "color", "datetime", "html", "interval", "mediaselection", "number", "select", "combo", "textarea", "time"

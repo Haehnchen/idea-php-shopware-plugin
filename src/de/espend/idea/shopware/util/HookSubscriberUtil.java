@@ -1,30 +1,23 @@
 package de.espend.idea.shopware.util;
 
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Processor;
-import com.intellij.util.containers.ConcurrentHashSet;
-import com.jetbrains.php.PhpIcons;
+import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import de.espend.idea.shopware.reference.EventSubscriberReferenceContributor;
 import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
-import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class HookSubscriberUtil {
 
-    public static Set<String> NOTIFY_EVENTS = new ConcurrentHashSet<String>();
+    public static Set<String> NOTIFY_EVENTS = ContainerUtil.newHashSet();
 
     final private static Set<String> CORE_CLASSES = new HashSet<String>() {{
         addAll(Arrays.asList("sCms", "sCore", "sAdmin", "sOrder", "sBasket", "sExport", "sSystem", "sArticles", "sMarketing", "sCategories", "sCategories", "sNewsletter", "sConfigurator", "sRewriteTable"));
