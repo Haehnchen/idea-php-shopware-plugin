@@ -8,7 +8,6 @@ import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.smarty.SmartyFileType;
 import de.espend.idea.shopware.util.SmartyPattern;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;

@@ -13,7 +13,11 @@ import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HookSubscriberUtil {
 
