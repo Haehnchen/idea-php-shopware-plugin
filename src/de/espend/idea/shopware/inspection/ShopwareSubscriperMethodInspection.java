@@ -79,7 +79,7 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
                 return;
             }
 
-            holder.registerProblem(literalExpression, "Create Function", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new CreateMethodQuickFix(reference, phpClass, contents));
+            holder.registerProblem(literalExpression, "Create function", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new CreateMethodQuickFix(reference, phpClass, contents));
 
         }
 

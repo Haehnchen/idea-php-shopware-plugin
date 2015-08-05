@@ -43,7 +43,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
     @NotNull
     @Override
     public String getName() {
-        return "Create Method";
+        return "Create method";
     }
 
     @NotNull
