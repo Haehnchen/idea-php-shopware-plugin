@@ -1,10 +1,8 @@
 package de.espend.idea.shopware.navigation;
 
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -12,16 +10,13 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.Processor;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.smarty.SmartyFileType;
-import com.jetbrains.twig.TwigFileType;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.index.SmartyBlockStubIndex;
 import de.espend.idea.shopware.util.SmartyBlockUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
-import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.TwigExtendsStubIndex;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
