@@ -65,7 +65,7 @@ public class PsiParameterStorageRunnable implements Runnable {
                                 String content = PhpElementsUtil.getStringValue(parameters[0]);
                                 if(StringUtils.isNotBlank(content)) {
                                     if(!events.containsKey(content)) {
-                                        events.put(content, new HashSet<>());
+                                        events.put(content, new HashSet<String>());
                                     }
                                     Collection<String> data = events.get(content);
                                     Method parentOfType = PsiTreeUtil.getParentOfType(parameters[0], Method.class);

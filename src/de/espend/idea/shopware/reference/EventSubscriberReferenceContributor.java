@@ -501,7 +501,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
 
         }
 
-        for (Map.Entry<String, Collection<String>> entry : HookSubscriberUtil.NOTIFY_EVENTS_MAP.entrySet()) {
+        for (final Map.Entry<String, Collection<String>> entry : HookSubscriberUtil.NOTIFY_EVENTS_MAP.entrySet()) {
             for (String value : entry.getValue()) {
                 String[] split = value.split("\\.");
                 Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
