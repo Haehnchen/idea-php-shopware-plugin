@@ -12,7 +12,6 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.PhpCodeUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
@@ -38,14 +37,12 @@ import java.util.regex.Pattern;
  */
 public class CreateMethodQuickFix implements LocalQuickFix {
 
-    private final MethodReference methodReference;
-    private final PhpClass phpClass;
-    private final String contents;
+    private final StringLiteralExpression context;
+    private final GeneratorContainer generatorContainer;
 
-    public CreateMethodQuickFix(MethodReference methodReference, PhpClass phpClass, String contents) {
-        this.methodReference = methodReference;
-        this.phpClass = phpClass;
-        this.contents = contents;
+    public CreateMethodQuickFix(StringLiteralExpression context, GeneratorContainer generatorContainer) {
+        this.context = context;
+        this.generatorContainer = generatorContainer;
     }
 
     @NotNull
@@ -63,46 +60,29 @@ public class CreateMethodQuickFix implements LocalQuickFix {
     @Override
     public void applyFix(@NotNull final Project project, @NotNull ProblemDescriptor problemDescriptor) {
 
-        Method method = PsiTreeUtil.getParentOfType(methodReference, Method.class);
+        Method method = PsiTreeUtil.getParentOfType(context, Method.class);
         if(method == null) {
             return;
-        }
-
-        final PsiElement[] parameters = methodReference.getParameters();
-        String subjectDoc = null;
-        Method hookMethod = null;
-        String hookName = null;
-        if(parameters.length > 1 && parameters[0] instanceof StringLiteralExpression) {
-            hookName = ((StringLiteralExpression) parameters[0]).getContents();
-            PsiElement subjectTarget = getSubjectTargetOnHook(project, hookName);
-            if(subjectTarget instanceof PhpClass) {
-                subjectDoc = ((PhpClass) subjectTarget).getPresentableFQN();
-            } else if(subjectTarget instanceof Method) {
-                hookMethod = (Method) subjectTarget;
-                PhpClass containingClass = ((Method) subjectTarget).getContainingClass();
-                if(containingClass != null) {
-                    subjectDoc = containingClass.getPresentableFQN();
-                }
-            }
         }
 
         int insertPos = method.getTextRange().getEndOffset();
 
         // Enlight_Controller_Action_PostDispatch_Frontend_Blog
         String typeHint = "Enlight_Event_EventArgs";
-        if(hookName != null && hookName.contains("::")) {
+        if(generatorContainer.getHookName() != null && generatorContainer.getHookName().contains("::")) {
             // Enlight_Controller_Action::dispatch::replace
             typeHint = "Enlight_Hook_HookArgs";
         }
 
         final StringBuilder stringBuilder = new StringBuilder();
+        final String contents = context.getContents();
         stringBuilder.append("public function ").append(contents).append("(").append(typeHint).append(" $args) {");
 
-        if(subjectDoc == null) {
+        if(generatorContainer.getSubjectDoc() == null) {
             stringBuilder.append("\n");
             stringBuilder.append("$return = $args->getReturn();\n");
 
-            Collection<String> references = HookSubscriberUtil.NOTIFY_EVENTS_MAP.get(hookName);
+            Collection<String> references = HookSubscriberUtil.NOTIFY_EVENTS_MAP.get(generatorContainer.getHookName());
             for (String value : references) {
                 String[] split = value.split("\\.");
                 Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
@@ -113,7 +93,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
                 classMethod.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
                     @Override
                     public void visitElement(PsiElement element) {
-                        if ((element instanceof StringLiteralExpression) && ((StringLiteralExpression) element).getContents().equals(((StringLiteralExpression) parameters[0]).getContents())) {
+                        if ((element instanceof StringLiteralExpression) && ((StringLiteralExpression) element).getContents().equals(generatorContainer.getHookName())) {
                             PsiElement parent = element.getParent();
                             if(parent instanceof ParameterList) {
                                 PsiElement[] parameterList = ((ParameterList) parent).getParameters();
@@ -156,16 +136,16 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             stringBuilder.append("$args->setReturn($return);\n");
         } else {
             stringBuilder.append("\n");
-            stringBuilder.append("/** @var ").append(subjectDoc).append(" $subject */\n");
+            stringBuilder.append("/** @var ").append(generatorContainer.getSubjectDoc()).append(" $subject */\n");
             stringBuilder.append("$subject = $args->getSubject();\n");
 
-            if(hookName != null && hookName.contains("::")) {
+            if(generatorContainer.getHookName() != null && generatorContainer.getHookName().contains("::")) {
                 stringBuilder.append("\n");
                 stringBuilder.append("$return = $args->getReturn();\n");
 
                 // add hook parameter
-                if(hookMethod != null) {
-                    Parameter[] hookMethodParameters = hookMethod.getParameters();
+                if(generatorContainer.getHookMethod() != null) {
+                    Parameter[] hookMethodParameters = generatorContainer.getHookMethod().getParameters();
                     if(hookMethodParameters.length > 0 ) {
                         stringBuilder.append("\n");
                         for(Parameter parameter : hookMethodParameters) {
@@ -182,10 +162,10 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             stringBuilder.append("\n");
         }
 
-        if(hookName != null) {
+        if(generatorContainer.getHookName() != null) {
 
             Pattern pattern = Pattern.compile("Enlight_Controller_Dispatcher_ControllerPath_(Frontend|Backend|Widget|Api)_(\\w+)");
-            Matcher matcher = pattern.matcher(hookName);
+            Matcher matcher = pattern.matcher(generatorContainer.getHookName());
 
             if(matcher.find()) {
                 stringBuilder.append("\n");
@@ -197,6 +177,8 @@ public class CreateMethodQuickFix implements LocalQuickFix {
 
 
         stringBuilder.append("}");
+
+        PhpClass phpClass = method.getContainingClass();
 
         Method methodCreated = PhpCodeUtil.createMethodFromTemplate(phpClass, phpClass.getProject(), stringBuilder.toString());
         if(methodCreated == null) {
@@ -214,7 +196,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
 
         editor.getDocument().insertString(insertPos, textBuf);
         int endPos = insertPos + textBuf.length();
-        CodeStyleManager.getInstance(project).reformatText(methodReference.getContainingFile(), insertPos, endPos);
+        CodeStyleManager.getInstance(project).reformatText(phpClass.getContainingFile(), insertPos, endPos);
         PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
 
         Method insertedMethod = phpClass.findMethodByName(contents);
@@ -226,7 +208,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
     }
 
     @Nullable
-    private PsiElement getSubjectTargetOnHook(Project project, final String contents) {
+    public static PsiElement getSubjectTargetOnHook(Project project, final String contents) {
 
         for(PsiElement psiElement : LazySubscriberReferenceProvider.getHookTargets(project, contents)) {
             if(psiElement instanceof Method) {
@@ -237,6 +219,32 @@ public class CreateMethodQuickFix implements LocalQuickFix {
         }
 
         return null;
+    }
+
+    public static class GeneratorContainer {
+
+        private String hookName = null;
+        private String subjectDoc = null;
+        private Method hookMethod = null;
+
+        public GeneratorContainer(String subjectDoc, Method hookMethod, String hookName) {
+            this.subjectDoc = subjectDoc;
+            this.hookMethod = hookMethod;
+            this.hookName = hookName;
+        }
+
+        public String getHookName() {
+            return hookName;
+        }
+
+        public String getSubjectDoc() {
+            return subjectDoc;
+        }
+
+        public Method getHookMethod() {
+            return hookMethod;
+        }
+
     }
 
 }
