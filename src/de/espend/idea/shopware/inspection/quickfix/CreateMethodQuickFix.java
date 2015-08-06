@@ -225,6 +225,20 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             }
         }
 
+        if(HookSubscriberUtil.NOTIFY_EVENTS_MAP.containsKey(contents)) {
+            Collection<String> references = HookSubscriberUtil.NOTIFY_EVENTS_MAP.get(contents);
+            for (String value : references) {
+                String[] split = value.split("\\.");
+                Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
+                if(classMethod == null) {
+                    continue;
+                }
+
+                return classMethod;
+            }
+        }
+
+
         return null;
     }
 

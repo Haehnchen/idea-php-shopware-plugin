@@ -155,9 +155,23 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
                 return;
             }
 
-            holder.registerProblem(element, "Create function", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
-            //holder.registerProblem(element, "Create function", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new CreateMethodQuickFix(null, phpClass, subscriperName, subscriperName, element));
+            String subjectDoc = null;
+            Method hookMethod = null;
 
+            if(subscriperName.contains("::")) {
+                PsiElement subjectTarget = CreateMethodQuickFix.getSubjectTargetOnHook(element.getProject(), subscriperName);
+                if(subjectTarget instanceof PhpClass) {
+                    subjectDoc = ((PhpClass) subjectTarget).getPresentableFQN();
+                } else if(subjectTarget instanceof Method) {
+                    hookMethod = (Method) subjectTarget;
+                    PhpClass containingClass = ((Method) subjectTarget).getContainingClass();
+                    if(containingClass != null) {
+                        subjectDoc = containingClass.getPresentableFQN();
+                    }
+                }
+            }
+
+            holder.registerProblem(element, "Create function", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new CreateMethodQuickFix(element, new CreateMethodQuickFix.GeneratorContainer(subjectDoc, hookMethod, subscriperName)));
         }
     }
 
