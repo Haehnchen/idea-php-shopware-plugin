@@ -61,14 +61,14 @@ public class CreateMethodQuickFix implements LocalQuickFix {
     }
 
     @Override
-    public void applyFix(@NotNull final Project project, @NotNull ProblemDescriptor problemDescriptor) {
+    public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
 
         Method method = PsiTreeUtil.getParentOfType(methodReference, Method.class);
         if(method == null) {
             return;
         }
 
-        final PsiElement[] parameters = methodReference.getParameters();
+        PsiElement[] parameters = methodReference.getParameters();
         String subjectDoc = null;
         Method hookMethod = null;
         String hookName = null;
@@ -95,7 +95,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             typeHint = "Enlight_Hook_HookArgs";
         }
 
-        final StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("public function ").append(contents).append("(").append(typeHint).append(" $args) {");
 
         if(subjectDoc == null) {
@@ -103,55 +103,56 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             stringBuilder.append("$return = $args->getReturn();\n");
 
             Collection<String> references = HookSubscriberUtil.NOTIFY_EVENTS_MAP.get(hookName);
-            for (String value : references) {
-                String[] split = value.split("\\.");
-                Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
-                if(classMethod == null) {
-                    continue;
-                }
+            if (references != null) {
+                for (String value : references) {
+                    String[] split = value.split("\\.");
+                    Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
+                    if (classMethod == null) {
+                        continue;
+                    }
 
-                classMethod.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
-                    @Override
-                    public void visitElement(PsiElement element) {
-                        if ((element instanceof StringLiteralExpression) && ((StringLiteralExpression) element).getContents().equals(((StringLiteralExpression) parameters[0]).getContents())) {
-                            PsiElement parent = element.getParent();
-                            if(parent instanceof ParameterList) {
-                                PsiElement[] parameterList = ((ParameterList) parent).getParameters();
-                                if(parameterList.length > 1) {
-                                    if(parameterList[1] instanceof ArrayCreationExpression) {
-                                        Map<String, PsiElement> eventParameters = PhpElementsUtil.getArrayCreationKeyMap((ArrayCreationExpression) parameterList[1]);
-                                        for(Map.Entry<String, PsiElement> entrySet : eventParameters.entrySet()) {
-                                            stringBuilder.append("\n");
-                                            PhpPsiElement psiElement = PhpElementsUtil.getArrayValue((ArrayCreationExpression) parameterList[1], entrySet.getKey());
-                                            if(psiElement instanceof PhpTypedElement) {
+                    classMethod.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+                        @Override
+                        public void visitElement(PsiElement element) {
+                            if ((element instanceof StringLiteralExpression) && ((StringLiteralExpression) element).getContents().equals(((StringLiteralExpression) parameters[0]).getContents())) {
+                                PsiElement parent = element.getParent();
+                                if (parent instanceof ParameterList) {
+                                    PsiElement[] parameterList = ((ParameterList) parent).getParameters();
+                                    if (parameterList.length > 1) {
+                                        if (parameterList[1] instanceof ArrayCreationExpression) {
+                                            Map<String, PsiElement> eventParameters = PhpElementsUtil.getArrayCreationKeyMap((ArrayCreationExpression) parameterList[1]);
+                                            for (Map.Entry<String, PsiElement> entrySet : eventParameters.entrySet()) {
+                                                stringBuilder.append("\n");
+                                                PhpPsiElement psiElement = PhpElementsUtil.getArrayValue((ArrayCreationExpression) parameterList[1], entrySet.getKey());
+                                                if (psiElement instanceof PhpTypedElement) {
 
-                                                Set<String> classes = new HashSet<String>();
+                                                    Set<String> classes = new HashSet<String>();
 
-                                                PhpType type = ((PhpTypedElement) psiElement).getType();
-                                                for (PhpClass aClass : PhpElementsUtil.getClassFromPhpTypeSet(project, type.getTypes())) {
-                                                    String presentableFQN = aClass.getPresentableFQN();
-                                                    if(presentableFQN == null) {
-                                                        continue;
+                                                    PhpType type = ((PhpTypedElement) psiElement).getType();
+                                                    for (PhpClass aClass : PhpElementsUtil.getClassFromPhpTypeSet(project, type.getTypes())) {
+                                                        String presentableFQN = aClass.getPresentableFQN();
+                                                        if (presentableFQN == null) {
+                                                            continue;
+                                                        }
+
+                                                        classes.add(presentableFQN);
                                                     }
 
-                                                    classes.add(presentableFQN);
+                                                    if (classes.size() > 0) {
+                                                        stringBuilder.append("/** @var ").append(StringUtils.join(classes, "|")).append("$").append(entrySet.getKey()).append(" */\n");
+                                                    }
                                                 }
-
-                                                if(classes.size() > 0) {
-                                                    stringBuilder.append("/** @var ").append(StringUtils.join(classes, "|")).append("$").append(entrySet.getKey()).append(" */\n");
-                                                }
+                                                stringBuilder.append("$").append(entrySet.getKey()).append(" = ").append("$args->get('").append(entrySet.getKey()).append("');\n");
                                             }
-                                            stringBuilder.append("$").append(entrySet.getKey()).append(" = ").append("$args->get('").append(entrySet.getKey()).append("');\n");
                                         }
                                     }
                                 }
                             }
+                            super.visitElement(element);
                         }
-                        super.visitElement(element);
-                    }
-                });
+                    });
+                }
             }
-
             stringBuilder.append("\n");
             stringBuilder.append("$args->setReturn($return);\n");
         } else {

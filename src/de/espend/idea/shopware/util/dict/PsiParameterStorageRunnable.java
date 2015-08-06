@@ -53,7 +53,7 @@ public class PsiParameterStorageRunnable implements Runnable {
         private void visitMethodReference(MethodReference methodReference) {
             String name = methodReference.getName();
 
-            if (name != null && ("notify".equals(name) || "notifyUntil".equals(name))) {
+            if (name != null && ("notify".equals(name) || "notifyUntil".equals(name) || "filter".equals(name))) {
                 PsiElement[] parameters = methodReference.getParameters();
                 if(parameters.length > 1) {
                     if(parameters[0] instanceof StringLiteralExpression) {
