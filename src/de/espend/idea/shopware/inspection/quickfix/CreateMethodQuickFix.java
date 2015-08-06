@@ -22,11 +22,14 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,14 +61,14 @@ public class CreateMethodQuickFix implements LocalQuickFix {
     }
 
     @Override
-    public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
+    public void applyFix(@NotNull final Project project, @NotNull ProblemDescriptor problemDescriptor) {
 
         Method method = PsiTreeUtil.getParentOfType(methodReference, Method.class);
         if(method == null) {
             return;
         }
 
-        PsiElement[] parameters = methodReference.getParameters();
+        final PsiElement[] parameters = methodReference.getParameters();
         String subjectDoc = null;
         Method hookMethod = null;
         String hookName = null;
@@ -92,7 +95,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             typeHint = "Enlight_Hook_HookArgs";
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("public function ").append(contents).append("(").append(typeHint).append(" $args) {");
 
         if(subjectDoc == null) {
@@ -121,8 +124,22 @@ public class CreateMethodQuickFix implements LocalQuickFix {
                                             stringBuilder.append("\n");
                                             PhpPsiElement psiElement = PhpElementsUtil.getArrayValue((ArrayCreationExpression) parameterList[1], entrySet.getKey());
                                             if(psiElement instanceof PhpTypedElement) {
+
+                                                Set<String> classes = new HashSet<String>();
+
                                                 PhpType type = ((PhpTypedElement) psiElement).getType();
-                                                stringBuilder.append("/** @var ").append(type).append("$").append(entrySet.getKey()).append(" */\n");
+                                                for (PhpClass aClass : PhpElementsUtil.getClassFromPhpTypeSet(project, type.getTypes())) {
+                                                    String presentableFQN = aClass.getPresentableFQN();
+                                                    if(presentableFQN == null) {
+                                                        continue;
+                                                    }
+
+                                                    classes.add(presentableFQN);
+                                                }
+
+                                                if(classes.size() > 0) {
+                                                    stringBuilder.append("/** @var ").append(StringUtils.join(classes, "|")).append("$").append(entrySet.getKey()).append(" */\n");
+                                                }
                                             }
                                             stringBuilder.append("$").append(entrySet.getKey()).append(" = ").append("$args->get('").append(entrySet.getKey()).append("');\n");
                                         }
