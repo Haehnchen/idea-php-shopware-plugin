@@ -286,6 +286,7 @@
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyIncludeStubIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyExtendsStubIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.EventConfigGoToIndex"/>
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.ServiceDiIndex"/>
 
       <localInspection groupPath="Shopware" shortName="Shopware" displayName="Boostrap"
                        groupName="Shopware"
