@@ -291,6 +291,10 @@
                        groupName="Shopware"
                        enabledByDefault="true" level="WARNING"
                        implementationClass="de.espend.idea.shopware.inspection.ShopwareBoostrapInspection"/>
+      <localInspection groupPath="Shopware" shortName="ShopwareBoostrapCheckLicense" displayName="BoostrapCheckLicense"
+                       groupName="Shopware"
+                       enabledByDefault="true" level="WARNING"
+                       implementationClass="de.espend.idea.shopware.inspection.ShopwareBoostrapCheckLicenseInspection"/>
 
       <localInspection groupPath="Shopware" shortName="ShopwareSubscriperMethodInspection" displayName="ShopwareSubscriperMethodInspection"
                        groupName="Shopware"
