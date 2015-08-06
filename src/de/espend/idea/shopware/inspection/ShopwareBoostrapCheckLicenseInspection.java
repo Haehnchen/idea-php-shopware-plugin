@@ -26,7 +26,7 @@ public class ShopwareBoostrapCheckLicenseInspection extends LocalInspectionTool 
     @Override
     public PsiElementVisitor buildVisitor(final @NotNull ProblemsHolder holder, boolean isOnTheFly) {
 
-        PsiFile psiFile = holder.getFile();
+        final PsiFile psiFile = holder.getFile();
 
         /**
          * Only run inspection if the file is a bootstrap.php, then iterate over each element in class.
@@ -56,7 +56,7 @@ public class ShopwareBoostrapCheckLicenseInspection extends LocalInspectionTool 
                              * Check if checkLicense-method is actually called.
                              */
                             final int[] counterOfFoundCallsOfCheckLicense = {0};
-                            ArrayList<String> checkLicenseCalledFrom = new ArrayList<String>();
+                            final ArrayList<String> checkLicenseCalledFrom = new ArrayList<String>();
 
                             /**
                              * Count occurrences of calls and where it is called
