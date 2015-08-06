@@ -8,8 +8,10 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.inspection.quickfix.CreateMethodQuickFix;
+import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,18 +33,20 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
         PsiFile psiFile = holder.getFile();
 
         String name = psiFile.getName();
-        if(!name.contains("Bootstrap")) {
+
+        if(name.contains("Bootstrap")) {
+            psiFile.acceptChildren(new MyBootstrapRecursiveElementWalkingVisitor(holder));
             return super.buildVisitor(holder, isOnTheFly);
         }
 
-        psiFile.acceptChildren(new MyPsiRecursiveElementWalkingVisitor(holder));
+        psiFile.acceptChildren(new MySubscriberRecursiveElementWalkingVisitor(holder));
         return super.buildVisitor(holder, isOnTheFly);
     }
 
-    private static class MyPsiRecursiveElementWalkingVisitor extends PsiRecursiveElementWalkingVisitor {
+    private static class MyBootstrapRecursiveElementWalkingVisitor extends PsiRecursiveElementWalkingVisitor {
         private final ProblemsHolder holder;
 
-        public MyPsiRecursiveElementWalkingVisitor(ProblemsHolder holder) {
+        public MyBootstrapRecursiveElementWalkingVisitor(ProblemsHolder holder) {
             this.holder = holder;
         }
 
@@ -80,5 +84,78 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
 
         }
 
+    }
+
+    /**
+     * return array(
+     *  'Shopware_Controllers_Frontend_Account::ajaxLogoutAction::before' => 'onFrontendLogout'
+     * );
+     */
+    private static class MySubscriberRecursiveElementWalkingVisitor extends PsiRecursiveElementWalkingVisitor {
+        private final ProblemsHolder holder;
+
+        public MySubscriberRecursiveElementWalkingVisitor(ProblemsHolder holder) {
+            this.holder = holder;
+        }
+
+        @Override
+        public void visitElement(PsiElement element) {
+
+            if(element instanceof StringLiteralExpression) {
+                String subscriperName = getHashKey((StringLiteralExpression) element);
+                if(subscriperName != null) {
+                    Method method = PsiTreeUtil.getParentOfType(element, Method.class);
+                    if(method != null) {
+                        if("getSubscribedEvents".equals(method.getName())) {
+                            PhpClass phpClass = method.getContainingClass();
+                            if(phpClass != null && new Symfony2InterfacesUtil().isInstanceOf(phpClass, "\\Enlight\\Event\\SubscriberInterface")) {
+                                visitSubscriber(phpClass, (StringLiteralExpression) element, subscriperName);
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            super.visitElement(element);
+        }
+
+        public void visitSubscriber(PhpClass phpClass, final StringLiteralExpression element, String subscriperName) {
+
+            final String contents = element.getContents();
+            if(StringUtils.isBlank(contents)) {
+                return;
+            }
+
+            Method method = phpClass.findMethodByName(contents);
+            if(method != null) {
+                return;
+            }
+
+            holder.registerProblem(element, "Create function", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+            //holder.registerProblem(element, "Create function", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new CreateMethodQuickFix(null, phpClass, subscriperName, subscriperName, element));
+
+        }
+    }
+
+    public static String getHashKey(@NotNull StringLiteralExpression psiElement) {
+
+        PsiElement arrayValue = psiElement.getParent();
+        if(arrayValue != null && arrayValue.getNode().getElementType() == PhpElementTypes.ARRAY_VALUE) {
+            PsiElement arrayHash = arrayValue.getParent();
+
+            if(arrayHash instanceof ArrayHashElement) {
+                PhpPsiElement key = ((ArrayHashElement) arrayHash).getKey();
+                if(key instanceof StringLiteralExpression) {
+                    String contents = ((StringLiteralExpression) key).getContents();
+                    if(StringUtils.isNotBlank(contents)) {
+                        return contents;
+                    }
+                }
+            }
+
+        }
+
+        return null;
     }
 }
