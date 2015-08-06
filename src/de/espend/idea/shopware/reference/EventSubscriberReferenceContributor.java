@@ -497,9 +497,31 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                         }
                     }
                 }
-
             }
 
+        }
+
+        for (Map.Entry<String, Collection<String>> entry : HookSubscriberUtil.NOTIFY_EVENTS_MAP.entrySet()) {
+            for (String value : entry.getValue()) {
+                String[] split = value.split("\\.");
+                Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
+                if(classMethod == null) {
+                    continue;
+                }
+
+                final PsiElement[] count = {classMethod};
+                classMethod.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+                           @Override
+                           public void visitElement(PsiElement element) {
+                               if ((element instanceof StringLiteralExpression) && ((StringLiteralExpression) element).getContents().equals(entry.getKey())) {
+                                   count[0] = element;
+                               }
+                               super.visitElement(element);
+                           }
+                       });
+
+                collector.collect(count[0], entry.getKey());
+            }
         }
     }
 

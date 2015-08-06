@@ -14,6 +14,7 @@ import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HookSubscriberUtil {
 
@@ -22,6 +23,8 @@ public class HookSubscriberUtil {
     final private static Set<String> CORE_CLASSES = new HashSet<String>() {{
         addAll(Arrays.asList("sCms", "sCore", "sAdmin", "sOrder", "sBasket", "sExport", "sSystem", "sArticles", "sMarketing", "sCategories", "sCategories", "sNewsletter", "sConfigurator", "sRewriteTable"));
     }};
+
+    public static Map<String, Collection<String>> NOTIFY_EVENTS_MAP = new ConcurrentHashMap<String, Collection<String>>();
 
     public static void collectHooks(Project project, HookVisitor hookVisitor) {
 
