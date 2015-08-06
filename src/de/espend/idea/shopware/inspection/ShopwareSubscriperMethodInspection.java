@@ -104,6 +104,10 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
                 }
             }
 
+            if(hookName != null && !hookName.contains("::")) {
+                subjectDoc = null;
+            }
+
             holder.registerProblem(literalExpression, "Create function", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new CreateMethodQuickFix(literalExpression, new CreateMethodQuickFix.GeneratorContainer(subjectDoc, hookMethod, hookName)));
         }
 
