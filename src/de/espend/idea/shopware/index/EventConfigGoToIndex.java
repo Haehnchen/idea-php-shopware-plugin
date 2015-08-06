@@ -10,12 +10,8 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.smarty.SmartyFileType;
-import de.espend.idea.shopware.util.SmartyPattern;
-import de.espend.idea.shopware.util.TemplateUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
 import gnu.trove.THashMap;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -31,7 +27,7 @@ public class EventConfigGoToIndex extends FileBasedIndexExtension<String, Void> 
     public static final ID<String, Void> KEY = ID.create("de.espend.idea.shopware.event_config_go_to_index");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
-    public static final Set<String> METHOD_NAMES = new HashSet<String>(Arrays.asList("notify", "notifyUntil", "setElement", "addElement"));
+    public static final Set<String> METHOD_NAMES = new HashSet<String>(Arrays.asList("notify", "notifyUntil", "setElement", "addElement","filter"));
 
     @NotNull
     @Override
