@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.Processor;
@@ -24,10 +25,7 @@ import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -262,7 +260,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
             hookNameContent = ((StringLiteralExpression) context).getContents();
         }
 
-        if(hookNameContent == null || !hookNameContent.contains(":")) {
+        if(hookNameContent == null) {
             return new PsiElement[0];
         }
 
@@ -273,6 +271,36 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
     public static PsiElement[] getHookTargets(@NotNull Project project, @NotNull final String hookNameContent) {
 
         if(!hookNameContent.contains(":")) {
+
+            final Collection<PsiElement> psiElements = new ArrayList<PsiElement>();
+
+            for (final Map.Entry<String, Collection<String>> entry : HookSubscriberUtil.NOTIFY_EVENTS_MAP.entrySet()) {
+
+                if(!entry.getKey().equals(hookNameContent)) {
+                    continue;
+                }
+
+                for (String value : entry.getValue()) {
+                    String[] split = value.split("\\.");
+                    Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
+                    if(classMethod == null) {
+                        continue;
+                    }
+
+                    classMethod.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+                        @Override
+                        public void visitElement(PsiElement element) {
+                            if ((element instanceof StringLiteralExpression) && ((StringLiteralExpression) element).getContents().equals(entry.getKey())) {
+                                psiElements.add(element);
+                            }
+                            super.visitElement(element);
+                        }
+                    });
+
+                    return psiElements.toArray(new PsiElement[psiElements.size()]);
+                }
+            }
+
             return new PsiElement[0];
         }
 
