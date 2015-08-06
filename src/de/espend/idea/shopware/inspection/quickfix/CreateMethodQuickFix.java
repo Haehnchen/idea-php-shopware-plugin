@@ -8,7 +8,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.PhpCodeUtil;
@@ -17,7 +16,6 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import de.espend.idea.shopware.reference.EventSubscriberReferenceContributor;
 import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +41,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
     @NotNull
     @Override
     public String getName() {
-        return "Create Method";
+        return "Create method";
     }
 
     @NotNull

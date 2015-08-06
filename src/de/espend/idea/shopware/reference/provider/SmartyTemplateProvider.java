@@ -1,20 +1,14 @@
 package de.espend.idea.shopware.reference.provider;
 
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.completion.SmartyFileCompletionProvider;
-import de.espend.idea.shopware.lookup.TemplateLookupElement;
 import de.espend.idea.shopware.util.TemplateUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
