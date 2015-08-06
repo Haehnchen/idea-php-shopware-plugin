@@ -16,10 +16,17 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
+import de.espend.idea.shopware.util.HookSubscriberUtil;
+import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,7 +94,50 @@ public class CreateMethodQuickFix implements LocalQuickFix {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("public function ").append(contents).append("(").append(typeHint).append(" $args) {");
-        if(subjectDoc != null) {
+
+        if(subjectDoc == null) {
+            stringBuilder.append("\n");
+            stringBuilder.append("$return = $args->getReturn();\n");
+
+            Collection<String> references = HookSubscriberUtil.NOTIFY_EVENTS_MAP.get(hookName);
+            for (String value : references) {
+                String[] split = value.split("\\.");
+                Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
+                if(classMethod == null) {
+                    continue;
+                }
+
+                classMethod.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+                    @Override
+                    public void visitElement(PsiElement element) {
+                        if ((element instanceof StringLiteralExpression) && ((StringLiteralExpression) element).getContents().equals(((StringLiteralExpression) parameters[0]).getContents())) {
+                            PsiElement parent = element.getParent();
+                            if(parent instanceof ParameterList) {
+                                PsiElement[] parameterList = ((ParameterList) parent).getParameters();
+                                if(parameterList.length > 1) {
+                                    if(parameterList[1] instanceof ArrayCreationExpression) {
+                                        Map<String, PsiElement> eventParameters = PhpElementsUtil.getArrayCreationKeyMap((ArrayCreationExpression) parameterList[1]);
+                                        for(Map.Entry<String, PsiElement> entrySet : eventParameters.entrySet()) {
+                                            stringBuilder.append("\n");
+                                            PhpPsiElement psiElement = PhpElementsUtil.getArrayValue((ArrayCreationExpression) parameterList[1], entrySet.getKey());
+                                            if(psiElement instanceof PhpTypedElement) {
+                                                PhpType type = ((PhpTypedElement) psiElement).getType();
+                                                stringBuilder.append("/** @var ").append(type).append("$").append(entrySet.getKey()).append(" */\n");
+                                            }
+                                            stringBuilder.append("$").append(entrySet.getKey()).append(" = ").append("$args->get('").append(entrySet.getKey()).append("');\n");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        super.visitElement(element);
+                    }
+                });
+            }
+
+            stringBuilder.append("\n");
+            stringBuilder.append("$args->setReturn($return);\n");
+        } else {
             stringBuilder.append("\n");
             stringBuilder.append("/** @var ").append(subjectDoc).append(" $subject */\n");
             stringBuilder.append("$subject = $args->getSubject();\n");
