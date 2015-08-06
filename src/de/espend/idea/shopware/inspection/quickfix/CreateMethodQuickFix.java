@@ -82,54 +82,18 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             stringBuilder.append("\n");
             stringBuilder.append("$return = $args->getReturn();\n");
 
-            Collection<String> references = HookSubscriberUtil.NOTIFY_EVENTS_MAP.get(generatorContainer.getHookName());
-            for (String value : references) {
-                String[] split = value.split("\\.");
-                Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
-                if(classMethod == null) {
-                    continue;
-                }
-
-                classMethod.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
-                    @Override
-                    public void visitElement(PsiElement element) {
-                        if ((element instanceof StringLiteralExpression) && ((StringLiteralExpression) element).getContents().equals(generatorContainer.getHookName())) {
-                            PsiElement parent = element.getParent();
-                            if(parent instanceof ParameterList) {
-                                PsiElement[] parameterList = ((ParameterList) parent).getParameters();
-                                if(parameterList.length > 1) {
-                                    if(parameterList[1] instanceof ArrayCreationExpression) {
-                                        Map<String, PsiElement> eventParameters = PhpElementsUtil.getArrayCreationKeyMap((ArrayCreationExpression) parameterList[1]);
-                                        for(Map.Entry<String, PsiElement> entrySet : eventParameters.entrySet()) {
-                                            stringBuilder.append("\n");
-                                            PhpPsiElement psiElement = PhpElementsUtil.getArrayValue((ArrayCreationExpression) parameterList[1], entrySet.getKey());
-                                            if(psiElement instanceof PhpTypedElement) {
-
-                                                Set<String> classes = new HashSet<String>();
-
-                                                PhpType type = ((PhpTypedElement) psiElement).getType();
-                                                for (PhpClass aClass : PhpElementsUtil.getClassFromPhpTypeSet(project, type.getTypes())) {
-                                                    String presentableFQN = aClass.getPresentableFQN();
-                                                    if(presentableFQN == null) {
-                                                        continue;
-                                                    }
-
-                                                    classes.add(presentableFQN);
-                                                }
-
-                                                if(classes.size() > 0) {
-                                                    stringBuilder.append("/** @var ").append(StringUtils.join(classes, "|")).append("$").append(entrySet.getKey()).append(" */\n");
-                                                }
-                                            }
-                                            stringBuilder.append("$").append(entrySet.getKey()).append(" = ").append("$args->get('").append(entrySet.getKey()).append("');\n");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        super.visitElement(element);
+            // Events
+            if(HookSubscriberUtil.NOTIFY_EVENTS_MAP.containsKey(generatorContainer.getHookName())) {
+                Collection<String> references = HookSubscriberUtil.NOTIFY_EVENTS_MAP.get(generatorContainer.getHookName());
+                for (String value : references) {
+                    String[] split = value.split("\\.");
+                    Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
+                    if(classMethod == null) {
+                        continue;
                     }
-                });
+
+                    buildEventVariables(project, stringBuilder, classMethod);
+                }
             }
 
             stringBuilder.append("\n");
@@ -205,6 +169,49 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             editor.getScrollingModel().scrollToCaret(ScrollType.CENTER_UP);
         }
 
+    }
+
+    private void buildEventVariables(@NotNull final Project project, final StringBuilder stringBuilder, Method classMethod) {
+        classMethod.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+            @Override
+            public void visitElement(PsiElement element) {
+                if ((element instanceof StringLiteralExpression) && ((StringLiteralExpression) element).getContents().equals(generatorContainer.getHookName())) {
+                    PsiElement parent = element.getParent();
+                    if(parent instanceof ParameterList) {
+                        PsiElement[] parameterList = ((ParameterList) parent).getParameters();
+                        if(parameterList.length > 1) {
+                            if(parameterList[1] instanceof ArrayCreationExpression) {
+                                Map<String, PsiElement> eventParameters = PhpElementsUtil.getArrayCreationKeyMap((ArrayCreationExpression) parameterList[1]);
+                                for(Map.Entry<String, PsiElement> entrySet : eventParameters.entrySet()) {
+                                    stringBuilder.append("\n");
+                                    PhpPsiElement psiElement = PhpElementsUtil.getArrayValue((ArrayCreationExpression) parameterList[1], entrySet.getKey());
+                                    if(psiElement instanceof PhpTypedElement) {
+
+                                        Set<String> classes = new HashSet<String>();
+
+                                        PhpType type = ((PhpTypedElement) psiElement).getType();
+                                        for (PhpClass aClass : PhpElementsUtil.getClassFromPhpTypeSet(project, type.getTypes())) {
+                                            String presentableFQN = aClass.getPresentableFQN();
+                                            if(presentableFQN == null) {
+                                                continue;
+                                            }
+
+                                            classes.add(presentableFQN);
+                                        }
+
+                                        if(classes.size() > 0) {
+                                            stringBuilder.append("/** @var ").append(StringUtils.join(classes, "|")).append("$").append(entrySet.getKey()).append(" */\n");
+                                        }
+                                    }
+                                    stringBuilder.append("$").append(entrySet.getKey()).append(" = ").append("$args->get('").append(entrySet.getKey()).append("');\n");
+                                }
+                            }
+                        }
+                    }
+                }
+                super.visitElement(element);
+            }
+        });
     }
 
     @Nullable
