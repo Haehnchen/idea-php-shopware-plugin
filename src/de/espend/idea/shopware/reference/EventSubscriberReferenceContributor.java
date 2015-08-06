@@ -30,7 +30,12 @@ import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -473,31 +478,34 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         Collection<PhpClass> phpClasses = phpIndex.getAllSubclasses("\\Shopware_Components_Plugin_Bootstrap");
 
         for (PhpClass phpClass : phpClasses) {
-            Method method = PhpElementsUtil.getClassMethod(phpClass, "install");
-            if(method != null) {
+            for (String methodName : new String[]{"install", "update"}) {
+                Method method = PhpElementsUtil.getClassMethod(phpClass, methodName);
 
-                PsiElement[] methodReferences = PsiTreeUtil.collectElements(method, new PsiElementFilter() {
-                    @Override
-                    public boolean isAccepted(PsiElement element) {
-                        if(element instanceof MethodReference) {
-                            if("subscribeEvent".equals(((MethodReference) element).getName())) {
-                                return true;
+                if (method != null) {
+
+                    PsiElement[] methodReferences = PsiTreeUtil.collectElements(method, new PsiElementFilter() {
+                        @Override
+                        public boolean isAccepted(PsiElement element) {
+                            if (element instanceof MethodReference) {
+                                if ("subscribeEvent".equals(((MethodReference) element).getName())) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+                    });
+
+                    for (PsiElement methodReference : methodReferences) {
+                        if (methodReference instanceof MethodReference) {
+                            PsiElement parameter = PsiElementUtils.getMethodParameterPsiElementAt((MethodReference) methodReference, 0);
+                            String parameterString = PhpElementsUtil.getStringValue(parameter);
+                            if (parameterString != null) {
+                                collector.collect(parameter, parameterString);
                             }
                         }
-                        return false;
                     }
-                });
 
-                for(PsiElement methodReference: methodReferences ) {
-                    if(methodReference instanceof MethodReference) {
-                        PsiElement parameter = PsiElementUtils.getMethodParameterPsiElementAt((MethodReference) methodReference, 0);
-                        String parameterString = PhpElementsUtil.getStringValue(parameter);
-                        if(parameterString != null) {
-                            collector.collect(parameter, parameterString);
-                        }
-                    }
                 }
-
             }
 
         }
