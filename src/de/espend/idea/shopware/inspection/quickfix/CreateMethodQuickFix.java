@@ -8,9 +8,12 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
 import com.jetbrains.php.lang.PhpCodeUtil;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -74,6 +77,11 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             typeHint = "Enlight_Hook_HookArgs";
         }
 
+        PsiFile containingFile = method.getContainingFile();
+        if(containingFile instanceof PhpFile && PhpCodeInsightUtil.collectNamespaces((PhpFile) containingFile).size() > 0) {
+            typeHint = "\\" + typeHint;
+        }
+
         final StringBuilder stringBuilder = new StringBuilder();
         final String contents = context.getContents();
         stringBuilder.append("public function ").append(contents).append("(").append(typeHint).append(" $args) {");
@@ -100,7 +108,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             stringBuilder.append("$args->setReturn($return);\n");
         } else {
             stringBuilder.append("\n");
-            stringBuilder.append("/** @var ").append(generatorContainer.getSubjectDoc()).append(" $subject */\n");
+            stringBuilder.append("/** @var \\").append(generatorContainer.getSubjectDoc()).append(" $subject */\n");
             stringBuilder.append("$subject = $args->getSubject();\n");
 
             if(generatorContainer.getHookName() != null && generatorContainer.getHookName().contains("::")) {
@@ -194,6 +202,10 @@ public class CreateMethodQuickFix implements LocalQuickFix {
                                             String presentableFQN = aClass.getPresentableFQN();
                                             if(presentableFQN == null) {
                                                 continue;
+                                            }
+
+                                            if(!presentableFQN.startsWith("\\")) {
+                                                presentableFQN = "\\" + presentableFQN;
                                             }
 
                                             classes.add(presentableFQN);
