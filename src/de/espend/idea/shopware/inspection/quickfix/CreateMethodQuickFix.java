@@ -23,6 +23,7 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
+import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -86,52 +87,37 @@ public class CreateMethodQuickFix implements LocalQuickFix {
         final String contents = context.getContents();
         stringBuilder.append("public function ").append(contents).append("(").append(typeHint).append(" $args) {");
 
-        if(generatorContainer.getSubjectDoc() == null) {
+        String subjectDoc = generatorContainer.getSubjectDoc();
+
+        // find subject on controller "Enlight_Controller_Action_PostDispatchSecure_Frontend_Payment"
+        if(subjectDoc == null && generatorContainer.getHookName() != null && !generatorContainer.getHookName().contains("::")) {
+            PhpClass phpClass = ShopwareUtil.getControllerOnActionSubscriberName(project, generatorContainer.getHookName());
+            if(phpClass != null) {
+                String presentableFQN = phpClass.getPresentableFQN();
+                if(presentableFQN != null) {
+                    subjectDoc = presentableFQN;
+                    if(subjectDoc.startsWith("\\")) {
+                        subjectDoc = "\\" + subjectDoc;
+                    }
+                }
+            }
+        }
+
+        if(subjectDoc != null) {
+            stringBuilder.append("/** @var \\").append(subjectDoc).append(" $subject */\n");
+            stringBuilder.append("$subject = $args->getSubject();\n");
+        }
+
+        if(generatorContainer.getHookName() != null && generatorContainer.getHookName().contains("::")) {
             stringBuilder.append("\n");
             stringBuilder.append("$return = $args->getReturn();\n");
 
-            // Events
-            if(HookSubscriberUtil.NOTIFY_EVENTS_MAP.containsKey(generatorContainer.getHookName())) {
-                Collection<String> references = HookSubscriberUtil.NOTIFY_EVENTS_MAP.get(generatorContainer.getHookName());
-                for (String value : references) {
-                    String[] split = value.split("\\.");
-                    Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
-                    if(classMethod == null) {
-                        continue;
-                    }
-
-                    buildEventVariables(project, stringBuilder, classMethod);
-                }
-            }
+            attachVariablesInScope(project, stringBuilder);
 
             stringBuilder.append("\n");
             stringBuilder.append("$args->setReturn($return);\n");
         } else {
-            stringBuilder.append("\n");
-            stringBuilder.append("/** @var \\").append(generatorContainer.getSubjectDoc()).append(" $subject */\n");
-            stringBuilder.append("$subject = $args->getSubject();\n");
-
-            if(generatorContainer.getHookName() != null && generatorContainer.getHookName().contains("::")) {
-                stringBuilder.append("\n");
-                stringBuilder.append("$return = $args->getReturn();\n");
-
-                // add hook parameter
-                if(generatorContainer.getHookMethod() != null) {
-                    Parameter[] hookMethodParameters = generatorContainer.getHookMethod().getParameters();
-                    if(hookMethodParameters.length > 0 ) {
-                        stringBuilder.append("\n");
-                        for(Parameter parameter : hookMethodParameters) {
-                            String name = parameter.getName();
-                            stringBuilder.append("$").append(name).append(" = ").append("$args->get('").append(name).append("');\n");
-                        }
-                    }
-                }
-
-                stringBuilder.append("\n");
-                stringBuilder.append("$args->setReturn($return);\n");
-            }
-
-            stringBuilder.append("\n");
+            attachVariablesInScope(project, stringBuilder);
         }
 
         if(generatorContainer.getHookName() != null) {
@@ -177,6 +163,33 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             editor.getScrollingModel().scrollToCaret(ScrollType.CENTER_UP);
         }
 
+    }
+
+    private void attachVariablesInScope(@NotNull Project project, StringBuilder stringBuilder) {
+
+        // Events
+        if(HookSubscriberUtil.NOTIFY_EVENTS_MAP.containsKey(generatorContainer.getHookName())) {
+            Collection<String> references = HookSubscriberUtil.NOTIFY_EVENTS_MAP.get(generatorContainer.getHookName());
+            for (String value : references) {
+                String[] split = value.split("\\.");
+                Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
+                if(classMethod == null) {
+                    continue;
+                }
+
+                buildEventVariables(project, stringBuilder, classMethod);
+            }
+        } else if(generatorContainer.getHookMethod() != null) {
+            // add hook parameter
+            Parameter[] hookMethodParameters = generatorContainer.getHookMethod().getParameters();
+            if(hookMethodParameters.length > 0 ) {
+                stringBuilder.append("\n");
+                for(Parameter parameter : hookMethodParameters) {
+                    String name = parameter.getName();
+                    stringBuilder.append("$").append(name).append(" = ").append("$args->get('").append(name).append("');\n");
+                }
+            }
+        }
     }
 
     private void buildEventVariables(@NotNull final Project project, final StringBuilder stringBuilder, Method classMethod) {

@@ -384,7 +384,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         @Override
         public Object[] getVariants() {
 
-            final Set<String> events = new HashSet<String>(HookSubscriberUtil.NOTIFY_EVENTS);
+            final Set<String> events = new HashSet<String>(HookSubscriberUtil.NOTIFY_EVENTS_MAP.keySet());
 
             final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
             collectEvents(getElement().getProject(), new Collector() {

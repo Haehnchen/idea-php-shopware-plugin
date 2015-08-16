@@ -86,6 +86,7 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
                 return;
             }
 
+            // @TODO: clean up
             final PsiElement[] parameters = reference.getParameters();
             String subjectDoc = null;
             Method hookMethod = null;
@@ -162,6 +163,7 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
             String subjectDoc = null;
             Method hookMethod = null;
 
+            // @TODO: clean up
             if(subscriperName.contains("::")) {
                 PsiElement subjectTarget = CreateMethodQuickFix.getSubjectTargetOnHook(element.getProject(), subscriperName);
                 if(subjectTarget instanceof PhpClass) {

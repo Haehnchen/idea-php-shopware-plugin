@@ -89,9 +89,6 @@ public class ShopwareProjectComponent implements ProjectComponent {
                             ApplicationManager.getApplication().runReadAction(new PsiParameterStorageRunnable(project, virtualFile, events, configs));
                         }
 
-                        HookSubscriberUtil.NOTIFY_EVENTS.clear();
-                        HookSubscriberUtil.NOTIFY_EVENTS.addAll(events.keySet());
-
                         HookSubscriberUtil.NOTIFY_EVENTS_MAP.clear();
                         HookSubscriberUtil.NOTIFY_EVENTS_MAP.putAll(events);
 

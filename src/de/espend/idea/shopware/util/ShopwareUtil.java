@@ -349,4 +349,22 @@ public class ShopwareUtil {
         return Character.toUpperCase(subject.charAt(0)) + subject.substring(1);
     }
 
+    /**
+     * "Enlight_Controller_Action_PostDispatchSecure_Frontend_Payment" _> Shopware_Controllers_Frontend_Payment
+     */
+    @Nullable
+    public static PhpClass getControllerOnActionSubscriberName(@NotNull Project project, @NotNull String subscriberName) {
+        Pattern pattern = Pattern.compile("Enlight_Controller_Action_\\w+_(Frontend|Backend|Core|Widgets)_(\\w+)");
+        Matcher matcher = pattern.matcher(subscriberName);
+
+        if(matcher.find()) {
+            PhpClass phpClass = PhpElementsUtil.getClass(project, String.format("Shopware_Controllers_%s_%s", matcher.group(1), matcher.group(2)));
+            if(phpClass != null) {
+                return phpClass;
+            }
+        }
+
+        return null;
+    }
+
 }
