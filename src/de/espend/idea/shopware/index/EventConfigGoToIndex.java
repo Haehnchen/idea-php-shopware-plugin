@@ -70,21 +70,24 @@ public class EventConfigGoToIndex extends FileBasedIndexExtension<String, Void> 
         };
     }
 
+    @NotNull
     @Override
     public KeyDescriptor<String> getKeyDescriptor() {
         return this.myKeyDescriptor;
     }
 
+    @NotNull
     @Override
     public DataExternalizer<Void> getValueExternalizer() {
         return ScalarIndexExtension.VOID_DATA_EXTERNALIZER;
     }
 
+    @NotNull
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
         return new FileBasedIndex.InputFilter() {
             @Override
-            public boolean acceptInput(VirtualFile file) {
+            public boolean acceptInput(@NotNull VirtualFile file) {
                 return file.getFileType() == PhpFileType.INSTANCE;
             }
         };
