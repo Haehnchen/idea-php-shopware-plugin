@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.6.1</version>
+  <version>1.7</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -49,6 +49,18 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.7</h2>
+<ul>
+    <li>Replace deprecated api calls</li>
+    <li>Goto for events and configs <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/8">#8</a>, <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/9">#9</a> [florianklockenkemper]</li>
+    <li>check for references in install and update [84m]</li>
+    <li>Add check if checkLicense is called in bootstrap if present <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/11">#11</a> [84m]</li>
+    <li>Add full support of getSubscribedEvents syntax</li>
+    <li>"Create method" body for autogeneration of event methods <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/13">#13</a> [florianklockenkemper]</li>
+    <li>Add cache for time intensive subscriber extraction</li>
+    <li>Provide controller subjects in "Method create" quickfix</li>
+</ul>
 
 <h2>1.6.1</h2>
 <ul>
