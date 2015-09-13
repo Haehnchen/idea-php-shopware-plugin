@@ -4,24 +4,24 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import gnu.trove.THashMap;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 public class InitResourceServiceIndex extends FileBasedIndexExtension<String, String> {
@@ -43,33 +43,38 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
 
             @NotNull
             @Override
-            public Map<String, String> map(FileContent inputData) {
+            public Map<String, String> map(@NotNull FileContent inputData) {
                 final Map<String, String> events = new THashMap<String, String>();
 
                 PsiFile psiFile = inputData.getPsiFile();
-                if (!Symfony2ProjectComponent.isEnabled(psiFile.getProject())) {
+                if (!(psiFile instanceof PhpFile) || !Symfony2ProjectComponent.isEnabled(psiFile.getProject())) {
                     return events;
                 }
 
-                final Collection<Method> methodReferenceCollection = new HashSet<Method>();
+                final Collection<Method> methodReferences = new ArrayList<Method>();
 
                 psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
                     @Override
                     public void visitElement(PsiElement element) {
-
-                        if (element instanceof Method) {
-                            if("getSubscribedEvents".equals(((Method) element).getName())) {
-                                methodReferenceCollection.add((Method) element);
-                            }
+                        if(element instanceof Method && "getSubscribedEvents".equals(((Method) element).getName())) {
+                            methodReferences.add((Method) element);
                         }
-
                         super.visitElement(element);
                     }
-
                 });
 
-                for(Method reference : methodReferenceCollection) {
-                    reference.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+                if(methodReferences.size() == 0) {
+                    return events;
+                }
+
+                //public static function getSubscribedEvents() {
+                //  return [
+                //  'Enlight_Bootstrap_InitResource_swagcoupons.basket_helper' => 'onInitBasketHelper',
+                //  'Enlight_Bootstrap_InitResource_swagcoupons.settings' => 'onInitCouponSettings'
+                // ];
+                //}
+                for(final Method method : methodReferences) {
+                    method.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
                         @Override
                         public void visitElement(PsiElement element) {
 
@@ -82,18 +87,21 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
                                         for (String key : arrayCreationKeyMap.keySet()) {
                                             if (key.startsWith(ENLIGHT_BOOTSTRAP_INIT_RESOURCE_PREFIX)) {
                                                 String serviceName = key.substring(ENLIGHT_BOOTSTRAP_INIT_RESOURCE_PREFIX.length());
-                                                PhpClass phpClass = PsiTreeUtil.getParentOfType(element, PhpClass.class);
-                                                if(phpClass != null) {
-                                                    String methodName = arrayCreationKeyMap.get(key);
-                                                    events.put(serviceName, phpClass.getPresentableFQN() + '.' + methodName);
+                                                String methodName = arrayCreationKeyMap.get(key);
+                                                if(StringUtils.isNotBlank(serviceName) && StringUtils.isNotBlank(methodName)) {
+                                                    PhpClass phpClass = method.getContainingClass();
+                                                    if (phpClass != null) {
+                                                        String presentableFQN = phpClass.getPresentableFQN();
+                                                        if (StringUtils.isNotBlank(presentableFQN)) {
+                                                            events.put(serviceName, presentableFQN + '.' + methodName);
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-
-
                             super.visitElement(element);
                         }
                     });
@@ -101,27 +109,28 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
 
                 return events;
             }
-
-
         };
     }
 
+    @NotNull
     @Override
     public KeyDescriptor<String> getKeyDescriptor() {
         return this.myKeyDescriptor;
     }
 
 
+    @NotNull
     @Override
     public DataExternalizer<String> getValueExternalizer() {
         return StringDataExternalizer.STRING_DATA_EXTERNALIZER;
     }
 
+    @NotNull
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
         return new FileBasedIndex.InputFilter() {
             @Override
-            public boolean acceptInput(VirtualFile file) {
+            public boolean acceptInput(@NotNull VirtualFile file) {
                 return file.getFileType() == PhpFileType.INSTANCE;
             }
         };
@@ -134,7 +143,7 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
 
     @Override
     public int getVersion() {
-        return 1;
+        return 7;
     }
 
     private static class StringDataExternalizer implements DataExternalizer<String> {

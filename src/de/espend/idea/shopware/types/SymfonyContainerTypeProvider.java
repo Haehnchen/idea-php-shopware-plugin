@@ -49,7 +49,7 @@ public class SymfonyContainerTypeProvider implements PhpTypeProvider2 {
     }
 
     @Override
-    public Collection<? extends PhpNamedElement> getBySignature(String expression, Project project) {
+    public Collection<? extends PhpNamedElement> getBySignature(String expression, final Project project) {
 
         // get back our original call
         // since phpstorm 7.1.2 we need to validate this
