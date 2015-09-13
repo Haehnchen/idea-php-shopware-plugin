@@ -292,11 +292,13 @@
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="de.espend.idea.shopware.navigation.PhpLineMarkerProvider"/>
 
       <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareApiResourcesTypeProvider"/>
+      <php.typeProvider2 implementation="de.espend.idea.shopware.types.SymfonyContainerTypeProvider"/>
 
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyBlockStubIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyIncludeStubIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyExtendsStubIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.EventConfigGoToIndex"/>
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.InitResourceServiceIndex"/>
 
       <localInspection groupPath="Shopware" shortName="Shopware" displayName="Boostrap"
                        groupName="Shopware"
