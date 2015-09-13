@@ -324,6 +324,7 @@
         <DoctrineModelProvider implementation="de.espend.idea.shopware.symfony.ShopwareDoctrineModelProvider"/>
         <ControllerActionGotoRelatedCollector implementation="de.espend.idea.shopware.navigation.SmartyActionGotoRelatedCollector"/>
         <MethodSignatureTypeProviderExtension implementation="de.espend.idea.shopware.types.EnlightTypeProviderExtension"/>
+        <GotoCompletionRegistrar implementation="de.espend.idea.shopware.ShopwareServiceGotoCompletionRegistrar"/>
     </extensions>
 
     <depends>com.jetbrains.php</depends>

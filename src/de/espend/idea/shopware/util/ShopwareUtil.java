@@ -9,13 +9,16 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
 import com.intellij.util.containers.ContainerUtil;
+import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.AssignmentExpressionImpl;
 import com.jetbrains.smarty.SmartyFile;
+import de.espend.idea.shopware.index.InitResourceServiceIndex;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.apache.commons.lang.StringUtils;
@@ -347,4 +350,24 @@ public class ShopwareUtil {
         return null;
     }
 
+    /**
+     * Class method which resolves "Enlight_Bootstrap_InitResource_*"
+     */
+    public static Collection<Method> getInitResourceServiceClass(@NotNull Project project, @NotNull String contents) {
+
+        Collection<Method> methods = new ArrayList<Method>();
+        for(String value : FileBasedIndexImpl.getInstance().getValues(InitResourceServiceIndex.KEY, contents, GlobalSearchScope.allScope(project))) {
+            String[] split = value.split("\\.");
+            if(split.length < 2) {
+                continue;
+            }
+
+            Method method = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
+            if(method != null) {
+                methods.add(method);
+            }
+        }
+
+        return methods;
+    }
 }
