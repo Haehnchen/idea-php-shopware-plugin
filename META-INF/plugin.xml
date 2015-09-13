@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.7</version>
+  <version>1.7.1</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -49,6 +49,12 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>1.7.1</h2>
+<ul>
+    <li>Remove ShopwareMagicFile functionality, to prevent file generator for just a simple use case; fixes <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/15">#15</a>, <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/16">#16</a></li>
+    <li>Implement completion and navigation for Enlight_Bootstrap_InitResource service subscriber <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/12">#12</a> [florianklockenkemper], [84m]</li>
+</ul>
 
 <h2>1.7</h2>
 <ul>
