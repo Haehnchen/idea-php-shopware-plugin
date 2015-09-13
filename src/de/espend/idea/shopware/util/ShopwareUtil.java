@@ -71,26 +71,6 @@ public class ShopwareUtil {
         "module", "controller", "appendSession", "action", "fullPath", "module"
     };
 
-    public static void writeShopwareMagicFile(String outputString, String outputPath) {
-
-        File file = new File(outputPath);
-
-        // create .idea folder, should not occur
-        File folder = new File(file.getParent());
-        if(!folder.exists() && !folder.mkdir()) {
-            return;
-        }
-
-        FileWriter fw;
-        try {
-            fw = new FileWriter(file);
-            fw.write(outputString);
-            fw.close();
-        } catch (IOException ignored) {
-        }
-
-    }
-
     public static void collectControllerClass(Project project, ControllerClassVisitor controllerClassVisitor) {
         collectControllerClass(project, controllerClassVisitor, "Frontend" , "Backend", "Core", "Widgets");
     }

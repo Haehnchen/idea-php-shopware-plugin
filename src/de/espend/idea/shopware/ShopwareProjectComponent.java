@@ -28,8 +28,6 @@ import java.util.*;
  */
 public class ShopwareProjectComponent implements ProjectComponent {
 
-
-    private static String MAGIC_FILE = "ShopwareIdeMagicStuff.php";
     public static final int DUMPER_PERIODE = 600 * 1000;
 
     final Project project;
@@ -53,8 +51,6 @@ public class ShopwareProjectComponent implements ProjectComponent {
                 if(PhpElementsUtil.getClassInterface(project, "\\Enlight_Controller_Action") == null) {
                     return;
                 }
-
-                ShopwareUtil.writeShopwareMagicFile(magicTemplate(), getMagicFilePathname());
 
                 timer = new Timer();
 
@@ -120,14 +116,6 @@ public class ShopwareProjectComponent implements ProjectComponent {
 
     }
 
-    public static String getMagicFilePathname(Project project) {
-        return project.getBasePath() + "/cache/" + MAGIC_FILE;
-    }
-
-    public String getMagicFilePathname() {
-        return project.getBasePath() + "/cache/" + MAGIC_FILE;
-    }
-
     public static boolean isValidForProject(@Nullable PsiElement psiElement) {
         if(psiElement == null) return false;
 
@@ -152,19 +140,4 @@ public class ShopwareProjectComponent implements ProjectComponent {
     public String getComponentName() {
         return "Shopware Plugin";
     }
-
-    public static String magicTemplate() {
-        return "<?php\n" +
-            "\n" +
-            "interface ShopwareIdeMagicStuff {\n" +
-            "    \n" +
-            "    /**\n" +
-            "     * @return \\Shopware\\Components\\Logger\n" +
-            "     */\n" +
-            "    public function Pluginlogger();\n" +
-            "}";
-
-    }
-
-
 }
