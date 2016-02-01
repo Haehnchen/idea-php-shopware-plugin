@@ -244,7 +244,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        Method method = PhpElementsUtil.getClassMethod(phpClass, action + "Action");
+        Method method = phpClass.findMethodByName(action + "Action");
         if(method != null) {
             gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(method, "Navigate to action").withIcon(PhpIcons.METHOD, PhpIcons.METHOD));
             return;

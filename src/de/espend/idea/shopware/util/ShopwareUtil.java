@@ -171,7 +171,7 @@ public class ShopwareUtil {
             return null;
         }
 
-        return PhpElementsUtil.getClassMethod(phpClass, action + "Action");
+        return phpClass.findMethodByName(action + "Action");
 
     }
 

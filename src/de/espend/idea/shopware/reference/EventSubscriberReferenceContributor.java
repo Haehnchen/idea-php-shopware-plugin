@@ -479,7 +479,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
 
         for (PhpClass phpClass : phpClasses) {
             for (String methodName : new String[]{"install", "update"}) {
-                Method method = PhpElementsUtil.getClassMethod(phpClass, methodName);
+                Method method = phpClass.findMethodByName(methodName);
 
                 if (method != null) {
 
