@@ -54,8 +54,8 @@ public class ThemeUtil {
 
     }
 
-    public static interface ThemeAssetVisitor {
-        public boolean visit(@NotNull VirtualFile virtualFile, @NotNull String path);
+    public interface ThemeAssetVisitor {
+        boolean visit(@NotNull VirtualFile virtualFile, @NotNull String path);
     }
 
     public static void collectThemeJsFieldReferences(@NotNull StringLiteralExpression element, @NotNull ThemeAssetVisitor visitor) {

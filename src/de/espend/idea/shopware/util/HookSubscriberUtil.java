@@ -85,12 +85,12 @@ public class HookSubscriberUtil {
         }
     }
 
-    public static interface DoctrineLifecycleHooksVisitor {
-        public boolean visitLifecycleHooks(PhpClass phpClass);
+    public interface DoctrineLifecycleHooksVisitor {
+        boolean visitLifecycleHooks(PhpClass phpClass);
     }
 
-    public static interface HookVisitor {
-        public boolean visitHook(PhpClass phpClass, Method method);
+    public interface HookVisitor {
+        boolean visitHook(PhpClass phpClass, Method method);
     }
 
     @NotNull

@@ -101,7 +101,7 @@ public class ShopwareUtil {
     }
 
     public interface ControllerClassVisitor {
-        public void visitClass(PhpClass phpClass, String moduleName, String controllerName);
+        void visitClass(PhpClass phpClass, String moduleName, String controllerName);
     }
 
     public static void collectControllerActionSmartyWrapper(PsiElement psiElement, ControllerActionVisitor visitor) {
@@ -136,7 +136,7 @@ public class ShopwareUtil {
     }
 
     public interface ControllerActionVisitor {
-        public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName);
+        void visitMethod(Method method, String methodStripped, String moduleName, String controllerName);
     }
 
     @Nullable
@@ -226,7 +226,7 @@ public class ShopwareUtil {
     }
 
     public interface ControllerViewVariableVisitor {
-        public void visitVariable(String variableName, @NotNull PsiElement sourceType, @Nullable PsiElement typeElement);
+        void visitVariable(String variableName, @NotNull PsiElement sourceType, @Nullable PsiElement typeElement);
     }
 
     public static Map<String, PhpClass> getResourceClasses(Project project) {
@@ -292,7 +292,7 @@ public class ShopwareUtil {
     }
 
     public interface BootstrapFileVisitor {
-        public void visitVariable(VirtualFile virtualFile, String relativePath);
+        void visitVariable(VirtualFile virtualFile, String relativePath);
     }
 
 

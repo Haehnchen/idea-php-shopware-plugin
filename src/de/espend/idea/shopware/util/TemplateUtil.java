@@ -193,7 +193,7 @@ public class TemplateUtil {
     }
 
     public interface SmartyTemplateVisitor {
-        public void visitFile(VirtualFile virtualFile, String fileName);
+        void visitFile(VirtualFile virtualFile, String fileName);
     }
 
     public static abstract class SmartyTemplatePreventSelfVisitor implements SmartyTemplateVisitor {

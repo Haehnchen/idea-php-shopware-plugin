@@ -535,7 +535,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
     }
 
     public interface Collector {
-        public void collect(PsiElement psiElement, String value);
+        void collect(PsiElement psiElement, String value);
     }
 
 }
