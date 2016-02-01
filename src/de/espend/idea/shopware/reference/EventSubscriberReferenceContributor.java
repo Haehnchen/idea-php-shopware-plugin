@@ -217,7 +217,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
 
                     if(arrayCreation != null) {
                         PsiElement arrayValue = psiElement.getParent();
-                        if(PhpPsiUtil.isOfType(arrayValue, PhpElementTypes.ARRAY_VALUE)) {
+                        if(arrayValue.getNode().getElementType() == PhpElementTypes.ARRAY_VALUE) {
                             PsiElement arrayHashElement = arrayValue.getParent();
                             if(arrayHashElement instanceof ArrayHashElement) {
                                 PhpPsiElement key = ((ArrayHashElement) arrayHashElement).getKey();
