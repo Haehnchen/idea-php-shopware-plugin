@@ -13,7 +13,6 @@ import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.util.*;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.Processor;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
@@ -22,14 +21,15 @@ import de.espend.idea.shopware.util.HookSubscriberUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
+import fr.adrienbrault.idea.symfony2plugin.stubs.ContainerCollectionResolver;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
+import fr.adrienbrault.idea.symfony2plugin.util.dict.ServiceUtil;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
@@ -235,6 +235,13 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
             }
         });
 
+        for (String service : ContainerCollectionResolver.getServiceNames(project)) {
+            result.addElement(
+                LookupElementBuilder.create("Enlight_Bootstrap_InitResource_" + service)
+                .withIcon(Symfony2Icons.SERVICE).withTypeText("Service", true)
+            );
+        }
+
         if(withReferences) {
 
             CachedValue<String[]> eventCache = project.getUserData(EVENT_CACHE);
@@ -345,6 +352,13 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                         }
                     });
                 }
+            }
+        }
+
+        if(hookNameContent.startsWith("Enlight_Bootstrap_InitResource_")) {
+            String serviceName = hookNameContent.substring("Enlight_Bootstrap_InitResource_".length());
+            if(StringUtils.isNotBlank(serviceName)) {
+                psiElements.addAll(ServiceUtil.getServiceClassTargets(project, serviceName));
             }
         }
 
