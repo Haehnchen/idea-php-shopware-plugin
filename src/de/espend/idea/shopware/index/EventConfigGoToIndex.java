@@ -27,7 +27,7 @@ public class EventConfigGoToIndex extends FileBasedIndexExtension<String, Void> 
     public static final ID<String, Void> KEY = ID.create("de.espend.idea.shopware.event_config_go_to_index");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
-    public static final Set<String> METHOD_NAMES = new HashSet<String>(Arrays.asList("notify", "notifyUntil", "setElement", "addElement","filter"));
+    public static final Set<String> METHOD_NAMES = new HashSet<String>(Arrays.asList("notify", "notifyUntil", "setElement", "addElement","filter", "collect"));
 
     @NotNull
     @Override
@@ -100,6 +100,6 @@ public class EventConfigGoToIndex extends FileBasedIndexExtension<String, Void> 
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 }
