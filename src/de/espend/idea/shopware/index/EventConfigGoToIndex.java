@@ -1,6 +1,5 @@
 package de.espend.idea.shopware.index;
 
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
@@ -27,7 +26,7 @@ public class EventConfigGoToIndex extends FileBasedIndexExtension<String, Void> 
     public static final ID<String, Void> KEY = ID.create("de.espend.idea.shopware.event_config_go_to_index");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
-    public static final Set<String> METHOD_NAMES = new HashSet<String>(Arrays.asList("notify", "notifyUntil", "setElement", "addElement","filter", "collect"));
+    public static final Set<String> METHOD_NAMES = new HashSet<>(Arrays.asList("notify", "notifyUntil", "setElement", "addElement", "filter", "collect"));
 
     @NotNull
     @Override
@@ -43,7 +42,7 @@ public class EventConfigGoToIndex extends FileBasedIndexExtension<String, Void> 
             @NotNull
             @Override
             public Map<String, Void> map(FileContent inputData) {
-                final Map<String, Void> map = new THashMap<String, Void>();
+                final Map<String, Void> map = new THashMap<>();
 
                 PsiFile psiFile = inputData.getPsiFile();
                 if(!Symfony2ProjectComponent.isEnabled(psiFile.getProject())) {
@@ -85,12 +84,7 @@ public class EventConfigGoToIndex extends FileBasedIndexExtension<String, Void> 
     @NotNull
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
-        return new FileBasedIndex.InputFilter() {
-            @Override
-            public boolean acceptInput(@NotNull VirtualFile file) {
-                return file.getFileType() == PhpFileType.INSTANCE;
-            }
-        };
+        return file -> file.getFileType() == PhpFileType.INSTANCE;
     }
 
     @Override

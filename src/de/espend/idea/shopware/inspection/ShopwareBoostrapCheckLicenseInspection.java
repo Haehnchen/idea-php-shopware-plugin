@@ -56,7 +56,7 @@ public class ShopwareBoostrapCheckLicenseInspection extends LocalInspectionTool 
                              * Check if checkLicense-method is actually called.
                              */
                             final int[] counterOfFoundCallsOfCheckLicense = {0};
-                            final ArrayList<String> checkLicenseCalledFrom = new ArrayList<String>();
+                            final ArrayList<String> checkLicenseCalledFrom = new ArrayList<>();
 
                             /**
                              * Count occurrences of calls and where it is called

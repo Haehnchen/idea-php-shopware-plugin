@@ -1,6 +1,5 @@
 package de.espend.idea.shopware.index;
 
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
@@ -44,14 +43,14 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
             @NotNull
             @Override
             public Map<String, String> map(@NotNull FileContent inputData) {
-                final Map<String, String> events = new THashMap<String, String>();
+                final Map<String, String> events = new THashMap<>();
 
                 PsiFile psiFile = inputData.getPsiFile();
                 if (!(psiFile instanceof PhpFile) || !Symfony2ProjectComponent.isEnabled(psiFile.getProject())) {
                     return events;
                 }
 
-                final Collection<Method> methodReferences = new ArrayList<Method>();
+                final Collection<Method> methodReferences = new ArrayList<>();
 
                 psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
                     @Override
@@ -128,12 +127,7 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
     @NotNull
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
-        return new FileBasedIndex.InputFilter() {
-            @Override
-            public boolean acceptInput(@NotNull VirtualFile file) {
-                return file.getFileType() == PhpFileType.INSTANCE;
-            }
-        };
+        return file -> file.getFileType() == PhpFileType.INSTANCE;
     }
 
     @Override

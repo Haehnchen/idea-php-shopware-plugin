@@ -36,14 +36,11 @@ public class ControllerActionReferenceProvider extends PsiPolyVariantReferenceBa
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean b) {
-        final List<PsiElement> targets = new ArrayList<PsiElement>();
+        final List<PsiElement> targets = new ArrayList<>();
 
-        ShopwareUtil.collectControllerAction(getElement().getProject(), this.controllerName, new ShopwareUtil.ControllerActionVisitor() {
-            @Override
-            public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
-                if (methodStripped.equalsIgnoreCase(content)) {
-                    targets.add(method);
-                }
+        ShopwareUtil.collectControllerAction(getElement().getProject(), this.controllerName, (method, methodStripped, moduleName1, controllerName1) -> {
+            if (methodStripped.equalsIgnoreCase(content)) {
+                targets.add(method);
             }
         }, moduleName);
 
@@ -54,14 +51,9 @@ public class ControllerActionReferenceProvider extends PsiPolyVariantReferenceBa
     @Override
     public Object[] getVariants() {
 
-        final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
+        final List<LookupElement> lookupElements = new ArrayList<>();
 
-        ShopwareUtil.collectControllerAction(getElement().getProject(), this.controllerName, new ShopwareUtil.ControllerActionVisitor() {
-            @Override
-            public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
-                lookupElements.add(attachTypeText(LookupElementBuilder.create(methodStripped).withIcon(method.getIcon()), method));
-            }
-        }, moduleName);
+        ShopwareUtil.collectControllerAction(getElement().getProject(), this.controllerName, (method, methodStripped, moduleName1, controllerName1) -> lookupElements.add(attachTypeText(LookupElementBuilder.create(methodStripped).withIcon(method.getIcon()), method)), moduleName);
 
         return lookupElements.toArray();
     }

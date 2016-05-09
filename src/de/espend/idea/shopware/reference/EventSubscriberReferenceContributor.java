@@ -5,7 +5,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
-import com.intellij.psi.util.PsiElementFilter;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIcons;
@@ -13,7 +12,6 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.PhpLanguage;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.patterns.PhpPatterns;
-import com.jetbrains.php.lang.psi.PhpPsiUtil;
 import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
@@ -315,7 +313,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         @NotNull
         @Override
         public ResolveResult[] multiResolve(boolean incompleteCode) {
-            final List<ResolveResult> results = new ArrayList<ResolveResult>();
+            final List<ResolveResult> results = new ArrayList<>();
 
             PhpClass phpClass = PsiTreeUtil.getParentOfType(getElement(), PhpClass.class);
             if(phpClass == null) {
@@ -336,7 +334,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         @Override
         public Object[] getVariants() {
 
-            final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
+            final List<LookupElement> lookupElements = new ArrayList<>();
 
             PhpClass phpClass = PsiTreeUtil.getParentOfType(getElement(), PhpClass.class);
             if(phpClass == null) {
@@ -365,14 +363,11 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         @NotNull
         @Override
         public ResolveResult[] multiResolve(boolean incompleteCode) {
-            final List<ResolveResult> results = new ArrayList<ResolveResult>();
+            final List<ResolveResult> results = new ArrayList<>();
 
-            collectEvents(getElement().getProject(), new Collector() {
-                @Override
-                public void collect(PsiElement psiElement, String value) {
-                    if(value.equals(valueName)) {
-                        results.add(new PsiElementResolveResult(psiElement));
-                    }
+            collectEvents(getElement().getProject(), (psiElement, value) -> {
+                if(value.equals(valueName)) {
+                    results.add(new PsiElementResolveResult(psiElement));
                 }
             });
 
@@ -384,15 +379,10 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         @Override
         public Object[] getVariants() {
 
-            final Set<String> events = new HashSet<String>(HookSubscriberUtil.NOTIFY_EVENTS_MAP.keySet());
+            final Set<String> events = new HashSet<>(HookSubscriberUtil.NOTIFY_EVENTS_MAP.keySet());
 
-            final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
-            collectEvents(getElement().getProject(), new Collector() {
-                @Override
-                public void collect(PsiElement psiElement, String value) {
-                    events.add(value);
-                }
-            });
+            final List<LookupElement> lookupElements = new ArrayList<>();
+            collectEvents(getElement().getProject(), (psiElement, value) -> events.add(value));
 
             for(String event: events) {
                 lookupElements.add(LookupElementBuilder.create(event).withIcon(ShopwarePluginIcons.SHOPWARE).withTypeText("Event", true));
@@ -414,7 +404,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         @NotNull
         @Override
         public ResolveResult[] multiResolve(boolean incompleteCode) {
-            List<ResolveResult> results = new ArrayList<ResolveResult>();
+            List<ResolveResult> results = new ArrayList<>();
 
             PhpClass phpClass = ShopwareUtil.getResourceClass(getElement().getProject(), valueName);
             if(phpClass != null) {
@@ -429,7 +419,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
         @Override
         public Object[] getVariants() {
 
-            List<LookupElement> lookupElements = new ArrayList<LookupElement>();
+            List<LookupElement> lookupElements = new ArrayList<>();
 
             for(Map.Entry<String, PhpClass> entry: ShopwareUtil.getResourceClasses(getElement().getProject()).entrySet()) {
                 lookupElements.add(LookupElementBuilder.createWithIcon(entry.getValue()).withLookupString(entry.getKey()).withTypeText(entry.getValue().getPresentableFQN(), true));
@@ -483,16 +473,13 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
 
                 if (method != null) {
 
-                    PsiElement[] methodReferences = PsiTreeUtil.collectElements(method, new PsiElementFilter() {
-                        @Override
-                        public boolean isAccepted(PsiElement element) {
-                            if (element instanceof MethodReference) {
-                                if ("subscribeEvent".equals(((MethodReference) element).getName())) {
-                                    return true;
-                                }
+                    PsiElement[] methodReferences = PsiTreeUtil.collectElements(method, element -> {
+                        if (element instanceof MethodReference) {
+                            if ("subscribeEvent".equals(((MethodReference) element).getName())) {
+                                return true;
                             }
-                            return false;
                         }
+                        return false;
                     });
 
                     for (PsiElement methodReference : methodReferences) {

@@ -89,7 +89,7 @@ public class SymfonyContainerTypeProvider implements PhpTypeProvider2 {
 
         List<String> values = FileBasedIndexImpl.getInstance().getValues(InitResourceServiceIndex.KEY, parameter, GlobalSearchScope.allScope(project));
 
-        final Collection<PhpClass> classes = new HashSet<PhpClass>();
+        final Collection<PhpClass> classes = new HashSet<>();
         for(String value : values) {
             String[] split = value.split("\\.");
             Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);

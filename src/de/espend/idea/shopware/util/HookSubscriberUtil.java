@@ -24,11 +24,11 @@ public class HookSubscriberUtil {
         addAll(Arrays.asList("sCms", "sCore", "sAdmin", "sOrder", "sBasket", "sExport", "sSystem", "sArticles", "sMarketing", "sCategories", "sCategories", "sNewsletter", "sConfigurator", "sRewriteTable"));
     }};
 
-    public static Map<String, Collection<String>> NOTIFY_EVENTS_MAP = new ConcurrentHashMap<String, Collection<String>>();
+    public static Map<String, Collection<String>> NOTIFY_EVENTS_MAP = new ConcurrentHashMap<>();
 
     public static void collectHooks(Project project, HookVisitor hookVisitor) {
 
-        Collection<PhpClass> phpClasses = new ArrayList<PhpClass>();
+        Collection<PhpClass> phpClasses = new ArrayList<>();
 
         // directly use core classes
         PhpIndex phpIndex = PhpIndex.getInstance(project);

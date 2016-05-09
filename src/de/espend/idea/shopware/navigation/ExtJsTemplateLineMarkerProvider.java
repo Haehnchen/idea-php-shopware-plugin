@@ -70,7 +70,7 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        List<PsiElement> psiElementList = new ArrayList<PsiElement>();
+        List<PsiElement> psiElementList = new ArrayList<>();
 
         if(attachController) {
             attachController(psiElement.getProject(), namespaces, psiElementList);
@@ -100,7 +100,7 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        Set<String> classMap = new HashSet<String>(Arrays.asList(
+        Set<String> classMap = new HashSet<>(Arrays.asList(
             String.format("Shopware\\Models\\%s\\%s", namespaces[2], ShopwareUtil.toCamelCase(namespaces[4], false)).toLowerCase(),
             String.format("Shopware\\CustomModels\\%s\\%s", namespaces[2], ShopwareUtil.toCamelCase(namespaces[4], false)).toLowerCase()
         ));
@@ -170,7 +170,7 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
         }
 
         String test = phpClassName.substring(model + "\\model".length() + 1);
-        List<String> set = new ArrayList<String>();
+        List<String> set = new ArrayList<>();
         for(String foo: StringUtils.split(test, "\\")) {
             set.add(ShopwareUtil.toCamelCase(foo, false));
         }

@@ -1,6 +1,5 @@
 package de.espend.idea.shopware.reference.provider;
 
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.completion.SmartyFileCompletionProvider;
@@ -27,21 +26,18 @@ public class SmartyTemplateProvider extends PsiPolyVariantReferenceBase<PsiEleme
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
 
-        final List<ResolveResult> results = new ArrayList<ResolveResult>();
+        final List<ResolveResult> results = new ArrayList<>();
 
 
-        TemplateUtil.collectFiles(getElement().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
-            @Override
-            public void visitFile(VirtualFile virtualFile, String fileName) {
+        TemplateUtil.collectFiles(getElement().getProject(), (virtualFile, fileName) -> {
 
-                if (!fileName.equals(valueName)) {
-                    return;
-                }
+            if (!fileName.equals(valueName)) {
+                return;
+            }
 
-                PsiFile psiFile = PsiManager.getInstance(getElement().getProject()).findFile(virtualFile);
-                if (psiFile != null) {
-                    results.add(new PsiElementResolveResult(psiFile));
-                }
+            PsiFile psiFile = PsiManager.getInstance(getElement().getProject()).findFile(virtualFile);
+            if (psiFile != null) {
+                results.add(new PsiElementResolveResult(psiFile));
             }
         }, extensions);
 

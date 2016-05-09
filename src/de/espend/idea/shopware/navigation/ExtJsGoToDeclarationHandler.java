@@ -25,7 +25,7 @@ public class ExtJsGoToDeclarationHandler implements GotoDeclarationHandler {
             return new PsiElement[0];
         }
 
-        final List<PsiElement> targets = new ArrayList<PsiElement>();
+        final List<PsiElement> targets = new ArrayList<>();
 
         // {link file='frontend/_resources/styles/framework.css'}
         if(ExtJsUtil.getStringLiteralPattern().accepts(sourceElement)) {

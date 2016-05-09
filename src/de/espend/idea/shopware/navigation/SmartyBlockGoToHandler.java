@@ -9,7 +9,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.Processor;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.smarty.SmartyFileType;
 import de.espend.idea.shopware.ShopwareProjectComponent;
@@ -42,7 +41,7 @@ public class SmartyBlockGoToHandler implements GotoDeclarationHandler {
             return new PsiElement[0];
         }
 
-        final List<PsiElement> psiTargets = new ArrayList<PsiElement>();
+        final List<PsiElement> psiTargets = new ArrayList<>();
 
         PsiFile containingFile = sourceElement.getContainingFile();
         if(TemplateUtil.isExtendsTemplate(containingFile)) {
@@ -58,28 +57,25 @@ public class SmartyBlockGoToHandler implements GotoDeclarationHandler {
 
         final String text = sourceElement.getText();
 
-        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyBlockStubIndex.KEY, new HashSet<String>(Arrays.asList(text)), new Processor<VirtualFile>() {
-            @Override
-            public boolean process(VirtualFile virtualFile) {
+        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyBlockStubIndex.KEY, new HashSet<>(Arrays.asList(text)), virtualFile -> {
 
-                if(psiFile.getVirtualFile().equals(virtualFile)) {
-                    return true;
-                }
-
-                PsiFile psiFile1 = PsiManager.getInstance(sourceElement.getProject()).findFile(virtualFile);
-                if(psiFile1 != null) {
-                    psiTargets.addAll(getBlockPsiElement(psiFile1, text));
-                }
-
+            if(psiFile.getVirtualFile().equals(virtualFile)) {
                 return true;
             }
+
+            PsiFile psiFile1 = PsiManager.getInstance(sourceElement.getProject()).findFile(virtualFile);
+            if(psiFile1 != null) {
+                psiTargets.addAll(getBlockPsiElement(psiFile1, text));
+            }
+
+            return true;
         }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(psiFile.getProject()), SmartyFileType.INSTANCE));
 
 
     }
 
     public static List<PsiElement> getBlockPsiElement(PsiFile psiFile, final String blockName) {
-        final List<PsiElement> psiElements = new ArrayList<PsiElement>();
+        final List<PsiElement> psiElements = new ArrayList<>();
 
         psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
             @Override
@@ -102,7 +98,7 @@ public class SmartyBlockGoToHandler implements GotoDeclarationHandler {
 
     public void attachExtendsTemplateGoto(PsiElement sourceElement, PsiFile psiFile, List<PsiElement> psiTargets) {
 
-        final Map<VirtualFile, String> map = new HashMap<VirtualFile, String>();
+        final Map<VirtualFile, String> map = new HashMap<>();
 
         TemplateUtil.collectFiles(sourceElement.getProject(), new TemplateUtil.SmartyTemplatePreventSelfVisitor(psiFile.getVirtualFile()) {
             @Override
@@ -111,7 +107,7 @@ public class SmartyBlockGoToHandler implements GotoDeclarationHandler {
             }
         });
 
-        List<SmartyBlockUtil.SmartyBlock> blockNameSet = new ArrayList<SmartyBlockUtil.SmartyBlock>();
+        List<SmartyBlockUtil.SmartyBlock> blockNameSet = new ArrayList<>();
         SmartyBlockUtil.collectFileBlocks(sourceElement.getContainingFile(), map, blockNameSet, 5);
 
 

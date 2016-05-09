@@ -5,7 +5,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReferenceBase;
 import com.intellij.psi.ResolveResult;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.resolve.PhpResolveResult;
 import de.espend.idea.shopware.ShopwarePluginIcons;
@@ -34,14 +33,11 @@ public class ControllerReferenceProvider extends PsiPolyVariantReferenceBase<Psi
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean b) {
-        final List<PsiElement> targets = new ArrayList<PsiElement>();
+        final List<PsiElement> targets = new ArrayList<>();
 
-        ShopwareUtil.collectControllerClass(getElement().getProject(), new ShopwareUtil.ControllerClassVisitor() {
-            @Override
-            public void visitClass(PhpClass phpClass, String moduleName, String controllerName) {
-                if (controllerName.equalsIgnoreCase(content)) {
-                    targets.add(phpClass);
-                }
+        ShopwareUtil.collectControllerClass(getElement().getProject(), (phpClass, moduleName1, controllerName) -> {
+            if (controllerName.equalsIgnoreCase(content)) {
+                targets.add(phpClass);
             }
         }, moduleName);
 
@@ -52,17 +48,12 @@ public class ControllerReferenceProvider extends PsiPolyVariantReferenceBase<Psi
     @Override
     public Object[] getVariants() {
 
-        final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
+        final List<LookupElement> lookupElements = new ArrayList<>();
 
-        ShopwareUtil.collectControllerClass(getElement().getProject(), new ShopwareUtil.ControllerClassVisitor() {
-            @Override
-            public void visitClass(PhpClass phpClass, String moduleName, String controllerName) {
-                lookupElements.add(LookupElementBuilder.create(ShopwareUtil.toCamelCase(controllerName, true))
-                    .withIcon(ShopwarePluginIcons.SHOPWARE)
-                    .withTypeText(phpClass.getPresentableFQN(), true)
-                );
-            }
-        }, moduleName);
+        ShopwareUtil.collectControllerClass(getElement().getProject(), (phpClass, moduleName1, controllerName) -> lookupElements.add(LookupElementBuilder.create(ShopwareUtil.toCamelCase(controllerName, true))
+            .withIcon(ShopwarePluginIcons.SHOPWARE)
+            .withTypeText(phpClass.getPresentableFQN(), true)
+        ), moduleName);
 
         return lookupElements.toArray();
     }

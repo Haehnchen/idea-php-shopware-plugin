@@ -7,7 +7,7 @@ public class SwPluginJson {
 
     private String name;
     private String type;
-    private Map<String, SwPluginProperty> properties = new HashMap<String, SwPluginProperty>();
+    private Map<String, SwPluginProperty> properties = new HashMap<>();
 
     public String getName() {
         return name;

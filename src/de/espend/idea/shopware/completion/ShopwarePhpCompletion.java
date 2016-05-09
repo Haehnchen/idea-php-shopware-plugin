@@ -3,7 +3,6 @@ package de.espend.idea.shopware.completion;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -141,14 +140,11 @@ public class ShopwarePhpCompletion extends CompletionContributor{
                         return;
                     }
 
-                    ShopwareUtil.collectBootstrapFiles((StringLiteralExpression) parent, new ShopwareUtil.BootstrapFileVisitor() {
-                        @Override
-                        public void visitVariable(VirtualFile virtualFile, String relativePath) {
-                            if (virtualFile.isDirectory()) {
-                                result.addElement(LookupElementBuilder.create(relativePath + "/").withIcon(PhpIcons.FILE_ICON));
-                            } else if ("php".equalsIgnoreCase(virtualFile.getExtension())) {
-                                result.addElement(LookupElementBuilder.create(relativePath).withIcon(PhpIcons.PHP_FILE));
-                            }
+                    ShopwareUtil.collectBootstrapFiles((StringLiteralExpression) parent, (virtualFile, relativePath) -> {
+                        if (virtualFile.isDirectory()) {
+                            result.addElement(LookupElementBuilder.create(relativePath + "/").withIcon(PhpIcons.FILE_ICON));
+                        } else if ("php".equalsIgnoreCase(virtualFile.getExtension())) {
+                            result.addElement(LookupElementBuilder.create(relativePath).withIcon(PhpIcons.PHP_FILE));
                         }
                     });
 
@@ -198,12 +194,9 @@ public class ShopwarePhpCompletion extends CompletionContributor{
                         return;
                     }
 
-                    ThemeUtil.collectThemeJsFieldReferences((StringLiteralExpression) parent, new ThemeUtil.ThemeAssetVisitor() {
-                        @Override
-                        public boolean visit(@NotNull VirtualFile virtualFile, @NotNull String path) {
-                            result.addElement(LookupElementBuilder.create(path).withIcon(AllIcons.FileTypes.JavaScript));
-                            return true;
-                        }
+                    ThemeUtil.collectThemeJsFieldReferences((StringLiteralExpression) parent, (virtualFile, path) -> {
+                        result.addElement(LookupElementBuilder.create(path).withIcon(AllIcons.FileTypes.JavaScript));
+                        return true;
                     });
 
                 }

@@ -46,10 +46,10 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
 
 
 
-        final Map<String, Method> methods = new HashMap<String, Method>();
+        final Map<String, Method> methods = new HashMap<>();
 
         // we dont want multiple line markers, so wrap all into one here
-        final Map<String, Set<PsiElement>> methodTargets = new HashMap<String, Set<PsiElement>>();
+        final Map<String, Set<PsiElement>> methodTargets = new HashMap<>();
 
         for(PsiElement psiElement: psiElements) {
             if(psiElement instanceof Method && ((Method) psiElement).getModifier().isPublic()) {
@@ -84,7 +84,7 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
                             if(methods.containsKey(methodName)) {
 
                                 if(!methodTargets.containsKey(methodName)) {
-                                    methodTargets.put(methodName, new HashSet<PsiElement>());
+                                    methodTargets.put(methodName, new HashSet<>());
                                 }
 
                                 methodTargets.get(methodName).add(parameters[1]);

@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public class ShopwareBoostrapInspection extends LocalInspectionTool {
 
-    final private static Set<String> INSTALL_METHODS = new HashSet<String>(Arrays.asList("install", "uninstall", "update"));
+    final private static Set<String> INSTALL_METHODS = new HashSet<>(Arrays.asList("install", "uninstall", "update"));
 
     @NotNull
     @Override

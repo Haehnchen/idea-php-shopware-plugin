@@ -11,7 +11,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.Processor;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.php.PhpIndex;
@@ -25,9 +24,6 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -231,7 +227,7 @@ public class ShopwareUtil {
 
     public static Map<String, PhpClass> getResourceClasses(Project project) {
 
-        Map<String, PhpClass> phpClassMap = new HashMap<String, PhpClass>();
+        Map<String, PhpClass> phpClassMap = new HashMap<>();
 
         for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Api\\Resource\\Resource")) {
             phpClassMap.put(phpClass.getName(), phpClass);
@@ -275,19 +271,16 @@ public class ShopwareUtil {
             return;
         }
 
-        VfsUtil.processFilesRecursively(psiDirectory.getVirtualFile(), new Processor<VirtualFile>() {
-            @Override
-            public boolean process(VirtualFile virtualFile) {
+        VfsUtil.processFilesRecursively(psiDirectory.getVirtualFile(), virtualFile -> {
 
-                if(virtualFile.isDirectory() || "php".equalsIgnoreCase(virtualFile.getExtension())) {
-                    String relativePath = VfsUtil.getRelativePath(virtualFile, psiDirectory.getVirtualFile(), '/');
-                    if(StringUtils.isNotBlank(relativePath)) {
-                        visitor.visitVariable(virtualFile, relativePath);
-                    }
+            if(virtualFile.isDirectory() || "php".equalsIgnoreCase(virtualFile.getExtension())) {
+                String relativePath = VfsUtil.getRelativePath(virtualFile, psiDirectory.getVirtualFile(), '/');
+                if(StringUtils.isNotBlank(relativePath)) {
+                    visitor.visitVariable(virtualFile, relativePath);
                 }
-
-                return true;
             }
+
+            return true;
         });
     }
 
@@ -304,7 +297,7 @@ public class ShopwareUtil {
 
         content = content.replaceAll("_+", "_").replaceAll(":+", "_").replaceAll("\\\\+", "_");
 
-        List<String> items = new ArrayList<String>();
+        List<String> items = new ArrayList<>();
         for(String s: content.split("(?=\\p{Lu})")) {
             if(s.length() > 1) {
                 items.add(s);
@@ -316,7 +309,7 @@ public class ShopwareUtil {
 
     public static Set<String> getHookCompletionNameCleanup(String content) {
 
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add("on" + ucfirst(content));
 
         for(String startCleanup: new String[] {"shopware", "shopwareControllers", "enlightController", "enlight", "shopwareControllers"}) {
@@ -355,7 +348,7 @@ public class ShopwareUtil {
      */
     public static Collection<Method> getInitResourceServiceClass(@NotNull Project project, @NotNull String contents) {
 
-        Collection<Method> methods = new ArrayList<Method>();
+        Collection<Method> methods = new ArrayList<>();
         for(String value : FileBasedIndexImpl.getInstance().getValues(InitResourceServiceIndex.KEY, contents, GlobalSearchScope.allScope(project))) {
             String[] split = value.split("\\.");
             if(split.length < 2) {

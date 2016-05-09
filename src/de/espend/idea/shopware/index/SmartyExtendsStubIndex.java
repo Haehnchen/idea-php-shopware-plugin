@@ -1,6 +1,5 @@
 package de.espend.idea.shopware.index;
 
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
@@ -40,7 +39,7 @@ public class SmartyExtendsStubIndex extends FileBasedIndexExtension<String, Void
             @NotNull
             @Override
             public Map<String, Void> map(FileContent inputData) {
-                final Map<String, Void> map = new THashMap<String, Void>();
+                final Map<String, Void> map = new THashMap<>();
 
                 PsiFile psiFile = inputData.getPsiFile();
                 if(!Symfony2ProjectComponent.isEnabled(psiFile.getProject())) {
@@ -91,12 +90,7 @@ public class SmartyExtendsStubIndex extends FileBasedIndexExtension<String, Void
 
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
-        return new FileBasedIndex.InputFilter() {
-            @Override
-            public boolean acceptInput(VirtualFile file) {
-                return file.getFileType() == SmartyFileType.INSTANCE;
-            }
-        };
+        return file -> file.getFileType() == SmartyFileType.INSTANCE;
     }
 
     @Override

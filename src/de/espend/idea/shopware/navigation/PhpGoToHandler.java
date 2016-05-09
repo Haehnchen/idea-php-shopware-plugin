@@ -3,7 +3,6 @@ package de.espend.idea.shopware.navigation;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
@@ -13,7 +12,6 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.ThemeUtil;
 import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -27,7 +25,7 @@ public class PhpGoToHandler implements GotoDeclarationHandler {
     @Override
     public PsiElement[] getGotoDeclarationTargets(PsiElement psiElement, int i, Editor editor) {
 
-        List<PsiElement> psiElements = new ArrayList<PsiElement>();
+        List<PsiElement> psiElements = new ArrayList<>();
 
         if(ShopwareUtil.getBootstrapPathPattern().accepts(psiElement)) {
             attachBootstrapFiles(psiElement, psiElements);
@@ -56,20 +54,17 @@ public class PhpGoToHandler implements GotoDeclarationHandler {
             return;
         }
 
-        ThemeUtil.collectThemeJsFieldReferences((StringLiteralExpression) parent, new ThemeUtil.ThemeAssetVisitor() {
-            @Override
-            public boolean visit(@NotNull VirtualFile virtualFile, @NotNull String path) {
-                if(path.equals(contents)) {
-                    PsiFile psiFile = PsiManager.getInstance(psiElement.getProject()).findFile(virtualFile);
-                    if(psiFile != null) {
-                        psiElements.add(psiFile);
-                    }
-
-                    return false;
+        ThemeUtil.collectThemeJsFieldReferences((StringLiteralExpression) parent, (virtualFile, path) -> {
+            if(path.equals(contents)) {
+                PsiFile psiFile = PsiManager.getInstance(psiElement.getProject()).findFile(virtualFile);
+                if(psiFile != null) {
+                    psiElements.add(psiFile);
                 }
 
-                return true;
+                return false;
             }
+
+            return true;
         });
 
     }
@@ -101,25 +96,22 @@ public class PhpGoToHandler implements GotoDeclarationHandler {
             return;
         }
 
-        ShopwareUtil.collectBootstrapFiles((StringLiteralExpression) parent, new ShopwareUtil.BootstrapFileVisitor() {
-            @Override
-            public void visitVariable(VirtualFile virtualFile, String relativePath) {
+        ShopwareUtil.collectBootstrapFiles((StringLiteralExpression) parent, (virtualFile, relativePath) -> {
 
-                String contents = ((StringLiteralExpression) parent).getContents();
-                if(contents.endsWith("\\") || contents.endsWith("/")) {
-                    contents = contents.substring(0, contents.length() - 1);
-                }
-
-                if(!contents.equalsIgnoreCase(relativePath)) {
-                    return;
-                }
-
-                PsiFile file = PsiManager.getInstance(psiElement.getProject()).findFile(virtualFile);
-                if(file != null) {
-                    psiElements.add(file);
-                }
-
+            String contents = ((StringLiteralExpression) parent).getContents();
+            if(contents.endsWith("\\") || contents.endsWith("/")) {
+                contents = contents.substring(0, contents.length() - 1);
             }
+
+            if(!contents.equalsIgnoreCase(relativePath)) {
+                return;
+            }
+
+            PsiFile file = PsiManager.getInstance(psiElement.getProject()).findFile(virtualFile);
+            if(file != null) {
+                psiElements.add(file);
+            }
+
         });
 
     }

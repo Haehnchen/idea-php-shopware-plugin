@@ -35,7 +35,7 @@ public class StringReferenceProvider extends PsiPolyVariantReferenceBase<PsiElem
     @Override
     public Object[] getVariants() {
 
-        final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
+        final List<LookupElement> lookupElements = new ArrayList<>();
 
         for(String value: values) {
             lookupElements.add(LookupElementBuilder.create(ShopwareUtil.toCamelCase(value, true))

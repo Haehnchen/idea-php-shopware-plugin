@@ -85,7 +85,7 @@ public class ShopwareJsonCompletion extends CompletionContributor{
 
                     PsiElement jsProperty = originalPosition.getParent();
 
-                    Map<String, String[]> map = new HashMap<String, String[]>();
+                    Map<String, String[]> map = new HashMap<>();
                     map.put("compatibility", new String[] {"minimumVersion", "maximumVersion", "blacklist"});
                     map.put("label", LOCALES);
                     map.put("changelogs", LOCALES);

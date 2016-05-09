@@ -7,7 +7,6 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.Method;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -58,7 +57,7 @@ public class ExtJsUtil {
 
     public static List<PsiElement> getControllerTargets(PsiElement sourceElement, String text) {
 
-        final List<PsiElement> psiElements = new ArrayList<PsiElement>();
+        final List<PsiElement> psiElements = new ArrayList<>();
 
         //{url controller="form" action="getFields"}
         Pattern pattern = Pattern.compile("controller=['|\"]*(\\w+)['|\"]*");
@@ -87,12 +86,9 @@ public class ExtJsUtil {
 
         final String jsActionName = ShopwareUtil.toCamelCase(matcher.group(1), false);
 
-        ShopwareUtil.collectControllerAction(sourceElement.getProject(), jsControllerName, new ShopwareUtil.ControllerActionVisitor() {
-            @Override
-            public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
-                if (jsActionName.equalsIgnoreCase(methodStripped)) {
-                    psiElements.add(method);
-                }
+        ShopwareUtil.collectControllerAction(sourceElement.getProject(), jsControllerName, (method, methodStripped, moduleName, controllerName) -> {
+            if (jsActionName.equalsIgnoreCase(methodStripped)) {
+                psiElements.add(method);
             }
         }, "backend");
 

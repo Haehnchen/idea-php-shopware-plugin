@@ -14,10 +14,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
 import com.jetbrains.php.lang.PhpCodeUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.Parameter;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
@@ -208,7 +204,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
                                     PhpPsiElement psiElement = PhpElementsUtil.getArrayValue((ArrayCreationExpression) parameterList[1], entrySet.getKey());
                                     if(psiElement instanceof PhpTypedElement) {
 
-                                        Set<String> classes = new HashSet<String>();
+                                        Set<String> classes = new HashSet<>();
 
                                         PhpType type = ((PhpTypedElement) psiElement).getType();
                                         for (PhpClass aClass : PhpElementsUtil.getClassFromPhpTypeSet(project, type.getTypes())) {

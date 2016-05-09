@@ -12,7 +12,6 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ConstantFunction;
-import com.intellij.util.Processor;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -74,7 +73,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
 
                 // cache template extends path
                 if(extendsPathFiles == null) {
-                    extendsPathFiles = new HashSet<VirtualFile>();
+                    extendsPathFiles = new HashSet<>();
                     getImplementedBlocks(psiElement.getProject(), psiElement.getContainingFile().getVirtualFile(), extendsPathFiles, 10);
                 }
 
@@ -86,7 +85,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
     }
 
     private void attachFileContextMaker(SmartyFile smartyFile, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
-        List<GotoRelatedItem> gotoRelatedItems = new ArrayList<GotoRelatedItem>();
+        List<GotoRelatedItem> gotoRelatedItems = new ArrayList<>();
 
         attachController(smartyFile, gotoRelatedItems);
         attachInclude(smartyFile, gotoRelatedItems);
@@ -117,7 +116,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             }
         }
 
-        return new LineMarkerInfo<PsiElement>(lineMarkerTarget, lineMarkerTarget.getTextOffset(), ShopwarePluginIcons.SHOPWARE_LINEMARKER, 6, new ConstantFunction<PsiElement, String>(title), new fr.adrienbrault.idea.symfony2plugin.dic.RelatedPopupGotoLineMarker.NavigationHandler(gotoRelatedItems));
+        return new LineMarkerInfo<>(lineMarkerTarget, lineMarkerTarget.getTextOffset(), ShopwarePluginIcons.SHOPWARE_LINEMARKER, 6, new ConstantFunction<>(title), new fr.adrienbrault.idea.symfony2plugin.dic.RelatedPopupGotoLineMarker.NavigationHandler(gotoRelatedItems));
     }
 
     public void attachImplementsBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos, Set<VirtualFile> virtualFiles) {
@@ -136,7 +135,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        final Collection<PsiElement> targets = new ArrayList<PsiElement>();
+        final Collection<PsiElement> targets = new ArrayList<>();
 
         for(VirtualFile virtualTemplate: virtualFiles) {
             PsiFile psiFile = PsiManager.getInstance(psiElement.getProject()).findFile(virtualTemplate);
@@ -184,15 +183,12 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
         }
 
         final int finalDepth = depth;
-        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyExtendsStubIndex.KEY, new HashSet<String>(Arrays.asList(templateName)), new Processor<VirtualFile>() {
-            @Override
-            public boolean process(VirtualFile virtualFile) {
+        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyExtendsStubIndex.KEY, new HashSet<>(Arrays.asList(templateName)), virtualFile1 -> {
 
-                templatePathFiles.add(virtualFile);
-                getImplementedBlocks(project, virtualFile, templatePathFiles, finalDepth);
+            templatePathFiles.add(virtualFile1);
+            getImplementedBlocks(project, virtualFile1, templatePathFiles, finalDepth);
 
-                return true;
-            }
+            return true;
         }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(project), SmartyFileType.INSTANCE));
     }
 
@@ -262,21 +258,18 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyIncludeStubIndex.KEY, new HashSet<String>(Arrays.asList(templateName)), new Processor<VirtualFile>() {
-            @Override
-            public boolean process(VirtualFile virtualFile) {
+        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyIncludeStubIndex.KEY, new HashSet<>(Arrays.asList(templateName)), virtualFile -> {
 
-                PsiFile psiFile = PsiManager.getInstance(smartyFile.getProject()).findFile(virtualFile);
-                if(psiFile != null) {
+            PsiFile psiFile = PsiManager.getInstance(smartyFile.getProject()).findFile(virtualFile);
+            if(psiFile != null) {
 
-                    for(PsiElement psiElement: getIncludePsiElement(psiFile, templateName)) {
-                        gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(psiElement, "Navigate to include").withIcon(PhpIcons.IMPLEMENTED, PhpIcons.IMPLEMENTED));
-                    }
-
+                for(PsiElement psiElement: getIncludePsiElement(psiFile, templateName)) {
+                    gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(psiElement, "Navigate to include").withIcon(PhpIcons.IMPLEMENTED, PhpIcons.IMPLEMENTED));
                 }
 
-                return true;
             }
+
+            return true;
         }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(smartyFile.getProject()), SmartyFileType.INSTANCE));
 
     }
@@ -288,23 +281,20 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyExtendsStubIndex.KEY, new HashSet<String>(Arrays.asList(templateName)), new Processor<VirtualFile>() {
-            @Override
-            public boolean process(VirtualFile virtualFile) {
+        FileBasedIndexImpl.getInstance().getFilesWithKey(SmartyExtendsStubIndex.KEY, new HashSet<>(Arrays.asList(templateName)), virtualFile -> {
 
-                PsiFile psiFile = PsiManager.getInstance(smartyFile.getProject()).findFile(virtualFile);
-                if(psiFile != null) {
-                    gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(psiFile, TemplateUtil.getTemplateName(psiFile.getProject(), psiFile.getVirtualFile())).withIcon(PhpIcons.IMPLEMENTED, PhpIcons.IMPLEMENTED));
-                }
-
-                return true;
+            PsiFile psiFile = PsiManager.getInstance(smartyFile.getProject()).findFile(virtualFile);
+            if(psiFile != null) {
+                gotoRelatedItems.add(new RelatedPopupGotoLineMarker.PopupGotoRelatedItem(psiFile, TemplateUtil.getTemplateName(psiFile.getProject(), psiFile.getVirtualFile())).withIcon(PhpIcons.IMPLEMENTED, PhpIcons.IMPLEMENTED));
             }
+
+            return true;
         }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(smartyFile.getProject()), SmartyFileType.INSTANCE));
 
     }
 
     private static List<PsiElement> getIncludePsiElement(PsiFile psiFile, final String templateName) {
-        final List<PsiElement> psiElements = new ArrayList<PsiElement>();
+        final List<PsiElement> psiElements = new ArrayList<>();
 
         psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
             @Override

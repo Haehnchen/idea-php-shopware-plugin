@@ -8,7 +8,6 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.Processor;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.php.lang.PhpFileType;
 import de.espend.idea.shopware.index.EventConfigGoToIndex;
@@ -44,55 +43,46 @@ public class ShopwareProjectComponent implements ProjectComponent {
             return;
         }
 
-        DumbService.getInstance(this.project).smartInvokeLater(new Runnable() {
-            @Override
-            public void run() {
+        DumbService.getInstance(this.project).smartInvokeLater(() -> {
 
-                if(PhpElementsUtil.getClassInterface(project, "\\Enlight_Controller_Action") == null) {
-                    return;
-                }
-
-                timer = new Timer();
-
-                timer.schedule(new TimerTask() {
-                    public void run() {
-
-                        if (DumbService.getInstance(project).isDumb()) {
-                            return;
-                        }
-
-                        final Map<String, Collection<String>> events = new HashMap<String, Collection<String>>();
-                        final Set<String> configs = new HashSet<String>();
-
-                        final Collection<VirtualFile> containingFiles = new HashSet<VirtualFile>();
-
-                        ApplicationManager.getApplication().runReadAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                for(String methodName : EventConfigGoToIndex.METHOD_NAMES) {
-                                    FileBasedIndexImpl.getInstance().getFilesWithKey(EventConfigGoToIndex.KEY, new HashSet<String>(Arrays.asList(methodName)), new Processor<VirtualFile>() {
-                                        @Override
-                                        public boolean process(VirtualFile virtualFile) {
-                                            containingFiles.add(virtualFile);
-                                            return true;
-                                        }
-                                    }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(project), PhpFileType.INSTANCE));
-                                }
-                            }
-                        });
-
-                        for (VirtualFile virtualFile : containingFiles) {
-                            ApplicationManager.getApplication().runReadAction(new PsiParameterStorageRunnable(project, virtualFile, events, configs));
-                        }
-
-                        HookSubscriberUtil.NOTIFY_EVENTS_MAP.clear();
-                        HookSubscriberUtil.NOTIFY_EVENTS_MAP.putAll(events);
-
-                        ShopwareUtil.PLUGIN_CONFIGS.clear();
-                        ShopwareUtil.PLUGIN_CONFIGS.addAll(configs);
-                    }
-                }, 0, DUMPER_PERIODE);
+            if(PhpElementsUtil.getClassInterface(project, "\\Enlight_Controller_Action") == null) {
+                return;
             }
+
+            timer = new Timer();
+
+            timer.schedule(new TimerTask() {
+                public void run() {
+
+                    if (DumbService.getInstance(project).isDumb()) {
+                        return;
+                    }
+
+                    final Map<String, Collection<String>> events = new HashMap<>();
+                    final Set<String> configs = new HashSet<>();
+
+                    final Collection<VirtualFile> containingFiles = new HashSet<>();
+
+                    ApplicationManager.getApplication().runReadAction(() -> {
+                        for(String methodName : EventConfigGoToIndex.METHOD_NAMES) {
+                            FileBasedIndexImpl.getInstance().getFilesWithKey(EventConfigGoToIndex.KEY, new HashSet<>(Arrays.asList(methodName)), virtualFile -> {
+                                containingFiles.add(virtualFile);
+                                return true;
+                            }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(project), PhpFileType.INSTANCE));
+                        }
+                    });
+
+                    for (VirtualFile virtualFile : containingFiles) {
+                        ApplicationManager.getApplication().runReadAction(new PsiParameterStorageRunnable(project, virtualFile, events, configs));
+                    }
+
+                    HookSubscriberUtil.NOTIFY_EVENTS_MAP.clear();
+                    HookSubscriberUtil.NOTIFY_EVENTS_MAP.putAll(events);
+
+                    ShopwareUtil.PLUGIN_CONFIGS.clear();
+                    ShopwareUtil.PLUGIN_CONFIGS.addAll(configs);
+                }
+            }, 0, DUMPER_PERIODE);
         });
 
     }

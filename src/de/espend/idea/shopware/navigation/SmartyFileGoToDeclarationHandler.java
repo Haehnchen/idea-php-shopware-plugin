@@ -9,13 +9,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.smarty.SmartyFile;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -34,7 +32,7 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
             return new PsiElement[0];
         }
 
-        final List<PsiElement> targets = new ArrayList<PsiElement>();
+        final List<PsiElement> targets = new ArrayList<>();
 
         // {link file='frontend/_resources/styles/framework.css'}
         if(SmartyPattern.getLinkFilePattern().accepts(sourceElement)) {
@@ -93,15 +91,10 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
             return;
         }
 
-        ShopwareUtil.collectControllerViewVariable(method, new ShopwareUtil.ControllerViewVariableVisitor() {
-
-            @Override
-            public void visitVariable(String variableName, @NotNull PsiElement sourceType, @Nullable PsiElement typeElement) {
-                if (variableName.equals(finalText)) {
-                    psiElements.add(typeElement != null ? typeElement : sourceType);
-                }
+        ShopwareUtil.collectControllerViewVariable(method, (variableName, sourceType, typeElement) -> {
+            if (variableName.equals(finalText)) {
+                psiElements.add(typeElement != null ? typeElement : sourceType);
             }
-
         });
 
     }
@@ -110,12 +103,9 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
         final Project project = sourceElement.getProject();
 
         final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
-        ShopwareUtil.collectControllerClass(project, new ShopwareUtil.ControllerClassVisitor() {
-            @Override
-            public void visitClass(PhpClass phpClass, String moduleName, String controllerName) {
-                if (controllerName.toLowerCase().equals(finalText)) {
-                    psiElements.add(phpClass);
-                }
+        ShopwareUtil.collectControllerClass(project, (phpClass, moduleName, controllerName) -> {
+            if (controllerName.toLowerCase().equals(finalText)) {
+                psiElements.add(phpClass);
             }
         });
 
@@ -125,12 +115,9 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
         final Project project = sourceElement.getProject();
 
         final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
-        ShopwareUtil.collectControllerClass(project, new ShopwareUtil.ControllerClassVisitor() {
-            @Override
-            public void visitClass(PhpClass phpClass, String moduleName, String controllerName) {
-                if (controllerName.toLowerCase().equals(finalText)) {
-                    psiElements.add(phpClass);
-                }
+        ShopwareUtil.collectControllerClass(project, (phpClass, moduleName, controllerName) -> {
+            if (controllerName.toLowerCase().equals(finalText)) {
+                psiElements.add(phpClass);
             }
         }, "Widgets");
 
@@ -139,12 +126,9 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
     private void attachControllerActionNameGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
 
         final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
-        ShopwareUtil.collectControllerActionSmartyWrapper(sourceElement, new ShopwareUtil.ControllerActionVisitor() {
-            @Override
-            public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
-                if(methodStripped.toLowerCase().equals(finalText)) {
-                    psiElements.add(method);
-                }
+        ShopwareUtil.collectControllerActionSmartyWrapper(sourceElement, (method, methodStripped, moduleName, controllerName) -> {
+            if(methodStripped.toLowerCase().equals(finalText)) {
+                psiElements.add(method);
             }
         });
 
@@ -153,12 +137,9 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
     private void attachWidgetsControllerActionNameGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
 
         final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
-        ShopwareUtil.collectControllerActionSmartyWrapper(sourceElement, new ShopwareUtil.ControllerActionVisitor() {
-            @Override
-            public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
-                if(methodStripped.toLowerCase().equals(finalText)) {
-                    psiElements.add(method);
-                }
+        ShopwareUtil.collectControllerActionSmartyWrapper(sourceElement, (method, methodStripped, moduleName, controllerName) -> {
+            if(methodStripped.toLowerCase().equals(finalText)) {
+                psiElements.add(method);
             }
         }, "Widgets");
 
@@ -193,18 +174,15 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
         final Project project = sourceElement.getProject();
 
         final String finalText = normalizeFilename(sourceElement.getText());
-        TemplateUtil.collectFiles(sourceElement.getProject(), new TemplateUtil.SmartyTemplateVisitor() {
-            @Override
-            public void visitFile(VirtualFile virtualFile, String fileName) {
+        TemplateUtil.collectFiles(sourceElement.getProject(), (virtualFile, fileName) -> {
 
-                if (!fileName.replaceFirst("[.][^.]+$", "").equals(finalText)) {
-                    return;
-                }
+            if (!fileName.replaceFirst("[.][^.]+$", "").equals(finalText)) {
+                return;
+            }
 
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-                if (psiFile != null) {
-                    psiElements.add(psiFile);
-                }
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+            if (psiFile != null) {
+                psiElements.add(psiFile);
             }
         }, "tpl");
 
@@ -215,18 +193,15 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
         final Project project = sourceElement.getProject();
 
         final String finalText = normalizeFilename(sourceElement.getText());
-        TemplateUtil.collectFiles(sourceElement.getProject(), new TemplateUtil.SmartyTemplateVisitor() {
-            @Override
-            public void visitFile(VirtualFile virtualFile, String fileName) {
+        TemplateUtil.collectFiles(sourceElement.getProject(), (virtualFile, fileName) -> {
 
-                if (!fileName.equals(finalText)) {
-                    return;
-                }
+            if (!fileName.equals(finalText)) {
+                return;
+            }
 
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-                if (psiFile != null) {
-                    psiElements.add(psiFile);
-                }
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+            if (psiFile != null) {
+                psiElements.add(psiFile);
             }
         }, SmartyPattern.TAG_LINK_FILE_EXTENSIONS);
 

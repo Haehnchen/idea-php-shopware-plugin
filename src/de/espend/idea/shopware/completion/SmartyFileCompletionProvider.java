@@ -13,7 +13,6 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.smarty.SmartyFile;
 import com.jetbrains.smarty.SmartyFileType;
@@ -29,7 +28,6 @@ import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.stubs.SymfonyProcessors;
 import fr.adrienbrault.idea.symfony2plugin.templating.util.TwigTypeResolveUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,21 +68,18 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                         return;
                     }
 
-                    TemplateUtil.collectFiles(parameters.getPosition().getProject(), new TemplateUtil.SmartyTemplateVisitor() {
-                        @Override
-                        public void visitFile(VirtualFile virtualFile, String fileName) {
-                            PsiFile psiFile = PsiManager.getInstance(parameters.getPosition().getProject()).findFile(virtualFile);
+                    TemplateUtil.collectFiles(parameters.getPosition().getProject(), (virtualFile, fileName) -> {
+                        PsiFile psiFile = PsiManager.getInstance(parameters.getPosition().getProject()).findFile(virtualFile);
 
-                            LookupElementBuilder lookupElementBuilder;
+                        LookupElementBuilder lookupElementBuilder;
 
-                            if(psiFile != null) {
-                                lookupElementBuilder = LookupElementBuilder.create(psiFile, fileName).withIcon(psiFile.getIcon(0));
-                            } else {
-                                lookupElementBuilder = LookupElementBuilder.create(fileName);
-                            }
-
-                            result.addElement(lookupElementBuilder);
+                        if(psiFile != null) {
+                            lookupElementBuilder = LookupElementBuilder.create(psiFile, fileName).withIcon(psiFile.getIcon(0));
+                        } else {
+                            lookupElementBuilder = LookupElementBuilder.create(fileName);
                         }
+
+                        result.addElement(lookupElementBuilder);
                     }, SmartyPattern.TAG_LINK_FILE_EXTENSIONS);
                 }
             }
@@ -135,16 +130,11 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
                 private void collectExtendsBlockNames(Project project, PsiFile psiFile, final @NotNull CompletionResultSet result) {
 
-                    final Map<VirtualFile, String> map = new HashMap<VirtualFile, String>();
+                    final Map<VirtualFile, String> map = new HashMap<>();
 
-                    TemplateUtil.collectFiles(project, new TemplateUtil.SmartyTemplateVisitor() {
-                        @Override
-                        public void visitFile(VirtualFile virtualFile, String fileName) {
-                            map.put(virtualFile, fileName);
-                        }
-                    });
+                    TemplateUtil.collectFiles(project, map::put);
 
-                    List<SmartyBlockUtil.SmartyBlock> blockNameSet = new ArrayList<SmartyBlockUtil.SmartyBlock>();
+                    List<SmartyBlockUtil.SmartyBlock> blockNameSet = new ArrayList<>();
                     SmartyBlockUtil.collectFileBlocks(psiFile, map, blockNameSet, 0);
 
                     for(SmartyBlockUtil.SmartyBlock smartyBlock: blockNameSet) {
@@ -169,12 +159,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
                     PsiElement psiElement = parameters.getOriginalPosition();
 
-                    ShopwareUtil.collectControllerClass(psiElement.getProject(), new ShopwareUtil.ControllerClassVisitor() {
-                        @Override
-                        public void visitClass(PhpClass phpClass, String moduleName, String controllerName) {
-                            result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON));
-                        }
-                    });
+                    ShopwareUtil.collectControllerClass(psiElement.getProject(), (phpClass, moduleName, controllerName) -> result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON)));
 
                 }
             }
@@ -195,12 +180,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                         return;
                     }
 
-                    TemplateUtil.collectFiles(psiElement.getProject(), new TemplateUtil.SmartyTemplateVisitor() {
-                        @Override
-                        public void visitFile(VirtualFile virtualFile, String fileName) {
-                            result.addElement(LookupElementBuilder.create(fileName.replaceFirst("[.][^.]+$", "")).withIcon(ShopwarePluginIcons.SHOPWARE));
-                        }
-                    }, "tpl");
+                    TemplateUtil.collectFiles(psiElement.getProject(), (virtualFile, fileName) -> result.addElement(LookupElementBuilder.create(fileName.replaceFirst("[.][^.]+$", "")).withIcon(ShopwarePluginIcons.SHOPWARE)), "tpl");
 
 
                 }
@@ -219,12 +199,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
                     PsiElement psiElement = parameters.getOriginalPosition();
 
-                    ShopwareUtil.collectControllerActionSmartyWrapper(psiElement, new ShopwareUtil.ControllerActionVisitor() {
-                        @Override
-                        public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
-                            result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName, true).withIcon(PhpIcons.METHOD_ICON));
-                        }
-                    });
+                    ShopwareUtil.collectControllerActionSmartyWrapper(psiElement, (method, methodStripped, moduleName, controllerName) -> result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName, true).withIcon(PhpIcons.METHOD_ICON)));
 
                 }
             }
@@ -255,16 +230,13 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                         return;
                     }
 
-                    ShopwareUtil.collectControllerViewVariable(method, new ShopwareUtil.ControllerViewVariableVisitor() {
-                        @Override
-                        public void visitVariable(String variableName, @NotNull PsiElement sourceElement, @Nullable PsiElement typeElement) {
-                            if (typeElement instanceof PhpTypedElement) {
-                                result.addElement(LookupElementBuilder.create(variableName).withTypeText(TwigTypeResolveUtil.getTypeDisplayName(psiFile.getProject(), ((PhpTypedElement) typeElement).getType().getTypes())));
-                            } else {
-                                result.addElement(LookupElementBuilder.create(variableName));
-                            }
-
+                    ShopwareUtil.collectControllerViewVariable(method, (variableName, sourceElement, typeElement) -> {
+                        if (typeElement instanceof PhpTypedElement) {
+                            result.addElement(LookupElementBuilder.create(variableName).withTypeText(TwigTypeResolveUtil.getTypeDisplayName(psiFile.getProject(), ((PhpTypedElement) typeElement).getType().getTypes())));
+                        } else {
+                            result.addElement(LookupElementBuilder.create(variableName));
                         }
+
                     });
 
                 }
@@ -285,12 +257,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
                     PsiElement psiElement = parameters.getOriginalPosition();
 
-                    ShopwareUtil.collectControllerClass(psiElement.getProject(), new ShopwareUtil.ControllerClassVisitor() {
-                        @Override
-                        public void visitClass(PhpClass phpClass, String moduleName, String controllerName) {
-                            result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON));
-                        }
-                    }, "Widgets");
+                    ShopwareUtil.collectControllerClass(psiElement.getProject(), (phpClass, moduleName, controllerName) -> result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON)), "Widgets");
 
                 }
             }
@@ -328,12 +295,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
                     PsiElement psiElement = parameters.getOriginalPosition();
 
-                    ShopwareUtil.collectControllerActionSmartyWrapper(psiElement, new ShopwareUtil.ControllerActionVisitor() {
-                        @Override
-                        public void visitMethod(Method method, String methodStripped, String moduleName, String controllerName) {
-                            result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName).withIcon(PhpIcons.METHOD_ICON));
-                        }
-                    }, "Widgets");
+                    ShopwareUtil.collectControllerActionSmartyWrapper(psiElement, (method, methodStripped, moduleName, controllerName) -> result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName).withIcon(PhpIcons.METHOD_ICON)), "Widgets");
 
                 }
             }
@@ -345,16 +307,13 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
     public static List<LookupElement> getTemplateCompletion(Project project, String... extensions) {
 
-        final List<LookupElement> lookupElements = new ArrayList<LookupElement>();
-        final Set<String> uniqueList = new HashSet<String>();
+        final List<LookupElement> lookupElements = new ArrayList<>();
+        final Set<String> uniqueList = new HashSet<>();
 
-        TemplateUtil.collectFiles(project, new TemplateUtil.SmartyTemplateVisitor() {
-            @Override
-            public void visitFile(VirtualFile virtualFile, String fileName) {
-                if(!uniqueList.contains(fileName)) {
-                    lookupElements.add(new TemplateLookupElement(fileName));
-                    uniqueList.add(fileName);
-                }
+        TemplateUtil.collectFiles(project, (virtualFile, fileName) -> {
+            if(!uniqueList.contains(fileName)) {
+                lookupElements.add(new TemplateLookupElement(fileName));
+                uniqueList.add(fileName);
             }
         }, extensions);
 

@@ -12,7 +12,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.util.*;
 import com.intellij.util.ProcessingContext;
-import com.intellij.util.Processor;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
@@ -38,8 +37,8 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
     public static final List<String> DOCTRINE_LIFECYCLES = Arrays.asList("prePersist", "postPersist", "preUpdate", "postUpdate", "preRemove", "postRemove");
     private static List<String> HOOK_EVENTS = Arrays.asList("after", "before", "replace");
 
-    private static final Key<CachedValue<String[]>> HOOK_CACHE = new Key<CachedValue<String[]>>("SW_HOOK_CACHE");
-    private static final Key<CachedValue<String[]>> EVENT_CACHE = new Key<CachedValue<String[]>>("SW_EVENT_CACHE");
+    private static final Key<CachedValue<String[]>> HOOK_CACHE = new Key<>("SW_HOOK_CACHE");
+    private static final Key<CachedValue<String[]>> EVENT_CACHE = new Key<>("SW_EVENT_CACHE");
 
     public LazySubscriberReferenceProvider() {
 
@@ -165,26 +164,19 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
         CachedValue<String[]> hookCache = project.getUserData(HOOK_CACHE);
 
         if(hookCache == null) {
-            hookCache = CachedValuesManager.getManager(project).createCachedValue(new CachedValueProvider<String[]>() {
-                @Nullable
-                @Override
-                public Result<String[]> compute() {
+            hookCache = CachedValuesManager.getManager(project).createCachedValue(() -> {
 
-                    final Collection<String> set = new HashSet<String>();
+                final Collection<String> set = new HashSet<>();
 
-                    HookSubscriberUtil.collectHooks(project, new HookSubscriberUtil.HookVisitor() {
-                        @Override
-                        public boolean visitHook(PhpClass phpClass, Method method) {
-                            for (String hookName : new String[]{"after", "before", "replace"}) {
-                                set.add(String.format("%s::%s::%s", phpClass.getPresentableFQN(), method.getName(), hookName));
-                            }
+                HookSubscriberUtil.collectHooks(project, (phpClass, method) -> {
+                    for (String hookName : new String[]{"after", "before", "replace"}) {
+                        set.add(String.format("%s::%s::%s", phpClass.getPresentableFQN(), method.getName(), hookName));
+                    }
 
-                            return true;
-                        }
-                    });
+                    return true;
+                });
 
-                    return Result.create(set.toArray(new String[set.size()]), PsiModificationTracker.MODIFICATION_COUNT);
-                }
+                return CachedValueProvider.Result.create(set.toArray(new String[set.size()]), PsiModificationTracker.MODIFICATION_COUNT);
             }, false);
 
             project.putUserData(HOOK_CACHE, hookCache);
@@ -194,41 +186,35 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
             result.addElement(LookupElementBuilder.create(s).withIcon(PhpIcons.METHOD_ICON).withTypeText("Hook", true));
         }
 
-        HookSubscriberUtil.collectDoctrineLifecycleHooks(project, new HookSubscriberUtil.DoctrineLifecycleHooksVisitor() {
-            @Override
-            public boolean visitLifecycleHooks(PhpClass phpClass) {
+        HookSubscriberUtil.collectDoctrineLifecycleHooks(project, phpClass -> {
 
-                for (String lifecycleName : new String[]{"prePersist", "postPersist", "preUpdate", "postUpdate", "preRemove", "postRemove"}) {
-                    result.addElement(LookupElementBuilder.create(String.format("%s::%s", phpClass.getPresentableFQN(), lifecycleName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("Doctrine", true));
-                }
-
-                return true;
+            for (String lifecycleName : new String[]{"prePersist", "postPersist", "preUpdate", "postUpdate", "preRemove", "postRemove"}) {
+                result.addElement(LookupElementBuilder.create(String.format("%s::%s", phpClass.getPresentableFQN(), lifecycleName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("Doctrine", true));
             }
+
+            return true;
         });
 
-        HookSubscriberUtil.visitDoctrineQueryBuilderClasses(project, new Processor<PhpClass>() {
-            @Override
-            public boolean process(PhpClass phpClass) {
+        HookSubscriberUtil.visitDoctrineQueryBuilderClasses(project, phpClass -> {
 
-                for(Method method: phpClass.getOwnMethods()) {
+            for(Method method: phpClass.getOwnMethods()) {
 
-                    String presentableFQN = phpClass.getPresentableFQN();
-                    if((presentableFQN.endsWith("Proxy") || PhpElementsUtil.isInstanceOf(phpClass, "\\Enlight_Hook_Proxy"))) {
-                        continue;
-                    }
+                String presentableFQN = phpClass.getPresentableFQN();
+                if((presentableFQN.endsWith("Proxy") || PhpElementsUtil.isInstanceOf(phpClass, "\\Enlight_Hook_Proxy"))) {
+                    continue;
+                }
 
-                    if(method.getAccess().isPublic() || method.getAccess().isProtected()) {
-                        String name = method.getName();
-                        if(!name.startsWith("__")) {
-                            for (String hookName : new String[]{"after", "before", "replace"}) {
-                                result.addElement(LookupElementBuilder.create(String.format("%s::%s::%s", presentableFQN, name, hookName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("QueryBuilder", true));
-                            }
+                if(method.getAccess().isPublic() || method.getAccess().isProtected()) {
+                    String name = method.getName();
+                    if(!name.startsWith("__")) {
+                        for (String hookName : new String[]{"after", "before", "replace"}) {
+                            result.addElement(LookupElementBuilder.create(String.format("%s::%s::%s", presentableFQN, name, hookName)).withIcon(Symfony2Icons.DOCTRINE).withTypeText("QueryBuilder", true));
                         }
                     }
                 }
-
-                return true;
             }
+
+            return true;
         });
 
         for (String service : ContainerCollectionResolver.getServiceNames(project)) {
@@ -243,22 +229,13 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
             CachedValue<String[]> eventCache = project.getUserData(EVENT_CACHE);
 
             if(eventCache == null) {
-                eventCache = CachedValuesManager.getManager(project).createCachedValue(new CachedValueProvider<String[]>() {
-                    @Nullable
-                    @Override
-                    public Result<String[]> compute() {
+                eventCache = CachedValuesManager.getManager(project).createCachedValue(() -> {
 
-                        final Collection<String> set = new HashSet<String>();
+                    final Collection<String> set = new HashSet<>();
 
-                        EventSubscriberReferenceContributor.collectEvents(project, new EventSubscriberReferenceContributor.Collector() {
-                            @Override
-                            public void collect(PsiElement psiElement, String value) {
-                                set.add(value);
-                            }
-                        });
+                    EventSubscriberReferenceContributor.collectEvents(project, (psiElement, value) -> set.add(value));
 
-                        return Result.create(set.toArray(new String[set.size()]), PsiModificationTracker.MODIFICATION_COUNT);
-                    }
+                    return CachedValueProvider.Result.create(set.toArray(new String[set.size()]), PsiModificationTracker.MODIFICATION_COUNT);
                 }, false);
 
                 project.putUserData(EVENT_CACHE, eventCache);
@@ -321,7 +298,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
     @NotNull
     public static PsiElement[] getHookTargets(@NotNull Project project, @NotNull final String hookNameContent) {
 
-        final Collection<PsiElement> psiElements = new ArrayList<PsiElement>();
+        final Collection<PsiElement> psiElements = new ArrayList<>();
 
         if(!hookNameContent.contains(":")) {
 

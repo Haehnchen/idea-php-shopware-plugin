@@ -4,31 +4,24 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.php.lang.PhpLanguage;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.index.InitResourceServiceIndex;
-import de.espend.idea.shopware.index.SmartyBlockStubIndex;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
-import fr.adrienbrault.idea.symfony2plugin.codeInsight.GotoCompletionContributor;
 import fr.adrienbrault.idea.symfony2plugin.codeInsight.GotoCompletionProvider;
 import fr.adrienbrault.idea.symfony2plugin.codeInsight.GotoCompletionRegistrar;
 import fr.adrienbrault.idea.symfony2plugin.codeInsight.GotoCompletionRegistrarParameter;
 import fr.adrienbrault.idea.symfony2plugin.stubs.SymfonyProcessors;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
-import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
@@ -36,27 +29,22 @@ import java.util.List;
 public class ShopwareServiceGotoCompletionRegistrar implements GotoCompletionRegistrar {
     @Override
     public void register(GotoCompletionRegistrarParameter registrar) {
-        registrar.register(PlatformPatterns.psiElement().withParent(StringLiteralExpression.class).withLanguage(PhpLanguage.INSTANCE), new GotoCompletionContributor() {
-            @Nullable
-            @Override
-            public GotoCompletionProvider getProvider(@NotNull PsiElement psiElement) {
+        registrar.register(PlatformPatterns.psiElement().withParent(StringLiteralExpression.class).withLanguage(PhpLanguage.INSTANCE), psiElement -> {
 
-                PsiElement context = psiElement.getContext();
-                if (!(context instanceof StringLiteralExpression)) {
-                    return null;
-                }
-
-                MethodMatcher.MethodMatchParameter match = new MethodMatcher.StringParameterRecursiveMatcher(context, 0)
-                        .withSignature("\\Symfony\\Component\\DependencyInjection\\ContainerInterface", "get")
-                        .match();
-
-                if(match == null) {
-                    return null;
-                }
-
-                return new MyGotoCompletionProvider(psiElement);
+            PsiElement context = psiElement.getContext();
+            if (!(context instanceof StringLiteralExpression)) {
+                return null;
             }
 
+            MethodMatcher.MethodMatchParameter match = new MethodMatcher.StringParameterRecursiveMatcher(context, 0)
+                    .withSignature("\\Symfony\\Component\\DependencyInjection\\ContainerInterface", "get")
+                    .match();
+
+            if(match == null) {
+                return null;
+            }
+
+            return new MyGotoCompletionProvider(psiElement);
         });
 
 
@@ -75,7 +63,7 @@ public class ShopwareServiceGotoCompletionRegistrar implements GotoCompletionReg
             SymfonyProcessors.CollectProjectUniqueKeys uniqueKeys = new SymfonyProcessors.CollectProjectUniqueKeys(getProject(), InitResourceServiceIndex.KEY);
             FileBasedIndex.getInstance().processAllKeys(InitResourceServiceIndex.KEY, uniqueKeys, getProject());
 
-            Collection<LookupElement> lookupElements = new ArrayList<LookupElement>();
+            Collection<LookupElement> lookupElements = new ArrayList<>();
 
             for (String s : uniqueKeys.getResult()) {
                 lookupElements.add(LookupElementBuilder.create(s).withIcon(Symfony2Icons.SERVICE).withTypeText("InitResource", true));
@@ -98,7 +86,7 @@ public class ShopwareServiceGotoCompletionRegistrar implements GotoCompletionReg
                 return Collections.emptyList();
             }
 
-            Collection<PsiElement> methods = new ArrayList<PsiElement>();
+            Collection<PsiElement> methods = new ArrayList<>();
             for(Method method : ShopwareUtil.getInitResourceServiceClass(getProject(), contents)) {
                 methods.add(method);
             }

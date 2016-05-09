@@ -1,7 +1,6 @@
 package de.espend.idea.shopware.navigation;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -54,20 +53,17 @@ public class SmartyActionGotoRelatedCollector implements ControllerActionGotoRel
 
         final String templateName = String.format("%s/%s/%s.tpl", moduleName, controller, methodNameNormalize);
         final Project project = parameter.getProject();
-        final List<PsiFile> psiFiles = new ArrayList<PsiFile>();
+        final List<PsiFile> psiFiles = new ArrayList<>();
 
-        TemplateUtil.collectFiles(project, new TemplateUtil.SmartyTemplateVisitor() {
-            @Override
-            public void visitFile(VirtualFile virtualFile, String fileName) {
+        TemplateUtil.collectFiles(project, (virtualFile, fileName) -> {
 
-                if (!fileName.equals(templateName)) {
-                    return;
-                }
+            if (!fileName.equals(templateName)) {
+                return;
+            }
 
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-                if (psiFile != null) {
-                    psiFiles.add(psiFile);
-                }
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+            if (psiFile != null) {
+                psiFiles.add(psiFile);
             }
         });
 

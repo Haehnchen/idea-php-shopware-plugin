@@ -36,12 +36,12 @@ public class TemplateUtil {
     public static void collectFiles(Project project, final SmartyTemplateVisitor smartyTemplateVisitor, String... extensions) {
 
         final List<String> exts = Arrays.asList(extensions);
-        final List<VirtualFile> uniqueVirtualFiles = new ArrayList<VirtualFile>();
+        final List<VirtualFile> uniqueVirtualFiles = new ArrayList<>();
 
         collectPluginTemplates(project, smartyTemplateVisitor, exts);
 
         // search for index files; think of lib and include path
-        List<LanguageFileType> languageFileTypes = new ArrayList<LanguageFileType>();
+        List<LanguageFileType> languageFileTypes = new ArrayList<>();
 
         if(exts.contains("tpl")) {
             languageFileTypes.add(SmartyFileType.INSTANCE);
@@ -52,7 +52,7 @@ public class TemplateUtil {
         }
 
         // sw5: provides parent class for themes
-        Set<VirtualFile> themes = new HashSet<VirtualFile>();
+        Set<VirtualFile> themes = new HashSet<>();
         for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Theme")) {
             PsiDirectory parent = phpClass.getContainingFile().getParent();
             if(parent != null) {
