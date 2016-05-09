@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>1.7.2</version>
+  <version>2.0.0</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -10,13 +10,14 @@
       <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues">Issues</a>
 
       <br>
-      Install <a href="http://plugins.jetbrains.com/plugin/7219">Symfony2 Plugin</a> and enable it per project
+      Install <a href="http://plugins.jetbrains.com/plugin/7219">Symfony Plugin</a> and enable it per project
       <br/><br/>
 
       <h2>Dependencies</h2>
       <ul>
-        <li><a href="http://plugins.jetbrains.com/plugin/7219">Symfony2 Plugin</a></li>
-        <li>(Optional) Improve Doctrine support <a href="http://plugins.jetbrains.com/plugin/7320">PHP Annotations</a></li>
+        <li><a href="http://plugins.jetbrains.com/plugin/7219">Symfony Plugin</a></li>
+        <li>(Optional) Improve Doctrine support <a href="https://plugins.jetbrains.com/plugin/7320">PHP Annotations</a></li>
+        <li>(Optional) Install <a href="https://plugins.jetbrains.com/plugin/8133">PHP Toolbox</a></li>
       </ul>
 
       <h2>Features</h2>
@@ -39,8 +40,9 @@
         <li>Smarty: Blockname implements and overwrite linemarker</li>
         <li>Shopware: Theme and assets</li>
         <li>PHP/Smarty: Template controller references for php and smarty</li>
-        <li>Symfony2: Custom container loader</li>
-        <li>Doctrine: Extension for Symfony2 Plugin</li>
+        <li>Symfony: Custom container loader</li>
+        <li>Symfony: Shopware service container ids in subscriber</li>
+        <li>Doctrine: Extension for Symfony Plugin</li>
         <li>Doctrine: Lifecycle event completion for subscriber</li>
         <li>ExtJs: Doctrine Model and controller targets</li>
         <li>ExtJs: Controller action linemarker and goto</li>
@@ -49,6 +51,14 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>2.0.0</h2>
+<ul>
+    <li>Add event "collect" method support for indexer</li>
+    <li>Add "Enlight_Bootstrap_InitResource_*" service subscriber support</li>
+    <li>Replace deprecated Symfony Plugin methods</li>
+    <li>Migrate to Java8 and raise minimum api level to PhpStorm 2016.1</li>
+</ul>
 
 <h2>1.7.2</h2>
 <ul>
