@@ -17,7 +17,10 @@ import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpTypeProviderUtil;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * @author Adrien Brault <adrien.brault@gmail.com>
@@ -80,7 +83,7 @@ public class SymfonyContainerTypeProvider implements PhpTypeProvider2 {
         }
 
         // finally search the classes
-        if(new Symfony2InterfacesUtil().isContainerGetCall((Method) phpNamedElement) && !new Symfony2InterfacesUtil().isInstanceOf(((Method) phpNamedElement).getContainingClass(), "Shopware\\Components\\DependencyInjection\\Container")) {
+        if(new Symfony2InterfacesUtil().isContainerGetCall((Method) phpNamedElement) && !PhpElementsUtil.isInstanceOf(((Method) phpNamedElement).getContainingClass(), "Shopware\\Components\\DependencyInjection\\Container")) {
             return phpNamedElementCollections;
         }
 

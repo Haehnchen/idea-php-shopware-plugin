@@ -11,7 +11,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.inspection.quickfix.CreateMethodQuickFix;
-import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
+import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -136,7 +136,7 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
                     if(method != null) {
                         if("getSubscribedEvents".equals(method.getName())) {
                             PhpClass phpClass = method.getContainingClass();
-                            if(phpClass != null && new Symfony2InterfacesUtil().isInstanceOf(phpClass, "\\Enlight\\Event\\SubscriberInterface")) {
+                            if(phpClass != null && PhpElementsUtil.isInstanceOf(phpClass, "\\Enlight\\Event\\SubscriberInterface")) {
                                 visitSubscriber(phpClass, (StringLiteralExpression) element, subscriperName);
                             }
                         }

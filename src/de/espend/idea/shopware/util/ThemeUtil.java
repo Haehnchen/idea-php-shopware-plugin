@@ -13,7 +13,7 @@ import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
+import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -81,7 +81,7 @@ public class ThemeUtil {
 
 
         PhpClass phpClass = PsiTreeUtil.getParentOfType(classField, PhpClass.class);
-        if(phpClass == null || !new Symfony2InterfacesUtil().isInstanceOf(phpClass, "\\Shopware\\Components\\Theme")) {
+        if(phpClass == null || !PhpElementsUtil.isInstanceOf(phpClass, "\\Shopware\\Components\\Theme")) {
             return;
         }
 

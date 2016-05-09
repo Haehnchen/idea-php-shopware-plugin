@@ -11,7 +11,6 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.apache.commons.lang.StringUtils;
 
@@ -61,7 +60,7 @@ public class PsiParameterStorageRunnable implements Runnable {
                         PsiElement method = methodReference.resolve();
                         if(method instanceof Method) {
                             PhpClass phpClass = ((Method) method).getContainingClass();
-                            if(phpClass != null && new Symfony2InterfacesUtil().isInstanceOf(phpClass, "\\Enlight_Event_EventManager")) {
+                            if(phpClass != null && PhpElementsUtil.isInstanceOf(phpClass, "\\Enlight_Event_EventManager")) {
                                 String content = PhpElementsUtil.getStringValue(parameters[0]);
                                 if(StringUtils.isNotBlank(content)) {
                                     if(!events.containsKey(content)) {
@@ -90,7 +89,7 @@ public class PsiParameterStorageRunnable implements Runnable {
                         PsiElement method = methodReference.resolve();
                         if(method instanceof Method) {
                             PhpClass phpClass = ((Method) method).getContainingClass();
-                            if(phpClass != null && new Symfony2InterfacesUtil().isInstanceOf(phpClass, "\\Shopware\\Models\\Config\\Form")) {
+                            if(phpClass != null && PhpElementsUtil.isInstanceOf(phpClass, "\\Shopware\\Models\\Config\\Form")) {
                                 String content = ((StringLiteralExpression) parameters[1]).getContents();
                                 if(StringUtils.isNotBlank(content)) {
                                     configs.add(content);

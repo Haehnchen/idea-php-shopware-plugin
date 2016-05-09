@@ -20,7 +20,6 @@ import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
-import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.stubs.ContainerCollectionResolver;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
@@ -148,7 +147,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                             if (method != null) {
                                 if ("getSubscribedEvents".equals(method.getName())) {
                                     PhpClass phpClass = method.getContainingClass();
-                                    if (new Symfony2InterfacesUtil().isInstanceOf(phpClass, "\\Enlight\\Event\\SubscriberInterface")) {
+                                    if (phpClass != null && PhpElementsUtil.isInstanceOf(phpClass, "\\Enlight\\Event\\SubscriberInterface")) {
                                         collectHookLookupElements(originalPosition.getProject(), result, true);
                                     }
                                 }
@@ -207,9 +206,6 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
             }
         });
 
-
-        final Symfony2InterfacesUtil symfony2InterfacesUtil = new Symfony2InterfacesUtil();
-
         HookSubscriberUtil.visitDoctrineQueryBuilderClasses(project, new Processor<PhpClass>() {
             @Override
             public boolean process(PhpClass phpClass) {
@@ -217,7 +213,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                 for(Method method: phpClass.getOwnMethods()) {
 
                     String presentableFQN = phpClass.getPresentableFQN();
-                    if(presentableFQN == null || (presentableFQN.endsWith("Proxy") || symfony2InterfacesUtil.isInstanceOf(phpClass, "\\Enlight_Hook_Proxy"))) {
+                    if((presentableFQN.endsWith("Proxy") || PhpElementsUtil.isInstanceOf(phpClass, "\\Enlight_Hook_Proxy"))) {
                         continue;
                     }
 
@@ -295,7 +291,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                 if(method != null) {
                     if("getSubscribedEvents".equals(method.getName())) {
                         PhpClass phpClass = method.getContainingClass();
-                        if(new Symfony2InterfacesUtil().isInstanceOf(phpClass, "\\Enlight\\Event\\SubscriberInterface")) {
+                        if(phpClass != null && PhpElementsUtil.isInstanceOf(phpClass, "\\Enlight\\Event\\SubscriberInterface")) {
                             hookNameContent = ((StringLiteralExpression) context).getContents();
                         }
                     }

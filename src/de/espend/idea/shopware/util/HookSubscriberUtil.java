@@ -10,7 +10,7 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
-import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
+import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -49,13 +49,12 @@ public class HookSubscriberUtil {
         }
 
         phpClasses.addAll(phpIndex.getAllSubclasses("\\Enlight_Hook"));
-        Symfony2InterfacesUtil symfony2InterfacesUtil = new Symfony2InterfacesUtil();
 
         for(PhpClass phpClass: phpClasses) {
 
             // dont use proxy classes
             String presentableFQN = phpClass.getPresentableFQN();
-            if(presentableFQN == null || (presentableFQN.endsWith("Proxy") && symfony2InterfacesUtil.isInstanceOf(phpClass, "\\Enlight_Hook_Proxy"))) {
+            if((presentableFQN.endsWith("Proxy") && PhpElementsUtil.isInstanceOf(phpClass, "\\Enlight_Hook_Proxy"))) {
                 continue;
             }
 
