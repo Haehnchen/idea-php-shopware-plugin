@@ -218,10 +218,12 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
         });
 
         for (String service : ContainerCollectionResolver.getServiceNames(project)) {
-            result.addElement(
-                LookupElementBuilder.create("Enlight_Bootstrap_InitResource_" + service)
-                .withIcon(Symfony2Icons.SERVICE).withTypeText("Service", true)
-            );
+            for (String prefix : ShopwareUtil.CONTAINER_SERVICE_PREFIX) {
+                result.addElement(
+                    LookupElementBuilder.create(prefix + service)
+                        .withIcon(Symfony2Icons.SERVICE).withTypeText("Service", true)
+                );
+            }
         }
 
         if(withReferences) {
@@ -328,10 +330,13 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
             }
         }
 
-        if(hookNameContent.startsWith("Enlight_Bootstrap_InitResource_")) {
-            String serviceName = hookNameContent.substring("Enlight_Bootstrap_InitResource_".length());
-            if(StringUtils.isNotBlank(serviceName)) {
-                psiElements.addAll(ServiceUtil.getServiceClassTargets(project, serviceName));
+        // eg Enlight_Bootstrap_InitResource_SERVICE_NAME
+        for (String prefix : ShopwareUtil.CONTAINER_SERVICE_PREFIX) {
+            if(hookNameContent.startsWith(prefix)) {
+                String serviceName = hookNameContent.substring(prefix.length());
+                if(StringUtils.isNotBlank(serviceName)) {
+                    psiElements.addAll(ServiceUtil.getServiceClassTargets(project, serviceName));
+                }
             }
         }
 

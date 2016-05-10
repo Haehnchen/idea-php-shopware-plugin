@@ -50,6 +50,10 @@ public class ShopwareUtil {
         "version", "author", "label", "license", "copyright", "support", "link"
     };
 
+    final public static String[] CONTAINER_SERVICE_PREFIX = new String[] {
+        "Enlight_Bootstrap_AfterInitResource_", "Enlight_Bootstrap_AfterRegisterResource_", "Enlight_Bootstrap_InitResource_"
+    };
+
     // @TODO: hell not here; we can get them from models!
     final public static String[] MODEL_STATIC_ATTRIBUTES = new String[] {
         "s_user_attributes", "s_articles_downloads_attributes", "s_articles_esd_attributes", "s_articles_img_attributes",
