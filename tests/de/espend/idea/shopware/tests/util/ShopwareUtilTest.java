@@ -1,5 +1,6 @@
-package de.espend.idea.shopware.util;
+package de.espend.idea.shopware.tests.util;
 
+import de.espend.idea.shopware.util.ShopwareUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
