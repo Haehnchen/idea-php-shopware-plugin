@@ -10,7 +10,10 @@ import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.*;
+import de.espend.idea.shopware.index.dict.ServiceResource;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
+import fr.adrienbrault.idea.symfony2plugin.dic.container.dict.ContainerBuilderCall;
+import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.externalizer.ObjectStreamDataExternalizer;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import gnu.trove.THashMap;
 import org.apache.commons.lang.StringUtils;
@@ -23,27 +26,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-public class InitResourceServiceIndex extends FileBasedIndexExtension<String, String> {
+public class InitResourceServiceIndex extends FileBasedIndexExtension<String, ServiceResource> {
 
-    public static final ID<String, String> KEY = ID.create("de.espend.idea.shopware.init_resource_service_index");
+    public static final ID<String, ServiceResource> KEY = ID.create("de.espend.idea.shopware.init_resource_service_index_object");
     public static final String ENLIGHT_BOOTSTRAP_INIT_RESOURCE_PREFIX = "Enlight_Bootstrap_InitResource_";
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
+    private final static ObjectStreamDataExternalizer<ServiceResource> EXTERNALIZER = new ObjectStreamDataExternalizer<>();
 
     @NotNull
     @Override
-    public ID<String, String> getName() {
+    public ID<String, ServiceResource> getName() {
         return KEY;
     }
 
     @NotNull
     @Override
-    public DataIndexer<String, String, FileContent> getIndexer() {
-        return new DataIndexer<String, String, FileContent>() {
+    public DataIndexer<String, ServiceResource, FileContent> getIndexer() {
+        return new DataIndexer<String, ServiceResource, FileContent>() {
 
             @NotNull
             @Override
-            public Map<String, String> map(@NotNull FileContent inputData) {
-                final Map<String, String> events = new THashMap<>();
+            public Map<String, ServiceResource> map(@NotNull FileContent inputData) {
+                final Map<String, ServiceResource> events = new THashMap<>();
 
                 PsiFile psiFile = inputData.getPsiFile();
                 if (!(psiFile instanceof PhpFile) || !Symfony2ProjectComponent.isEnabled(psiFile.getProject())) {
@@ -92,7 +96,7 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
                                                     if (phpClass != null) {
                                                         String presentableFQN = phpClass.getPresentableFQN();
                                                         if (StringUtils.isNotBlank(presentableFQN)) {
-                                                            events.put(serviceName, presentableFQN + '.' + methodName);
+                                                            events.put(serviceName, new ServiceResource(key, serviceName).setSignature(presentableFQN + '.' + methodName));
                                                         }
                                                     }
                                                 }
@@ -120,8 +124,8 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
 
     @NotNull
     @Override
-    public DataExternalizer<String> getValueExternalizer() {
-        return StringDataExternalizer.STRING_DATA_EXTERNALIZER;
+    public DataExternalizer<ServiceResource> getValueExternalizer() {
+        return EXTERNALIZER;
     }
 
     @NotNull
@@ -138,37 +142,5 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
     @Override
     public int getVersion() {
         return 7;
-    }
-
-    private static class StringDataExternalizer implements DataExternalizer<String> {
-
-        public static final StringDataExternalizer STRING_DATA_EXTERNALIZER = new StringDataExternalizer();
-        private final EnumeratorStringDescriptor myStringEnumerator = new EnumeratorStringDescriptor();
-
-        @Override
-        public void save(@NotNull DataOutput out, String value) throws IOException {
-
-            if(value == null) {
-                value = "";
-            }
-
-            this.myStringEnumerator.save(out, value);
-        }
-
-        @Override
-        public String read(@NotNull DataInput in) throws IOException {
-
-            String value = this.myStringEnumerator.read(in);
-
-            // EnumeratorStringDescriptor writes out "null" as string, so workaround here
-            if("null".equals(value)) {
-                value = "";
-            }
-
-            // it looks like this is our "null keys not supported" #238, #277
-            // so dont force null values here
-
-            return value;
-        }
     }
 }

@@ -11,6 +11,7 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
 import de.espend.idea.shopware.index.InitResourceServiceIndex;
+import de.espend.idea.shopware.index.dict.ServiceResource;
 import fr.adrienbrault.idea.symfony2plugin.Settings;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
@@ -87,11 +88,16 @@ public class SymfonyContainerTypeProvider implements PhpTypeProvider2 {
             return phpNamedElementCollections;
         }
 
-        List<String> values = FileBasedIndexImpl.getInstance().getValues(InitResourceServiceIndex.KEY, parameter, GlobalSearchScope.allScope(project));
+        List<ServiceResource> values = FileBasedIndexImpl.getInstance().getValues(InitResourceServiceIndex.KEY, parameter, GlobalSearchScope.allScope(project));
 
         final Collection<PhpClass> classes = new HashSet<>();
-        for(String value : values) {
-            String[] split = value.split("\\.");
+        for(ServiceResource value : values) {
+            String signature = value.getSignature();
+            if(signature == null) {
+                continue;
+            }
+
+            String[] split = signature.split("\\.");
             Method classMethod = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
             if(classMethod == null) {
                 continue;
@@ -106,14 +112,7 @@ public class SymfonyContainerTypeProvider implements PhpTypeProvider2 {
                         PhpPsiElement firstPsiChild = returnElement.getFirstPsiChild();
                         if (firstPsiChild instanceof PhpTypedElement) {
                             PhpType type = ((PhpTypedElement) firstPsiChild).getType();
-                            for (PhpClass aClass : PhpElementsUtil.getClassFromPhpTypeSet(project, type.getTypes())) {
-                                String presentableFQN = aClass.getPresentableFQN();
-                                if (presentableFQN == null) {
-                                    continue;
-                                }
-
-                                classes.add(aClass);
-                            }
+                            classes.addAll(PhpElementsUtil.getClassFromPhpTypeSet(project, type.getTypes()));
                         }
                     }
 
