@@ -18,7 +18,9 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.elements.impl.AssignmentExpressionImpl;
 import com.jetbrains.smarty.SmartyFile;
 import de.espend.idea.shopware.index.InitResourceServiceIndex;
+import de.espend.idea.shopware.index.dict.BootstrapResource;
 import de.espend.idea.shopware.index.dict.ServiceResource;
+import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.apache.commons.lang.StringUtils;
@@ -354,7 +356,7 @@ public class ShopwareUtil {
     public static Collection<Method> getInitResourceServiceClass(@NotNull Project project, @NotNull String contents) {
 
         Collection<Method> methods = new ArrayList<>();
-        for(ServiceResource value : FileBasedIndexImpl.getInstance().getValues(InitResourceServiceIndex.KEY, contents, GlobalSearchScope.allScope(project))) {
+        for(ServiceResource value : SubscriberIndexUtil.getIndexedBootstrapResources(project, BootstrapResource.INIT_RESOURCE)) {
             String signature = value.getSignature();
             if(signature == null) {
                 continue;

@@ -109,8 +109,8 @@ public class ShopwareProjectComponent implements ProjectComponent {
     public static boolean isValidForProject(@Nullable PsiElement psiElement) {
         if(psiElement == null) return false;
 
-        if(!Symfony2ProjectComponent.isEnabled(psiElement)) {
-            return false;
+        if(Symfony2ProjectComponent.isEnabled(psiElement)) {
+            return true;
         }
 
         if(VfsUtil.findRelativeFile(psiElement.getProject().getBaseDir(), "engine", "Shopware", "Kernel.php") != null) {

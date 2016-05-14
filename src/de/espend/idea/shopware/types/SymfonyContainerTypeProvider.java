@@ -4,14 +4,13 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
-import de.espend.idea.shopware.index.InitResourceServiceIndex;
+import de.espend.idea.shopware.index.dict.BootstrapResource;
 import de.espend.idea.shopware.index.dict.ServiceResource;
+import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
 import fr.adrienbrault.idea.symfony2plugin.Settings;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
@@ -21,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * @author Adrien Brault <adrien.brault@gmail.com>
@@ -88,7 +86,7 @@ public class SymfonyContainerTypeProvider implements PhpTypeProvider2 {
             return phpNamedElementCollections;
         }
 
-        List<ServiceResource> values = FileBasedIndexImpl.getInstance().getValues(InitResourceServiceIndex.KEY, parameter, GlobalSearchScope.allScope(project));
+        Collection<ServiceResource> values = SubscriberIndexUtil.getIndexedBootstrapResources(project, BootstrapResource.INIT_RESOURCE);
 
         final Collection<PhpClass> classes = new HashSet<>();
         for(ServiceResource value : values) {

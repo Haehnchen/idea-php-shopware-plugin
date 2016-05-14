@@ -1,0 +1,5 @@
+<container>
+    <services>
+        <service class="DateTime" id="foo.datetime"/>
+    </services>
+</container>

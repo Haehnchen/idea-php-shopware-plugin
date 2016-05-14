@@ -370,11 +370,6 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
         return psiElements.toArray(new PsiElement[psiElements.size()]);
     }
 
-    private static boolean isEqualHookClass(PhpClass phpClass, String hookNamePreFilter) {
-        String presentableFQN = phpClass.getPresentableFQN();
-        return !(presentableFQN == null || !presentableFQN.startsWith(hookNamePreFilter));
-    }
-
     @Nullable
     @Override
     public String getActionText(DataContext dataContext) {

@@ -14,6 +14,9 @@ public class ServiceResource implements Serializable {
     private String event;
 
     @NotNull
+    private final BootstrapResource subscriber;
+
+    @NotNull
     private final String serviceName;
 
     @Nullable
@@ -22,8 +25,9 @@ public class ServiceResource implements Serializable {
     @Nullable
     private String type;
 
-    public ServiceResource(@NotNull String event, @NotNull String serviceName) {
+    public ServiceResource(@NotNull String event, @NotNull BootstrapResource subscriber, @NotNull String serviceName) {
         this.event = event;
+        this.subscriber = subscriber;
         this.serviceName = serviceName;
     }
 
@@ -57,5 +61,10 @@ public class ServiceResource implements Serializable {
     @NotNull
     public String getServiceName() {
         return serviceName;
+    }
+
+    @NotNull
+    public BootstrapResource getSubscriber() {
+        return subscriber;
     }
 }
