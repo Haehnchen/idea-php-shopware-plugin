@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.ObjectUtils;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
@@ -262,11 +263,17 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
 
         /**
          * public static function getSubscribedEvents() {
-         *   return array('sBasket::sGetBasket::before' => '<caret>');
+         *   return [
+         *     'sBasket::sGetBasket::before' => '<caret>',
+         *     'sBasket::sGetBasket::before' => ['<caret>', 123],
+         *   ];
          * }
          */
         psiReferenceRegistrar.registerReferenceProvider(
-            PlatformPatterns.psiElement(StringLiteralExpression.class).withLanguage(PhpLanguage.INSTANCE),
+            PlatformPatterns.psiElement(StringLiteralExpression.class)
+                .withParent(PlatformPatterns.psiElement().withElementType(PhpElementTypes.ARRAY_VALUE))
+                .inside(PlatformPatterns.psiElement(Method.class).withName("getSubscribedEvents"))
+                .withLanguage(PhpLanguage.INSTANCE),
             new PsiReferenceProvider() {
                 @NotNull
                 @Override
@@ -277,19 +284,27 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                     }
 
                     PsiElement parent = psiElement.getParent();
-                    if(parent == null) {
+                    if(parent == null || parent.getNode().getElementType() != PhpElementTypes.ARRAY_VALUE) {
                         return new PsiReference[0];
                     }
 
-                    if(PhpPatterns.psiElement(PhpElementTypes.ARRAY_VALUE).accepts(parent)) {
-                        PsiElement arrayHashElement = parent.getContext();
-                        if(arrayHashElement instanceof ArrayHashElement) {
-                            PhpPsiElement arrayKey = ((ArrayHashElement) arrayHashElement).getKey();
-                            if(arrayKey instanceof StringLiteralExpression) {
-                                PsiElement arrayCreationExpression = arrayHashElement.getContext();
-                                if(arrayCreationExpression instanceof ArrayCreationExpression) {
-                                    return new PsiReference[]{ new MethodReferenceProvider((StringLiteralExpression) psiElement) };
-                                }
+                    PsiElement arrayHashElement = parent.getContext();
+                    if(arrayHashElement instanceof ArrayHashElement) {
+                        // 'foo' => 'method'
+                        PhpPsiElement arrayKey = ((ArrayHashElement) arrayHashElement).getKey();
+                        if(arrayKey instanceof StringLiteralExpression) {
+                            PsiElement arrayCreationExpression = arrayHashElement.getContext();
+                            if(arrayCreationExpression instanceof ArrayCreationExpression) {
+                                return new PsiReference[]{ new MethodReferenceProvider((StringLiteralExpression) psiElement) };
+                            }
+                        }
+                    } else if(arrayHashElement instanceof ArrayCreationExpression) {
+                        // 'foo' => ['method', 123]
+                        PhpPsiElement firstPsiChild = ((ArrayCreationExpression) arrayHashElement).getFirstPsiChild();
+                        if(firstPsiChild != null && firstPsiChild.getNode().getElementType() == PhpElementTypes.ARRAY_VALUE) {
+                            StringLiteralExpression stringLiteral = ObjectUtils.tryCast(firstPsiChild.getFirstPsiChild(), StringLiteralExpression.class);
+                            if(stringLiteral != null) {
+                                return new PsiReference[]{ new MethodReferenceProvider(stringLiteral) };
                             }
                         }
                     }
