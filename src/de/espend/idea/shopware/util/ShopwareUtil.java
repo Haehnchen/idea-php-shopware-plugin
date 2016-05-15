@@ -349,30 +349,4 @@ public class ShopwareUtil {
 
         return null;
     }
-
-    /**
-     * Class method which resolves "Enlight_Bootstrap_InitResource_*"
-     */
-    public static Collection<Method> getInitResourceServiceClass(@NotNull Project project, @NotNull String contents) {
-
-        Collection<Method> methods = new ArrayList<>();
-        for(ServiceResource value : SubscriberIndexUtil.getIndexedBootstrapResources(project, BootstrapResource.INIT_RESOURCE)) {
-            String signature = value.getSignature();
-            if(signature == null) {
-                continue;
-            }
-
-            String[] split = signature.split("\\.");
-            if(split.length < 2) {
-                continue;
-            }
-
-            Method method = PhpElementsUtil.getClassMethod(project, split[0], split[1]);
-            if(method != null) {
-                methods.add(method);
-            }
-        }
-
-        return methods;
-    }
 }
