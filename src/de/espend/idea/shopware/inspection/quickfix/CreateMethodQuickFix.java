@@ -17,6 +17,7 @@ import com.jetbrains.php.lang.psi.PhpFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
 import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
@@ -89,18 +90,16 @@ public class CreateMethodQuickFix implements LocalQuickFix {
         if(subjectDoc == null && generatorContainer.getHookName() != null && !generatorContainer.getHookName().contains("::")) {
             PhpClass phpClass = ShopwareUtil.getControllerOnActionSubscriberName(project, generatorContainer.getHookName());
             if(phpClass != null) {
-                String presentableFQN = phpClass.getPresentableFQN();
-                if(presentableFQN != null) {
-                    subjectDoc = presentableFQN;
-                    if(subjectDoc.startsWith("\\")) {
-                        subjectDoc = "\\" + subjectDoc;
-                    }
-                }
+                subjectDoc = phpClass.getFQN();
             }
         }
 
+        if(subjectDoc == null && generatorContainer.getHookName() != null && SubscriberIndexUtil.isContainerServiceEventAndContains(project, generatorContainer.getHookName())) {
+            subjectDoc = "Shopware\\Components\\DependencyInjection\\Container";
+        }
+
         if(subjectDoc != null) {
-            stringBuilder.append("/** @var \\").append(subjectDoc).append(" $subject */\n");
+            stringBuilder.append("/** @var \\").append(StringUtils.stripStart(subjectDoc, "\\")).append(" $subject */\n");
             stringBuilder.append("$subject = $args->getSubject();\n");
         }
 

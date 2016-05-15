@@ -16,7 +16,9 @@ import de.espend.idea.shopware.index.InitResourceServiceIndex;
 import de.espend.idea.shopware.index.dict.BootstrapResource;
 import de.espend.idea.shopware.index.dict.ServiceResource;
 import de.espend.idea.shopware.index.dict.SubscriberInfo;
+import de.espend.idea.shopware.symfony.service.ServiceCollector;
 import fr.adrienbrault.idea.symfony2plugin.dic.container.ServiceInterface;
+import fr.adrienbrault.idea.symfony2plugin.stubs.ContainerCollectionResolver;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -168,5 +170,25 @@ public class SubscriberIndexUtil {
         }
 
         return StringUtils.stripStart(phpClasses.iterator().next().getFQN(), "\\");
+    }
+
+    public static boolean isContainerServiceEvent(@NotNull String event) {
+        for (String s : ENLIGHT_BOOTSTRAP_RESOURCE) {
+            if(event.startsWith(s)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isContainerServiceEventAndContains(@NotNull Project project, @NotNull String event) {
+        for (String s : ENLIGHT_BOOTSTRAP_RESOURCE) {
+            if(event.startsWith(s)) {
+                return ContainerCollectionResolver.hasServiceNames(project, event.substring(s.length()));
+            }
+        }
+
+        return false;
     }
 }
