@@ -67,7 +67,7 @@ public class ServiceResource implements Serializable {
         return serviceName;
     }
 
-    @NotNull
+    @Nullable
     public BootstrapResource getSubscriber() {
         return BootstrapResource.fromString(subscriber);
     }

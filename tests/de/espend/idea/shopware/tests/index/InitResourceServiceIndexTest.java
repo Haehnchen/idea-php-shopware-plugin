@@ -3,6 +3,7 @@ package de.espend.idea.shopware.tests.index;
 import com.intellij.util.containers.ContainerUtil;
 import de.espend.idea.shopware.index.InitResourceServiceIndex;
 import de.espend.idea.shopware.index.dict.BootstrapResource;
+import de.espend.idea.shopware.index.dict.ServiceResource;
 import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
 import de.espend.idea.shopware.tests.ShopwareLightCodeInsightFixtureTestCase;
 
@@ -24,10 +25,15 @@ public class InitResourceServiceIndexTest extends ShopwareLightCodeInsightFixtur
     }
 
     public void testThatInlineIsIndexedSubscriber() {
-        assertNotNull(ContainerUtil.find(SubscriberIndexUtil.getIndexedBootstrapResources(getProject(), BootstrapResource.INIT_RESOURCE), value ->
-            value.getServiceName().equals("foobar") && value.getSubscriber() == BootstrapResource.INIT_RESOURCE &&
-            "MySubscriber.foobar".equals(value.getSignature()) && "Enlight_Bootstrap_InitResource_foobar".equals(value.getEvent())
-        ));
+        ServiceResource resource = ContainerUtil.find(SubscriberIndexUtil.getIndexedBootstrapResources(getProject(), BootstrapResource.INIT_RESOURCE), value ->
+            value.getServiceName().equals("foobar")
+        );
+
+        assertNotNull(resource);
+
+        assertEquals(BootstrapResource.INIT_RESOURCE, resource.getSubscriber());
+        assertEquals("MySubscriber.foobar", resource.getSignature());
+        assertEquals("Enlight_Bootstrap_InitResource_foobar", resource.getEvent());
     }
 
     public void testThatArraySubscriberIsIndexed() {

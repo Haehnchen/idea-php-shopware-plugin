@@ -4,13 +4,18 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiRecursiveElementVisitor;
+import com.intellij.util.ObjectUtils;
 import com.intellij.util.Processor;
 import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.*;
+import de.espend.idea.shopware.index.dict.ServiceResource;
+import de.espend.idea.shopware.index.dict.SubscriberInfo;
+import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
 import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -97,4 +102,50 @@ public class HookSubscriberUtil {
         return Arrays.asList(LazySubscriberReferenceProvider.getHookTargets(project, contents));
     }
 
+    public interface SubscriberEventsVisitor {
+        void visit(@NotNull String event, @NotNull String methodName, @NotNull StringLiteralExpression key);
+    }
+
+    public static void visitSubscriberEvents(@NotNull Method method, @NotNull SubscriberEventsVisitor visitor) {
+        method.acceptChildren(new PsiRecursiveElementVisitor() {
+            @Override
+            public void visitElement(PsiElement element) {
+                if(element instanceof PhpReturn) {
+                    visitSubscriberEvents((PhpReturn) element, visitor);
+                }
+                super.visitElement(element);
+            }
+        });
+    }
+
+    public static void visitSubscriberEvents(@NotNull PhpReturn phpReturn, @NotNull SubscriberEventsVisitor visitor) {
+        ArrayCreationExpression arrayCreationExpression = ObjectUtils.tryCast(phpReturn.getArgument(), ArrayCreationExpression.class);
+        if(arrayCreationExpression == null) {
+            return;
+        }
+
+        for (ArrayHashElement entry : arrayCreationExpression.getHashElements()) {
+            StringLiteralExpression keyString = ObjectUtils.tryCast(entry.getKey(), StringLiteralExpression.class);
+            if(keyString == null) {
+                continue;
+            }
+
+            String fullEvent = keyString.getContents();
+            if(StringUtils.isBlank(fullEvent)) {
+                continue;
+            }
+
+            PhpPsiElement value = entry.getValue();
+            if(value == null) {
+                continue;
+            }
+
+            String methodName = SubscriberIndexUtil.getMethodNameForEventValue(value);
+            if(methodName == null || StringUtils.isBlank(methodName)) {
+                continue;
+            }
+
+            visitor.visit(fullEvent, methodName, keyString);
+        }
+    }
 }

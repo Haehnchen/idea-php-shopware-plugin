@@ -18,6 +18,7 @@ import de.espend.idea.shopware.index.dict.ServiceResource;
 import de.espend.idea.shopware.index.dict.ServiceResources;
 import de.espend.idea.shopware.index.dict.SubscriberInfo;
 import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
+import de.espend.idea.shopware.util.HookSubscriberUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
 import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.externalizer.ArrayDataExternalizer;
 import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.externalizer.ObjectStreamDataExternalizer;
@@ -86,7 +87,7 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
                 // serialize to container object
                 for (Map.Entry<String, Collection<ServiceResource>> entry : serviceMap.entrySet()) {
                     List<String> map = ContainerUtil.map(entry.getValue(), serviceResource ->
-                        serviceResource.getEvent() + TRIM_KEY + serviceResource.getSubscriber() + TRIM_KEY + serviceResource.getServiceName() + TRIM_KEY + serviceResource.getSignature()
+                        serviceResource.getEvent() + TRIM_KEY + (serviceResource.getSubscriber() != null ? serviceResource.getSubscriber().getText() : "") + TRIM_KEY + serviceResource.getServiceName() + TRIM_KEY + serviceResource.getSignature()
                     );
 
                     events.put(entry.getKey(), map.toArray(new String[map.size()]));
@@ -149,40 +150,18 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
         }
 
         private void visitPhpReturn(@NotNull PhpReturn phpReturn) {
-            ArrayCreationExpression arrayCreationExpression = ObjectUtils.tryCast(phpReturn.getArgument(), ArrayCreationExpression.class);
-            if(arrayCreationExpression == null) {
+            PhpClass phpClass = method.getContainingClass();
+            if (phpClass == null) {
                 return;
             }
 
-            for (ArrayHashElement entry : arrayCreationExpression.getHashElements()) {
-                StringLiteralExpression keyString = ObjectUtils.tryCast(entry.getKey(), StringLiteralExpression.class);
-                if(keyString == null) {
-                    continue;
-                }
-
-
-                String fullEvent = keyString.getContents();
-                SubscriberInfo subscriberInfo = SubscriberIndexUtil.getSubscriberInfo(fullEvent);
+            HookSubscriberUtil.visitSubscriberEvents(phpReturn, (event, methodName, key) -> {
+                SubscriberInfo subscriberInfo = SubscriberIndexUtil.getSubscriberInfo(event);
                 if(subscriberInfo == null) {
-                    continue;
+                    return;
                 }
 
-                PhpPsiElement value = entry.getValue();
-                if(value == null) {
-                    continue;
-                }
-
-                String methodName = SubscriberIndexUtil.getMethodNameForEventValue(value);
-                if(methodName == null || StringUtils.isBlank(methodName)) {
-                    continue;
-                }
-
-                PhpClass phpClass = method.getContainingClass();
-                if (phpClass == null) {
-                    continue;
-                }
-
-                ServiceResource serviceResource = new ServiceResource(fullEvent, subscriberInfo.getEvent().getText(), subscriberInfo.getService())
+                ServiceResource serviceResource = new ServiceResource(event, subscriberInfo.getEvent().getText(), subscriberInfo.getService())
                     .setSignature(StringUtils.strip(phpClass.getFQN(), "\\") + '.' + methodName);
 
                 String resourceKey = subscriberInfo.getEvent().getText();
@@ -191,7 +170,7 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
                 }
 
                 serviceMap.get(resourceKey).add(serviceResource);
-            }
+            });
         }
     }
 }
