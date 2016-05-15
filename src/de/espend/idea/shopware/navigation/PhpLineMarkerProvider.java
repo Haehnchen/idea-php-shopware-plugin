@@ -4,25 +4,24 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.NotNullLazyValue;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
+import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class PhpLineMarkerProvider implements LineMarkerProvider {
     @Nullable
@@ -38,18 +37,21 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-
         PsiFile containingFile = psiElements.get(0).getContainingFile();
-        if(!containingFile.getName().contains("Bootstrap")) {
+        if(containingFile.getName().contains("Bootstrap")) {
+            collectBootstrapSubscriber(psiElements, lineMarkerInfos, containingFile);
             return;
         }
 
+        // Enlight\Event\SubscriberInterface::getSubscribedEvents
+        collectSubscriberTargets(psiElements, lineMarkerInfos);
+    }
 
-
-        final Map<String, Method> methods = new HashMap<>();
+    private void collectBootstrapSubscriber(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> lineMarkerInfos, PsiFile containingFile) {
+        Map<String, Method> methods = new HashMap<>();
 
         // we dont want multiple line markers, so wrap all into one here
-        final Map<String, Set<PsiElement>> methodTargets = new HashMap<>();
+        Map<String, Set<PsiElement>> methodTargets = new HashMap<>();
 
         for(PsiElement psiElement: psiElements) {
             if(psiElement instanceof Method && ((Method) psiElement).getModifier().isPublic()) {
@@ -112,6 +114,66 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
                 lineMarkerInfos.add(builder.createLineMarkerInfo(methods.get(method.getKey())));
             }
         }
+    }
 
+    private void collectSubscriberTargets(@NotNull List<PsiElement> psiElements, final @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
+        Collection<PhpClass> phpClasses = new ArrayList<>();
+
+        for (PsiElement psiElement : psiElements) {
+            if(psiElement instanceof PhpClass && PhpElementsUtil.isInstanceOf((PhpClass) psiElement, "Enlight\\Event\\SubscriberInterface")) {
+                phpClasses.add((PhpClass) psiElement);
+            }
+        }
+
+        for (PhpClass phpClass : phpClasses) {
+            Method getSubscribedEvents = phpClass.findOwnMethodByName("getSubscribedEvents");
+            if(getSubscribedEvents == null) {
+                continue;
+            }
+
+            Map<String, Pair<String, PsiElement>> methodEvent = new HashMap<>();
+
+            HookSubscriberUtil.visitSubscriberEvents(getSubscribedEvents, (event, methodName, key) -> {
+                methodEvent.put(methodName, Pair.create(event, key));
+            });
+
+            for (Method method : phpClass.getOwnMethods()) {
+                if(!methodEvent.containsKey(method.getName()) || !method.getAccess().isPublic()) {
+                    continue;
+                }
+
+                Pair<String, PsiElement> result = methodEvent.get(method.getName());
+                NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(ShopwarePluginIcons.SHOPWARE_LINEMARKER).
+                    setTargets(new MyCollectionNotNullLazyValue(result.getSecond(), result.getFirst())).
+                    setTooltipText("Related Targets");
+
+                lineMarkerInfos.add(builder.createLineMarkerInfo(method));
+            }
+        }
+    }
+
+    private static class MyCollectionNotNullLazyValue extends NotNullLazyValue<Collection<? extends PsiElement>> {
+
+        @NotNull
+        private final PsiElement event;
+
+        @NotNull
+        private final String eventName;
+
+        MyCollectionNotNullLazyValue(@NotNull PsiElement event, @NotNull String eventName) {
+            this.event = event;
+            this.eventName = eventName;
+        }
+
+        @NotNull
+        @Override
+        protected Collection<? extends PsiElement> compute() {
+            Collection<PsiElement> targets = new HashSet<>();
+
+            targets.add(event);
+            targets.addAll(HookSubscriberUtil.getAllHookTargets(event.getProject(), eventName));
+
+            return targets;
+        }
     }
 }
