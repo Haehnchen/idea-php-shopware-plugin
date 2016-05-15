@@ -10,14 +10,14 @@ import java.io.Serializable;
  */
 public class ServiceResource implements Serializable {
 
-    @NotNull
+    @Nullable
     private String event;
 
-    @NotNull
-    private final BootstrapResource subscriber;
+    @Nullable
+    private String subscriber;
 
-    @NotNull
-    private final String serviceName;
+    @Nullable
+    private String serviceName;
 
     @Nullable
     private String signature;
@@ -25,7 +25,11 @@ public class ServiceResource implements Serializable {
     @Nullable
     private String type;
 
-    public ServiceResource(@NotNull String event, @NotNull BootstrapResource subscriber, @NotNull String serviceName) {
+    public ServiceResource() {
+
+    }
+
+    public ServiceResource(@NotNull String event, @NotNull String subscriber, @NotNull String serviceName) {
         this.event = event;
         this.subscriber = subscriber;
         this.serviceName = serviceName;
@@ -65,6 +69,6 @@ public class ServiceResource implements Serializable {
 
     @NotNull
     public BootstrapResource getSubscriber() {
-        return subscriber;
+        return BootstrapResource.fromString(subscriber);
     }
 }

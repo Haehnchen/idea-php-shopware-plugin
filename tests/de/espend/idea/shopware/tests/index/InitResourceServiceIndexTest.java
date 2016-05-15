@@ -1,14 +1,16 @@
 package de.espend.idea.shopware.tests.index;
 
+import com.intellij.util.containers.ContainerUtil;
 import de.espend.idea.shopware.index.InitResourceServiceIndex;
-import de.espend.idea.shopware.index.dict.ServiceResource;
+import de.espend.idea.shopware.index.dict.BootstrapResource;
+import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
 import de.espend.idea.shopware.tests.ShopwareLightCodeInsightFixtureTestCase;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
+ * @see de.espend.idea.shopware.index.InitResourceServiceIndex
  */
 public class InitResourceServiceIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
 
@@ -21,11 +23,27 @@ public class InitResourceServiceIndexTest extends ShopwareLightCodeInsightFixtur
         return new File(this.getClass().getResource("fixtures").getFile()).getAbsolutePath();
     }
 
-    public void testThatInlineSubscriber() {
-        assertIndexContains(InitResourceServiceIndex.KEY, "foobar");
+    public void testThatInlineIsIndexedSubscriber() {
+        assertNotNull(ContainerUtil.find(SubscriberIndexUtil.getIndexedBootstrapResources(getProject(), BootstrapResource.INIT_RESOURCE), value ->
+            value.getServiceName().equals("foobar") && value.getSubscriber() == BootstrapResource.INIT_RESOURCE &&
+            "MySubscriber.foobar".equals(value.getSignature()) && "Enlight_Bootstrap_InitResource_foobar".equals(value.getEvent())
+        ));
+    }
 
-        assertIndexContainsKeyWithValue(InitResourceServiceIndex.KEY, "foobar", value ->
-            value.getServiceName().equals("foobar") && "MySubscriber.foobar".equals(value.getSignature()) && "Enlight_Bootstrap_InitResource_foobar".equals(value.getEvent())
-        );
+    public void testThatArraySubscriberIsIndexed() {
+        assertNotNull(ContainerUtil.find(SubscriberIndexUtil.getIndexedBootstrapResources(getProject(), BootstrapResource.INIT_RESOURCE), value ->
+            value.getServiceName().equals("foobar_array") && value.getSubscriber() == BootstrapResource.INIT_RESOURCE &&
+            "MySubscriber.foobar_array".equals(value.getSignature()) && "Enlight_Bootstrap_InitResource_foobar_array".equals(value.getEvent())
+        ));
+    }
+
+    public void testAfterAndRegisterResourceSubscriberIsIndexed() {
+        assertNotNull(ContainerUtil.find(SubscriberIndexUtil.getIndexedBootstrapResources(getProject(), BootstrapResource.AFTER_INIT_RESOURCE), value ->
+            value.getServiceName().equals("foobar_after_init")
+        ));
+
+        assertNotNull(ContainerUtil.find(SubscriberIndexUtil.getIndexedBootstrapResources(getProject(), BootstrapResource.AFTER_REGISTER_RESOURCE), value ->
+            value.getServiceName().equals("foobar_register_resource")
+        ));
     }
 }

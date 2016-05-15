@@ -348,6 +348,8 @@
         <ControllerActionGotoRelatedCollector implementation="de.espend.idea.shopware.navigation.SmartyActionGotoRelatedCollector"/>
         <MethodSignatureTypeProviderExtension implementation="de.espend.idea.shopware.types.EnlightTypeProviderExtension"/>
         <GotoCompletionRegistrar implementation="de.espend.idea.shopware.ShopwareServiceGotoCompletionRegistrar"/>
+        <ServiceCollector implementation="de.espend.idea.shopware.symfony.service.ServiceCollector"/>
+        <ServiceDefinitionLocator implementation="de.espend.idea.shopware.symfony.service.ServiceDefinitionLocator"/>
     </extensions>
 
     <depends>com.jetbrains.php</depends>
