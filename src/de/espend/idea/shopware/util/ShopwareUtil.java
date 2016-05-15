@@ -46,7 +46,7 @@ public class ShopwareUtil {
     };
 
     final public static String[] PLUGIN_CONFIG_OPTIONS = new String[] {
-        "label", "value", "scope", "description", "required", "attributes", "store"
+        "label", "value", "scope", "description", "required", "attributes", "store", "inputType"
     };
 
     final public static String[] PLUGIN_INFO = new String[] {
