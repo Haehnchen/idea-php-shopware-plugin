@@ -315,10 +315,6 @@
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="de.espend.idea.shopware.navigation.PhpLineMarkerProvider"/>
 
       <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareApiResourcesTypeProvider"/>
-      <!--
-      @TODO: migrate to symfony plugin
-      <php.typeProvider2 implementation="de.espend.idea.shopware.types.SymfonyContainerTypeProvider"/>
-      -->
 
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyBlockStubIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyIncludeStubIndex"/>
