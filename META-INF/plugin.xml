@@ -343,6 +343,7 @@
         <ControllerActionGotoRelatedCollector implementation="de.espend.idea.shopware.navigation.SmartyActionGotoRelatedCollector"/>
         <MethodSignatureTypeProviderExtension implementation="de.espend.idea.shopware.types.EnlightTypeProviderExtension"/>
         <ServiceCollector implementation="de.espend.idea.shopware.symfony.service.ServiceCollector"/>
+        <ServiceCollector implementation="de.espend.idea.shopware.symfony.service.DefaultServiceCollector"/>
         <ServiceDefinitionLocator implementation="de.espend.idea.shopware.symfony.service.ServiceDefinitionLocator"/>
     </extensions>
 
