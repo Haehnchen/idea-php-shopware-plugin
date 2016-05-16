@@ -339,7 +339,6 @@
   </extensions>
 
     <extensions defaultExtensionNs="fr.adrienbrault.idea.symfony2plugin.extension">
-        <ServiceContainerLoader implementation="de.espend.idea.shopware.symfony.ShopwareServiceContainerLoader"/>
         <DoctrineModelProvider implementation="de.espend.idea.shopware.symfony.ShopwareDoctrineModelProvider"/>
         <ControllerActionGotoRelatedCollector implementation="de.espend.idea.shopware.navigation.SmartyActionGotoRelatedCollector"/>
         <MethodSignatureTypeProviderExtension implementation="de.espend.idea.shopware.types.EnlightTypeProviderExtension"/>
