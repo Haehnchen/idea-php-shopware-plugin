@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
@@ -115,7 +116,7 @@ public class SubscriberIndexUtil {
         Collection<ServiceResource> serviceResources = new ArrayList<>();
 
         for (BootstrapResource bootstrapResource : bootstrapResources) {
-            for (String[] resources : FileBasedIndexImpl.getInstance().getValues(InitResourceServiceIndex.KEY, bootstrapResource.getText(), GlobalSearchScope.allScope(project))) {
+            for (Set<String> resources : FileBasedIndexImpl.getInstance().getValues(InitResourceServiceIndex.KEY, bootstrapResource.getText(), GlobalSearchScope.allScope(project))) {
                 if(resources == null) {
                     continue;
                 }

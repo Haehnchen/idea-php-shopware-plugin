@@ -3,8 +3,6 @@ package de.espend.idea.shopware.index;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
-import com.intellij.util.*;
-import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.HashMap;
 import com.intellij.util.indexing.*;
@@ -13,44 +11,43 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.PhpReturn;
 import de.espend.idea.shopware.index.dict.ServiceResource;
-import de.espend.idea.shopware.index.dict.ServiceResources;
 import de.espend.idea.shopware.index.dict.SubscriberInfo;
 import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
-import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.externalizer.ArrayDataExternalizer;
-import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.externalizer.ObjectStreamDataExternalizer;
+import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.externalizer.StringSetDataExternalizer;
 import gnu.trove.THashMap;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class InitResourceServiceIndex extends FileBasedIndexExtension<String, String[]> {
+public class InitResourceServiceIndex extends FileBasedIndexExtension<String, Set<String>> {
 
-    public static final ID<String, String[]> KEY = ID.create("de.espend.idea.shopware.init_resource2");
+    public static final ID<String, Set<String>> KEY = ID.create("de.espend.idea.shopware.init_resource2");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
-    private final static ObjectStreamDataExternalizer<ServiceResources> EXTERNALIZER = new ObjectStreamDataExternalizer<>();
 
     public final static char TRIM_KEY = '\u0200';
 
     @NotNull
     @Override
-    public ID<String, String[]> getName() {
+    public ID<String, Set<String>> getName() {
         return KEY;
     }
 
     @NotNull
     @Override
-    public DataIndexer<String, String[], FileContent> getIndexer() {
-        return new DataIndexer<String, String[], FileContent>() {
+    public DataIndexer<String, Set<String>, FileContent> getIndexer() {
+        return new DataIndexer<String, Set<String>, FileContent>() {
 
             @NotNull
             @Override
-            public Map<String, String[]> map(@NotNull FileContent inputData) {
-                final Map<String, String[]> events = new THashMap<>();
+            public Map<String, Set<String>> map(@NotNull FileContent inputData) {
+                final Map<String, Set<String>> events = new THashMap<>();
 
                 PsiFile psiFile = inputData.getPsiFile();
                 if (!(psiFile instanceof PhpFile) || !Symfony2ProjectComponent.isEnabled(psiFile.getProject())) {
@@ -90,7 +87,7 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
                         serviceResource.getEvent() + TRIM_KEY + (serviceResource.getSubscriber() != null ? serviceResource.getSubscriber().getText() : "") + TRIM_KEY + serviceResource.getServiceName() + TRIM_KEY + serviceResource.getSignature()
                     );
 
-                    events.put(entry.getKey(), map.toArray(new String[map.size()]));
+                    events.put(entry.getKey(), new HashSet<>(map));
                 }
 
                 return events;
@@ -107,8 +104,8 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
 
     @NotNull
     @Override
-    public DataExternalizer<String[]> getValueExternalizer() {
-        return new ArrayDataExternalizer();
+    public DataExternalizer<Set<String>> getValueExternalizer() {
+        return new StringSetDataExternalizer();
     }
 
     @NotNull
@@ -124,7 +121,7 @@ public class InitResourceServiceIndex extends FileBasedIndexExtension<String, St
 
     @Override
     public int getVersion() {
-        return 4;
+        return 5;
     }
 
     private static class MyEventSubscriberVisitor extends PsiRecursiveElementWalkingVisitor {

@@ -1,7 +1,6 @@
 package de.espend.idea.shopware.tests.index;
 
 import com.intellij.util.containers.ContainerUtil;
-import de.espend.idea.shopware.index.InitResourceServiceIndex;
 import de.espend.idea.shopware.index.dict.BootstrapResource;
 import de.espend.idea.shopware.index.dict.ServiceResource;
 import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
