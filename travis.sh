@@ -97,7 +97,7 @@ else
 fi
 
 rm -f $travisCache/symfony2-plugin.jar
-download "https://plugins.jetbrains.com/files/7219/25878/symfony2-plugin.jar"
+download "http://plugins.jetbrains.com/files/7219/26459/symfony2-plugin.jar"
 cp $travisCache/symfony2-plugin.jar ./plugins
 
 # Run the tests
