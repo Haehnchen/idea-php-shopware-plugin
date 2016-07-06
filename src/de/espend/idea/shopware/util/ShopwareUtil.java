@@ -57,16 +57,53 @@ public class ShopwareUtil {
         "Enlight_Bootstrap_AfterInitResource_", "Enlight_Bootstrap_AfterRegisterResource_", "Enlight_Bootstrap_InitResource_"
     };
 
-    // @TODO: hell not here; we can get them from models!
+    // Get the attribute tables from MYSQL with
+    /*
+        SELECT TABLE_NAME
+        FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = SCHEMA()
+        AND TABLE_NAME LIKE '%attributes'
+     */
     final public static String[] MODEL_STATIC_ATTRIBUTES = new String[] {
-        "s_user_attributes", "s_articles_downloads_attributes", "s_articles_esd_attributes", "s_articles_img_attributes",
-        "s_articles_information_attributes", "s_articles_prices_attributes", "s_articles_supplier_attributes", "s_article_configurator_templates_attributes",
-        "s_article_configurator_template_prices_attributes", "s_blog_attributes", "s_categories_attributes", "s_cms_static_attributes",
-        "s_cms_support_attributes", "s_core_auth_attributes", "s_core_config_mails_attributes", "s_core_countries_attributes", "s_core_countries_states_attributes",
-        "s_core_customergroups_attributes", "s_core_paymentmeans_attributes", "s_emarketing_banners_attributes", "s_emarketing_vouchers_attributes",
-        "s_emotion_attributes", "s_export_attributes", "s_filter_attributes", "s_media_attributes", "s_order_attributes", "s_order_basket_attributes",
-        "s_order_billingaddress_attributes", "s_order_details_attributes", "s_order_documents_attributes", "s_order_shippingaddress_attributes", "s_premium_dispatch_attributes",
-        "s_user_attributes", "s_user_billingaddress_attributes", "s_user_shippingaddress_attributes"
+        "s_article_configurator_template_prices_attributes",
+        "s_article_configurator_templates_attributes",
+        "s_articles_attributes",
+        "s_articles_downloads_attributes",
+        "s_articles_esd_attributes",
+        "s_articles_img_attributes",
+        "s_articles_information_attributes",
+        "s_articles_prices_attributes",
+        "s_articles_supplier_attributes",
+        "s_blog_attributes",
+        "s_categories_attributes",
+        "s_cms_static_attributes",
+        "s_cms_support_attributes",
+        "s_core_auth_attributes",
+        "s_core_config_mails_attributes",
+        "s_core_countries_attributes",
+        "s_core_countries_states_attributes",
+        "s_core_customergroups_attributes",
+        "s_core_paymentmeans_attributes",
+        "s_emarketing_banners_attributes",
+        "s_emarketing_vouchers_attributes",
+        "s_emotion_attributes",
+        "s_export_attributes",
+        "s_filter_attributes",
+        "s_filter_options_attributes",
+        "s_filter_values_attributes",
+        "s_media_attributes",
+        "s_order_attributes",
+        "s_order_basket_attributes",
+        "s_order_billingaddress_attributes",
+        "s_order_details_attributes",
+        "s_order_documents_attributes",
+        "s_order_shippingaddress_attributes",
+        "s_premium_dispatch_attributes",
+        "s_product_streams_attributes",
+        "s_user_addresses_attributes",
+        "s_user_attributes",
+        "s_user_billingaddress_attributes",
+        "s_user_shippingaddress_attributes"
     };
 
     final public static String[] MODEL_STATIC_ATTRIBUTE_TYPES = new String[] {
