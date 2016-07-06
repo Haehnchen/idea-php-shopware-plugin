@@ -7,7 +7,6 @@ import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.util.ui.UIUtil;
 import com.jetbrains.php.composer.InterpretersComboWithBrowseButton;
 import de.espend.idea.shopware.installer.project.dict.ShopwareInstallerVersion;
-import fr.adrienbrault.idea.symfony2plugin.installer.SymfonyInstallerUtil;
 import fr.adrienbrault.idea.symfony2plugin.installer.dict.SymfonyInstallerVersion;
 import org.apache.commons.lang.StringUtils;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
@@ -16,8 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,39 +31,39 @@ public class ShopwareInstallerForm {
         buttonRefresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                appendSymfonyVersions();
+                appendShopwareVersions();
             }
         });
 
         // @TODO: use com.intellij.util.ui.ReloadableComboBoxPanel in Phpstorm9 api level
         comboVersions.setRenderer(new ListCellRenderer());
-        appendSymfonyVersions();
+        appendShopwareVersions();
     }
 
     @Nullable
-    private List<SymfonyInstallerVersion> getVersions() {
+    private List<ShopwareInstallerVersion> getVersions() {
 
-        String content = SymfonyInstallerUtil.getDownloadVersions();
+        String content = ShopwareInstallerUtil.getDownloadVersions();
         if(content == null) {
             return null;
         }
 
-        return SymfonyInstallerUtil.getVersions(content);
+        return ShopwareInstallerUtil.getVersions(content);
     }
 
-    private void appendSymfonyVersions()
+    private void appendShopwareVersions()
     {
 
-        comboVersions.setModel(new ListComboBoxModel<SymfonyInstallerVersion>(new ArrayList<SymfonyInstallerVersion>()));
+        comboVersions.setModel(new ListComboBoxModel<ShopwareInstallerVersion>(new ArrayList<ShopwareInstallerVersion>()));
 
         ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
             public void run() {
-                final List<SymfonyInstallerVersion> symfonyInstallerVersions1 = getVersions();
-                if (symfonyInstallerVersions1 != null) {
+                final List<ShopwareInstallerVersion> shopwareInstallerVersions1 = getVersions();
+                if (shopwareInstallerVersions1 != null) {
                     UIUtil.invokeLaterIfNeeded(new Runnable() {
                         @Override
                         public void run() {
-                            comboVersions.setModel(new ListComboBoxModel<SymfonyInstallerVersion>(symfonyInstallerVersions1));
+                            comboVersions.setModel(new ListComboBoxModel<ShopwareInstallerVersion>(shopwareInstallerVersions1));
                         }
                     });
                 }
@@ -84,10 +81,10 @@ public class ShopwareInstallerForm {
         panelInterpreter = interpretersComboWithBrowseButton = new InterpretersComboWithBrowseButton(ProjectManager.getInstance().getDefaultProject());
     }
 
-    private static class ListCellRenderer extends ListCellRendererWrapper<SymfonyInstallerVersion> {
+    private static class ListCellRenderer extends ListCellRendererWrapper<ShopwareInstallerVersion> {
 
         @Override
-        public void customize(JList list, SymfonyInstallerVersion value, int index, boolean selected, boolean hasFocus) {
+        public void customize(JList list, ShopwareInstallerVersion value, int index, boolean selected, boolean hasFocus) {
             if(value != null) {
                 setText(value.getPresentableName());
             }
@@ -101,7 +98,7 @@ public class ShopwareInstallerForm {
         }
 
         Object selectedItem = this.comboVersions.getSelectedItem();
-        if(selectedItem instanceof SymfonyInstallerVersion) {
+        if(selectedItem instanceof ShopwareInstallerVersion) {
             return ((ShopwareInstallerVersion) selectedItem);
         }
 

@@ -9,15 +9,17 @@ public class ShopwareInstallerVersion {
 
     private String version;
     private String presentableName;
+    private String url;
 
     public ShopwareInstallerVersion(@NotNull String version) {
         this.version = version;
         this.presentableName = version;
     }
 
-    public ShopwareInstallerVersion(@NotNull String version, @NotNull String presentableName) {
+    public ShopwareInstallerVersion(@NotNull String version, @NotNull String presentableName, @NotNull String url) {
         this.version = version;
         this.presentableName = presentableName;
+        this.url = url;
     }
 
     public String getPresentableName() {
@@ -28,4 +30,7 @@ public class ShopwareInstallerVersion {
         return version;
     }
 
+    public String getUrl() {
+        return url;
+    }
 }
