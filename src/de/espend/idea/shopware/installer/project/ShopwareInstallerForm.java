@@ -7,8 +7,6 @@ import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.util.ui.UIUtil;
 import com.jetbrains.php.composer.InterpretersComboWithBrowseButton;
 import de.espend.idea.shopware.installer.project.dict.ShopwareInstallerVersion;
-import fr.adrienbrault.idea.symfony2plugin.installer.dict.SymfonyInstallerVersion;
-import org.apache.commons.lang.StringUtils;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,10 +91,6 @@ public class ShopwareInstallerForm {
 
     public ShopwareInstallerVersion getVersion() {
 
-        if(checkBoxDemo.isSelected()) {
-            return new ShopwareInstallerVersion("demo", "Demo Application");
-        }
-
         Object selectedItem = this.comboVersions.getSelectedItem();
         if(selectedItem instanceof ShopwareInstallerVersion) {
             return ((ShopwareInstallerVersion) selectedItem);
@@ -106,11 +100,12 @@ public class ShopwareInstallerForm {
     }
 
     public String getInterpreter() {
-        String text = interpretersComboWithBrowseButton.getText();
-        if(StringUtils.isNotBlank(text)) {
-            return text;
-        }
-        return this.interpretersComboWithBrowseButton.getPhpPath();
+        return "";
+//        String text = interpretersComboWithBrowseButton.getText();
+//        if(StringUtils.isNotBlank(text)) {
+//            return text;
+//        }
+//        return this.interpretersComboWithBrowseButton.getPhpPath();
     }
 
     @Nullable
