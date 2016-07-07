@@ -19,7 +19,7 @@ import java.awt.*;
 public class PluginGeneratorAction extends DumbAwareAction {
 
     public PluginGeneratorAction() {
-        super("Plugin", "Create Plugin", ShopwarePluginIcons.SHOPWARE);
+        super("Create Plugin", "Create Plugin", ShopwarePluginIcons.SHOPWARE);
     }
 
     public void update(AnActionEvent event) {
