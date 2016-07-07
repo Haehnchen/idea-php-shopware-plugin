@@ -11,8 +11,6 @@ import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +24,7 @@ public class ShopwareInstallerForm {
     private InterpretersComboWithBrowseButton interpretersComboWithBrowseButton;
 
     public ShopwareInstallerForm() {
-        buttonRefresh.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                appendShopwareVersions();
-            }
-        });
+        buttonRefresh.addActionListener(e -> appendShopwareVersions());
 
         // @TODO: use com.intellij.util.ui.ReloadableComboBoxPanel in Phpstorm9 api level
         comboVersions.setRenderer(new ListCellRenderer());
@@ -52,18 +45,13 @@ public class ShopwareInstallerForm {
     private void appendShopwareVersions()
     {
 
-        comboVersions.setModel(new ListComboBoxModel<ShopwareInstallerVersion>(new ArrayList<ShopwareInstallerVersion>()));
+        comboVersions.setModel(new ListComboBoxModel<>(new ArrayList<ShopwareInstallerVersion>()));
 
         ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
             public void run() {
                 final List<ShopwareInstallerVersion> shopwareInstallerVersions1 = getVersions();
                 if (shopwareInstallerVersions1 != null) {
-                    UIUtil.invokeLaterIfNeeded(new Runnable() {
-                        @Override
-                        public void run() {
-                            comboVersions.setModel(new ListComboBoxModel<ShopwareInstallerVersion>(shopwareInstallerVersions1));
-                        }
-                    });
+                    UIUtil.invokeLaterIfNeeded(() -> comboVersions.setModel(new ListComboBoxModel<>(shopwareInstallerVersions1)));
                 }
             }
         });
