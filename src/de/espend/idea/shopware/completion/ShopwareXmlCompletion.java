@@ -2,6 +2,7 @@ package de.espend.idea.shopware.completion;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.psi.xml.XmlTagValue;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class ShopwareXmlCompletion extends CompletionContributor {
 
     public ShopwareXmlCompletion() {
-        extend(CompletionType.BASIC, XmlPatternUtil.getMenuControllerPattern(), new MenuControllerProvider());
+        extend(CompletionType.BASIC, PlatformPatterns.or(XmlPatternUtil.getMenuControllerPattern(), XmlPatternUtil.getMenuControllerByParentPattern()), new MenuControllerProvider());
         extend(CompletionType.BASIC, XmlPatternUtil.getMenuControllerActionPattern(), new MenuControllerActionProvider());
     }
 

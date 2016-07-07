@@ -5,6 +5,7 @@ import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.psi.xml.XmlText;
@@ -30,7 +31,7 @@ public class XmlGoToHandler implements GotoDeclarationHandler {
         }
 
         PsiElement parent = psiElement.getParent();
-        if (XmlPatternUtil.getMenuControllerPattern().accepts(psiElement) && parent instanceof XmlText) {
+        if (PlatformPatterns.or(XmlPatternUtil.getMenuControllerPattern(), XmlPatternUtil.getMenuControllerByParentPattern()).accepts(psiElement) && parent instanceof XmlText) {
             Collection<PsiElement> controllerElements = this.getControllerElements(psiElement.getProject(), ((XmlText) parent).getValue());
             return controllerElements.toArray(new PsiElement[controllerElements.size()]);
         }

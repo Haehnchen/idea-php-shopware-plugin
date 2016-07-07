@@ -24,6 +24,21 @@ public class XmlPatternUtil {
     }
 
     /**
+     * <parent identifiedBy="controller">SwagBackendExample</parent>
+     */
+    public static PsiElementPattern.Capture<PsiElement> getMenuControllerByParentPattern() {
+        return XmlPatterns
+            .psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+            .withParent(XmlPatterns
+                .xmlText()
+                .withParent(XmlPatterns
+                    .xmlTag()
+                    .withName("parent").withAttributeValue("identifiedBy", "controller")
+                )
+            ).inside(XmlHelper.getInsideTagPattern("menu"));
+    }
+
+    /**
      * <action>SwagBackendExample</action>
      */
     public static PsiElementPattern.Capture<PsiElement> getMenuControllerActionPattern() {
