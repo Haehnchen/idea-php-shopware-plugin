@@ -17,6 +17,12 @@ public class PluginGeneratorDialog extends JDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField textPluginName;
+    private JCheckBox filterCheckBox;
+    private JCheckBox frontendControllerCheckBox;
+    private JCheckBox modelsCheckBox;
+    private JCheckBox commandCheckBox;
+    private JCheckBox widgetCheckBox;
+    private JCheckBox apiCheckBox;
 
     public PluginGeneratorDialog(@NotNull Callback callback) {
         this.callback = callback;

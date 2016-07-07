@@ -8,6 +8,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -18,6 +19,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.util.ArrayUtil;
+import com.jetbrains.php.util.PhpConfigurationUtil;
 import de.espend.idea.shopware.action.generator.dict.PluginGeneratorSettings;
 import fr.adrienbrault.idea.symfony2plugin.installer.SymfonyInstallerCommandExecutor;
 import fr.adrienbrault.idea.symfony2plugin.installer.SymfonyInstallerUtil;
@@ -44,8 +46,12 @@ public class PluginGeneratorUtil {
                 List<String> commands = new ArrayList<String>();
 
                 commands.add("php");
-                commands.add("sw.phar");
+                VirtualFile cliFile = VfsUtil.findFileByIoFile(new File(project.getBasePath() + "/sw-cli-tools.phar"), true);
+                if(cliFile == null) {
+                    //PhpConfigurationUtil.downloadFile(project, null, project.getBasePath(), "http://shopwarelabs.github.io/sw-cli-tools/sw.phar", "sw-cli-tools.phar");
+                }
 
+                commands.add("sw-cli-tools.phar");
                 commands.add("plugin:create");
 
                 commands.add(settings.getPluginName());
