@@ -18,11 +18,13 @@ public class PluginGeneratorDialog extends JDialog {
     private JButton buttonCancel;
     private JTextField textPluginName;
     private JCheckBox filterCheckBox;
-    private JCheckBox frontendControllerCheckBox;
-    private JCheckBox modelsCheckBox;
-    private JCheckBox commandCheckBox;
-    private JCheckBox widgetCheckBox;
-    private JCheckBox apiCheckBox;
+    private JComboBox namespaceComboBox;
+    private JCheckBox addDummyFrontendControllerCheckBox;
+    private JCheckBox addDummyBackendControllerCheckBox;
+    private JCheckBox addDummyModelsCheckBox;
+    private JCheckBox addDummyCommandCheckBox;
+    private JCheckBox addDummyWidgetCheckBox;
+    private JCheckBox addDummyApiCheckBox;
 
     public PluginGeneratorDialog(@NotNull Callback callback) {
         this.callback = callback;
@@ -49,20 +51,35 @@ public class PluginGeneratorDialog extends JDialog {
             }
         });
 
-
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        this.namespaceComboBox.addItem("Frontend");
+        this.namespaceComboBox.addItem("Core");
+        this.namespaceComboBox.addItem("Backend");
+
+        this.namespaceComboBox.setSelectedIndex(0);
     }
 
     private void onOK() {
-        if(StringUtils.isBlank(textPluginName.getText())) {
+        if (StringUtils.isBlank(textPluginName.getText())) {
             return;
         }
 
-        this.callback.onOk(new PluginGeneratorSettings(textPluginName.getText()));
+        this.callback.onOk(new PluginGeneratorSettings(
+                textPluginName.getText(),
+                (String) namespaceComboBox.getSelectedItem(),
+                filterCheckBox.isSelected(),
+                addDummyFrontendControllerCheckBox.isSelected(),
+                addDummyBackendControllerCheckBox.isSelected(),
+                addDummyModelsCheckBox.isSelected(),
+                addDummyCommandCheckBox.isSelected(),
+                addDummyWidgetCheckBox.isSelected(),
+                addDummyApiCheckBox.isSelected()
+        ));
 
         dispose();
     }

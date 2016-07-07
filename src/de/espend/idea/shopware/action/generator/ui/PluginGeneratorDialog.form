@@ -3,7 +3,7 @@
   <grid id="cbd77" binding="contentPane" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="48" y="54" width="436" height="297"/>
+      <xy x="48" y="54" width="443" height="358"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -49,7 +49,7 @@
           </grid>
         </children>
       </grid>
-      <grid id="e3588" layout-manager="GridLayoutManager" row-count="8" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="e3588" layout-manager="GridLayoutManager" row-count="10" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -67,7 +67,9 @@
           </component>
           <vspacer id="9da43">
             <constraints>
-              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+                <preferred-size width="11" height="24"/>
+              </grid>
             </constraints>
           </vspacer>
           <component id="5215a" class="javax.swing.JTextField" binding="textPluginName">
@@ -80,50 +82,72 @@
           </component>
           <component id="79f02" class="javax.swing.JCheckBox" binding="filterCheckBox">
             <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Filter"/>
-            </properties>
-          </component>
-          <component id="a9458" class="javax.swing.JCheckBox" binding="frontendControllerCheckBox" default-binding="true">
-            <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Frontend Controller"/>
+              <text value="Add dummy filter condition and handler"/>
             </properties>
           </component>
-          <component id="1ed58" class="javax.swing.JCheckBox" binding="modelsCheckBox" default-binding="true">
+          <component id="a9458" class="javax.swing.JCheckBox" binding="addDummyFrontendControllerCheckBox" default-binding="true">
             <constraints>
               <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Models"/>
+              <text value="Add dummy frontend controller"/>
             </properties>
           </component>
-          <component id="aeafb" class="javax.swing.JCheckBox" binding="commandCheckBox" default-binding="true">
-            <constraints>
-              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Command"/>
-            </properties>
-          </component>
-          <component id="4b1ec" class="javax.swing.JCheckBox" binding="widgetCheckBox" default-binding="true">
+          <component id="1ed58" class="javax.swing.JCheckBox" binding="addDummyModelsCheckBox" default-binding="true">
             <constraints>
               <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Widget"/>
+              <text value="Add dummy models"/>
             </properties>
           </component>
-          <component id="e826c" class="javax.swing.JCheckBox" binding="apiCheckBox" default-binding="true">
+          <component id="aeafb" class="javax.swing.JCheckBox" binding="addDummyCommandCheckBox" default-binding="true">
             <constraints>
               <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Api"/>
+              <text value="Add dummy command"/>
+            </properties>
+          </component>
+          <component id="4b1ec" class="javax.swing.JCheckBox" binding="addDummyWidgetCheckBox" default-binding="true">
+            <constraints>
+              <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Add dummy widget"/>
+            </properties>
+          </component>
+          <component id="e826c" class="javax.swing.JCheckBox" binding="addDummyApiCheckBox" default-binding="true">
+            <constraints>
+              <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Add dummy api"/>
+            </properties>
+          </component>
+          <component id="a028b" class="javax.swing.JComboBox" binding="namespaceComboBox">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+          </component>
+          <component id="88375" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Namespace"/>
+            </properties>
+          </component>
+          <component id="42448" class="javax.swing.JCheckBox" binding="addDummyBackendControllerCheckBox">
+            <constraints>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Add dummy backend controller"/>
             </properties>
           </component>
         </children>

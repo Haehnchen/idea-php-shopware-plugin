@@ -39,118 +39,124 @@ public class PluginGeneratorUtil {
 
     public static void installPlugin(@NotNull Project project, @NotNull PluginGeneratorSettings settings) {
 
-        Task task = new Task.Modal(project, "Generate", true) {
-            public void run(@NotNull final ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
+        // download cli tools, if not existing locally
+        VirtualFile cliFile = VfsUtil.findFileByIoFile(new File(project.getBasePath() + "/sw-cli-tools.phar"), true);
+        if (cliFile == null) {
+            PhpConfigurationUtil.downloadFile(project, null, project.getBasePath(), "http://shopwarelabs.github.io/sw-cli-tools/sw.phar", "sw-cli-tools.phar");
+            cliFile = VfsUtil.findFileByIoFile(new File(project.getBasePath() + "/sw-cli-tools.phar"), true);
+        }
+        if (cliFile == null) {
+            return;
+        }
 
-                List<String> commands = new ArrayList<String>();
+        List<String> commands = generateCommand(settings);
 
-                commands.add("php");
-                VirtualFile cliFile = VfsUtil.findFileByIoFile(new File(project.getBasePath() + "/sw-cli-tools.phar"), true);
-                if(cliFile == null) {
-                    //PhpConfigurationUtil.downloadFile(project, null, project.getBasePath(), "http://shopwarelabs.github.io/sw-cli-tools/sw.phar", "sw-cli-tools.phar");
+        String[] myCommand = ArrayUtil.toStringArray(commands);
+
+        final StringBuilder outputBuilder = new StringBuilder();
+        try {
+            OSProcessHandler processHandler = ScriptRunnerUtil.execute(myCommand[0], project.getBaseDir().getPath(), null, Arrays.copyOfRange(myCommand, 1, myCommand.length));
+
+            processHandler.addProcessListener(new ProcessAdapter() {
+                @Override
+                public void onTextAvailable(ProcessEvent event, com.intellij.openapi.util.Key outputType) {
+                    String text = event.getText();
+                    outputBuilder.append(text);
                 }
+            });
 
-                commands.add("sw-cli-tools.phar");
-                commands.add("plugin:create");
-
-                commands.add(settings.getPluginName());
-
-
-                String[] myCommand = ArrayUtil.toStringArray(commands);
-
-                StringBuilder sb = new StringBuilder();
-                sb.append("Running: ");
-                for (String aCommandToRun : Arrays.copyOfRange(myCommand, 1, myCommand.length)) {
-                    if (aCommandToRun.length() > 35) {
-                        aCommandToRun = "..." + aCommandToRun.substring(aCommandToRun.length() - 35);
-                    }
-                    sb.append(" ").append(aCommandToRun);
+            processHandler.startNotify();
+            for (;;){
+                boolean finished = processHandler.waitFor(CHECKING_TIMEOUT_IN_MILLISECONDS);
+                if (finished) {
+                    break;
                 }
-                indicator.setText(sb.toString());
+            }
+        }
+        catch (ExecutionException e) {
+            showErrorNotification(project, e.getMessage());
+            return;
+        }
 
-                boolean cancelledByUser = false;
-                final StringBuilder outputBuilder = new StringBuilder();
-                try {
-                    OSProcessHandler processHandler = ScriptRunnerUtil.execute(myCommand[0], project.getBaseDir().getPath(), null, Arrays.copyOfRange(myCommand, 1, myCommand.length));
+        String output = outputBuilder.toString();
+        if (output.toLowerCase().contains("exception")) {
 
-                    processHandler.addProcessListener(new ProcessAdapter() {
-                        @Override
-                        public void onTextAvailable(ProcessEvent event, com.intellij.openapi.util.Key outputType) {
-                            String text = event.getText();
-                            outputBuilder.append(text);
+            String message = SymfonyInstallerUtil.formatExceptionMessage(output);
+            if(message == null) {
+                message = "The unexpected happens...";
+            }
 
-                            text = SymfonyInstallerUtil.formatConsoleTextIndicatorOutput(text);
-                            if(StringUtils.isNotBlank(text)) {
-                                indicator.setText2(text);
-                            }
+            showErrorNotification(project, message);
+            return;
+        }
 
-                        }
-                    });
+        // delete cli tools
+        FileUtil.delete(VfsUtil.virtualToIoFile(cliFile));
 
-                    processHandler.startNotify();
-                    for (;;){
-                        boolean finished = processHandler.waitFor(CHECKING_TIMEOUT_IN_MILLISECONDS);
-                        if (finished) {
-                            break;
-                        }
-                        if (indicator.isCanceled()) {
-                            cancelledByUser = true;
-                            OSProcessManager.getInstance().killProcessTree(processHandler.getProcess());
-                            break;
-                        }
-                    }
+        // move into correct plugin folder
+        String newDir = project.getBasePath() + "/engine/Shopware/Plugins/Local/" + settings.getNamespace() + "/" + settings.getPluginName();
+        if (FileUtil.canWrite(newDir)) {
+            return;
+        }
+        FileUtil.createDirectory(new File(newDir));
+        FileUtil.moveDirWithContent(new File(project.getBasePath() + "/" + settings.getPluginName()), new File(newDir));
 
-                }
+        // open bootstrap file
+        VirtualFile fileByIoFile = VfsUtil.findFileByIoFile(new File(newDir + "/Bootstrap.php"), true);
+        if(fileByIoFile == null) {
+            return;
+        }
+        final PsiFile file = PsiManager.getInstance(project).findFile(fileByIoFile);
+        if (file == null) {
+            return;
+        }
+        IdeHelper.navigateToPsiElement(file);
+    }
 
-                catch (ExecutionException e) {
-                    showErrorNotification(project, e.getMessage());
-                    return;
-                }
+    @NotNull
+    private static List<String> generateCommand(@NotNull PluginGeneratorSettings settings) {
+        List<String> commands = new ArrayList<String>();
 
-                if(cancelledByUser) {
-                    showErrorNotification(project, "Checkout canceled");
-                    return;
-                }
+        commands.add("php");
+        commands.add("sw-cli-tools.phar");
+        commands.add("plugin:create");
 
-                String output = outputBuilder.toString();
-                if (output.toLowerCase().contains("exception")) {
+        commands.add("--namespace=" + settings.getNamespace());
 
-                    String message = SymfonyInstallerUtil.formatExceptionMessage(output);
-                    if(message == null) {
-                        message = "The unexpected happens...";
-                    }
+        if (settings.getAddDummyFilter()) {
+            commands.add("--haveFilter");
+        }
 
-                    showErrorNotification(project, message);
-                    return;
-                }
+        if (settings.getAddDummyFrontendController()) {
+            commands.add("--haveFrontend");
+        }
 
-                showInfoNotification(project, "OK?");
+        if (settings.getAddDummyBackendController()) {
+            commands.add("--haveBackend");
+        }
 
-                VirtualFile fileByIoFile = VfsUtil.findFileByIoFile(new File(project.getBasePath() + "/" + settings.getPluginName() + "/Bootstrap.php"), true);
-                if(fileByIoFile == null) {
-                    return;
-                }
+        if (settings.getAddDummyModels()) {
+            commands.add("--haveModels");
+        }
 
-                final PsiFile[] file = {null};
-                ApplicationManager.getApplication().runReadAction(() -> {
-                    //file[0] = PsiManager.getInstance(getProject()).findFile(fileByIoFile);
-                });
+        if (settings.getAddDummyCommand()) {
+            commands.add("--haveCommands");
+        }
 
-              }
-        };
+        if (settings.getAddDummyWidget()) {
+            commands.add("--haveWidget");
+        }
 
-        ProgressManager.getInstance().run(task);
+        if (settings.getAddDummyApi()) {
+            commands.add("--haveApi");
+        }
 
+        commands.add(settings.getPluginName());
+        return commands;
     }
 
     private static void showErrorNotification(@NotNull Project project, @NotNull String content)
     {
         Notifications.Bus.notify(new Notification(SymfonyInstallerUtil.INSTALLER_GROUP_DISPLAY_ID, "Shopware-Plugin", content, NotificationType.ERROR, null), project);
-    }
-
-    private static void showInfoNotification(@NotNull Project project, @NotNull String content)
-    {
-        Notifications.Bus.notify(new Notification(SymfonyInstallerUtil.INSTALLER_GROUP_DISPLAY_ID, "Shopware-Plugin", content, NotificationType.INFORMATION, null), project);
     }
 }
