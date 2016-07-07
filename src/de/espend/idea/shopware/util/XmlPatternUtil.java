@@ -22,4 +22,19 @@ public class XmlPatternUtil {
                         )
                 ).inside(XmlHelper.getInsideTagPattern("menu"));
     }
+
+    /**
+     * <action>SwagBackendExample</action>
+     */
+    public static PsiElementPattern.Capture<PsiElement> getMenuControllerActionPattern() {
+        return XmlPatterns
+            .psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+            .withParent(XmlPatterns
+                .xmlText()
+                .withParent(XmlPatterns
+                    .xmlTag()
+                    .withName("action")
+                )
+            ).inside(XmlHelper.getInsideTagPattern("menu"));
+    }
 }

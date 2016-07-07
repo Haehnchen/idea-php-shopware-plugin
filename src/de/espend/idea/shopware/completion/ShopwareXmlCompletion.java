@@ -2,23 +2,88 @@ package de.espend.idea.shopware.completion;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.xml.XmlTag;
+import com.intellij.psi.xml.XmlTagValue;
 import com.intellij.util.ProcessingContext;
+import com.jetbrains.php.lang.psi.elements.Method;
+import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.XmlPatternUtil;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ShopwareXmlCompletion extends CompletionContributor {
 
     public ShopwareXmlCompletion() {
         extend(CompletionType.BASIC, XmlPatternUtil.getMenuControllerPattern(), new MenuControllerProvider());
+        extend(CompletionType.BASIC, XmlPatternUtil.getMenuControllerActionPattern(), new MenuControllerActionProvider());
     }
 
     private class MenuControllerProvider extends CompletionProvider<CompletionParameters> {
         @Override
         protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-            ShopwareUtil.collectControllerClass(completionParameters.getPosition().getProject(), (phpClass, moduleName, controllerName) ->
-                    completionResultSet.addElement(LookupElementBuilder.create(controllerName)),
-            "Backend");
+            ShopwareUtil.collectControllerClass(completionParameters.getPosition().getProject(), (phpClass, moduleName, controllerName) -> {
+                    LookupElementBuilder lookupElement = LookupElementBuilder.create(controllerName)
+                        .withIcon(phpClass.getIcon())
+                        .withTypeText(phpClass.getPresentableFQN(), true);
+
+                    completionResultSet.addElement(lookupElement);
+                }, "Backend");
         }
+    }
+
+    private class MenuControllerActionProvider extends CompletionProvider<CompletionParameters> {
+        @Override
+        protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+            PsiElement psiElement = completionParameters.getOriginalPosition();
+            if(psiElement == null) {
+                return;
+            }
+
+            PsiElement parent = psiElement.getParent();
+            if(!(parent instanceof XmlTag)) {
+                return;
+            }
+
+            String controllerName = getControllerOnScope((XmlTag) parent);
+            if (controllerName == null) {
+                return;
+            }
+
+            ShopwareUtil.collectControllerAction(psiElement.getProject(), controllerName, (method, methodStripped, moduleName, controllerName1) -> {
+                LookupElementBuilder lookupElement = LookupElementBuilder.create(methodStripped)
+                    .withIcon(method.getIcon())
+                    .withTypeText(method.getName(), true);
+
+                completionResultSet.addElement(lookupElement);
+            }, "Backend");
+        }
+    }
+
+    @Nullable
+    public static String getControllerOnScope(@NotNull XmlTag xmlTag) {
+        PsiElement menuTag = xmlTag.getParent();
+        if(!(menuTag instanceof XmlTag)) {
+            return null;
+        }
+
+        String name = ((XmlTag) menuTag).getName();
+        if(!"entry".equals(name)) {
+            return null;
+        }
+
+        XmlTag controller = ((XmlTag) menuTag).findFirstSubTag("controller");
+        if(controller == null) {
+            return null;
+        }
+
+        String controllerName = controller.getValue().getTrimmedText();
+        if(StringUtils.isBlank(controllerName)) {
+            return null;
+        }
+
+        return controllerName;
     }
 }
