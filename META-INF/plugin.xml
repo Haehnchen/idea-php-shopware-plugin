@@ -326,11 +326,13 @@
       <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyBlockGoToHandler"/>
       <gotoDeclarationHandler implementation="de.espend.idea.shopware.reference.LazySubscriberReferenceProvider"/>
       <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.PhpGoToHandler"/>
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.XmlGoToHandler"/>
 
       <completion.contributor language="Smarty" implementationClass="de.espend.idea.shopware.completion.SmartyFileCompletionProvider"/>
       <completion.contributor language="PHP" implementationClass="de.espend.idea.shopware.reference.LazySubscriberReferenceProvider"/>
       <completion.contributor language="PHP" implementationClass="de.espend.idea.shopware.completion.ShopwarePhpCompletion"/>
       <completion.contributor language="JSON" implementationClass="de.espend.idea.shopware.completion.ShopwareJsonCompletion"/>
+      <completion.contributor language="XML" implementationClass="de.espend.idea.shopware.completion.ShopwareXmlCompletion"/>
 
       <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="de.espend.idea.shopware.navigation.ExtJsTemplateLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="Smarty" implementationClass="de.espend.idea.shopware.navigation.SmartyTemplateLineMarkerProvider"/>
