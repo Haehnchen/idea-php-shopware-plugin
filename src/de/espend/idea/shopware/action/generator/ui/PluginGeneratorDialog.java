@@ -1,5 +1,7 @@
 package de.espend.idea.shopware.action.generator.ui;
 
+import com.intellij.openapi.project.ProjectManager;
+import com.jetbrains.php.composer.InterpretersComboWithBrowseButton;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.action.generator.dict.PluginGeneratorSettings;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
@@ -25,6 +27,8 @@ public class PluginGeneratorDialog extends JDialog {
     private JCheckBox addDummyCommandCheckBox;
     private JCheckBox addDummyWidgetCheckBox;
     private JCheckBox addDummyApiCheckBox;
+    private JPanel panelInterpreter;
+    private InterpretersComboWithBrowseButton interpretersComboWithBrowseButton;
 
     public PluginGeneratorDialog(@NotNull Callback callback) {
         this.callback = callback;
@@ -32,17 +36,9 @@ public class PluginGeneratorDialog extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
 
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonCancel.addActionListener(e -> onCancel());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -51,11 +47,9 @@ public class PluginGeneratorDialog extends JDialog {
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(e ->
+            onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
 
         this.namespaceComboBox.addItem("Frontend");
         this.namespaceComboBox.addItem("Core");
@@ -70,15 +64,16 @@ public class PluginGeneratorDialog extends JDialog {
         }
 
         this.callback.onOk(new PluginGeneratorSettings(
-                textPluginName.getText(),
-                (String) namespaceComboBox.getSelectedItem(),
-                filterCheckBox.isSelected(),
-                addDummyFrontendControllerCheckBox.isSelected(),
-                addDummyBackendControllerCheckBox.isSelected(),
-                addDummyModelsCheckBox.isSelected(),
-                addDummyCommandCheckBox.isSelected(),
-                addDummyWidgetCheckBox.isSelected(),
-                addDummyApiCheckBox.isSelected()
+            textPluginName.getText(),
+            (String) namespaceComboBox.getSelectedItem(),
+            filterCheckBox.isSelected(),
+            addDummyFrontendControllerCheckBox.isSelected(),
+            addDummyBackendControllerCheckBox.isSelected(),
+            addDummyModelsCheckBox.isSelected(),
+            addDummyCommandCheckBox.isSelected(),
+            addDummyWidgetCheckBox.isSelected(),
+            addDummyApiCheckBox.isSelected(),
+            getInterpreter()
         ));
 
         dispose();
@@ -99,6 +94,18 @@ public class PluginGeneratorDialog extends JDialog {
         dialog.setVisible(true);
 
         return dialog;
+    }
+
+    private String getInterpreter() {
+        String text = interpretersComboWithBrowseButton.getText();
+        if(StringUtils.isNotBlank(text)) {
+            return text;
+        }
+        return this.interpretersComboWithBrowseButton.getPhpPath();
+    }
+
+    private void createUIComponents() {
+        panelInterpreter = interpretersComboWithBrowseButton = new InterpretersComboWithBrowseButton(ProjectManager.getInstance().getDefaultProject());
     }
 
     public interface Callback {

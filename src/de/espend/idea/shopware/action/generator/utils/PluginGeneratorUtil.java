@@ -117,7 +117,7 @@ public class PluginGeneratorUtil {
     private static List<String> generateCommand(@NotNull PluginGeneratorSettings settings) {
         List<String> commands = new ArrayList<String>();
 
-        commands.add("php");
+        commands.add(settings.getInterpreter());
         commands.add("sw-cli-tools.phar");
         commands.add("plugin:create");
 

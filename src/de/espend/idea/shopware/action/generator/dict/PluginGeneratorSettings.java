@@ -6,22 +6,33 @@ public class PluginGeneratorSettings {
 
     @NotNull
     private final String pluginName;
+
     @NotNull
     private final String namespace;
+
     @NotNull
     private final Boolean addDummyFilter;
+
     @NotNull
     private final Boolean addDummyFrontendController;
+
     @NotNull
     private final Boolean addDummyBackendController;
+
     @NotNull
     private final Boolean addDummyModels;
+
     @NotNull
     private final Boolean addDummyCommand;
+
     @NotNull
     private final Boolean addDummyWidget;
+
     @NotNull
     private final Boolean addDummyApi;
+
+    @NotNull
+    private final String interpreter;
 
     public PluginGeneratorSettings(
             @NotNull String pluginName,
@@ -32,7 +43,8 @@ public class PluginGeneratorSettings {
             @NotNull Boolean addDummyModels,
             @NotNull Boolean addDummyCommand,
             @NotNull Boolean addDummyWidget,
-            @NotNull Boolean addDummyApi
+            @NotNull Boolean addDummyApi,
+            @NotNull String interpreter
     ) {
         this.pluginName = pluginName;
         this.namespace = namespace;
@@ -43,6 +55,7 @@ public class PluginGeneratorSettings {
         this.addDummyCommand = addDummyCommand;
         this.addDummyWidget = addDummyWidget;
         this.addDummyApi = addDummyApi;
+        this.interpreter = interpreter;
     }
 
     @NotNull
@@ -88,5 +101,10 @@ public class PluginGeneratorSettings {
     @NotNull
     public String getNamespace() {
         return namespace;
+    }
+
+    @NotNull
+    public String getInterpreter() {
+        return interpreter;
     }
 }
