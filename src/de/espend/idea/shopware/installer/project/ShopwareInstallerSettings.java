@@ -11,16 +11,8 @@ public class ShopwareInstallerSettings {
     @NotNull
     private final ShopwareInstallerVersion version;
 
-    @NotNull
-    private final String phpInterpreter;
-
-    public ShopwareInstallerSettings(@NotNull ShopwareInstallerVersion version, @NotNull String phpInterpreter) {
+    public ShopwareInstallerSettings(@NotNull ShopwareInstallerVersion version) {
         this.version = version;
-        this.phpInterpreter = phpInterpreter;
-    }
-
-    public boolean isDownload() {
-        return true;
     }
 
     @NotNull
@@ -28,14 +20,8 @@ public class ShopwareInstallerSettings {
         return version;
     }
 
-    @NotNull
-    public String getPhpInterpreter() {
-        return phpInterpreter;
-    }
-
     public String getExistingPath() {
         // @TODO: implement
         return "";
     }
-
 }

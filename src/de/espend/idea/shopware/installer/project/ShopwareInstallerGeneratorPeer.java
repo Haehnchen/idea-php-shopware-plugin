@@ -35,8 +35,7 @@ public class ShopwareInstallerGeneratorPeer implements WebProjectGenerator.Gener
     @Override
     public ShopwareInstallerSettings getSettings() {
         return new ShopwareInstallerSettings(
-            symfonyInstallerForm.getVersion(),
-            symfonyInstallerForm.getInterpreter()
+            symfonyInstallerForm.getVersion()
         );
     }
 

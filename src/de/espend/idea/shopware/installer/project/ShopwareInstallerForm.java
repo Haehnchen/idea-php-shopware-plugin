@@ -7,6 +7,7 @@ import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.util.ui.UIUtil;
 import com.jetbrains.php.composer.InterpretersComboWithBrowseButton;
 import de.espend.idea.shopware.installer.project.dict.ShopwareInstallerVersion;
+import org.apache.commons.lang.StringUtils;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +22,6 @@ public class ShopwareInstallerForm {
     private JPanel mainPanel;
     private JPanel panelInterpreter;
     private JCheckBox checkBoxDemo;
-    private InterpretersComboWithBrowseButton interpretersComboWithBrowseButton;
 
     public ShopwareInstallerForm() {
         buttonRefresh.addActionListener(e -> appendShopwareVersions());
@@ -47,12 +47,10 @@ public class ShopwareInstallerForm {
 
         comboVersions.setModel(new ListComboBoxModel<>(new ArrayList<ShopwareInstallerVersion>()));
 
-        ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-            public void run() {
-                final List<ShopwareInstallerVersion> shopwareInstallerVersions1 = getVersions();
-                if (shopwareInstallerVersions1 != null) {
-                    UIUtil.invokeLaterIfNeeded(() -> comboVersions.setModel(new ListComboBoxModel<>(shopwareInstallerVersions1)));
-                }
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final List<ShopwareInstallerVersion> shopwareInstallerVersions1 = getVersions();
+            if (shopwareInstallerVersions1 != null) {
+                UIUtil.invokeLaterIfNeeded(() -> comboVersions.setModel(new ListComboBoxModel<>(shopwareInstallerVersions1)));
             }
         });
 
@@ -61,10 +59,6 @@ public class ShopwareInstallerForm {
     public JComponent getContentPane()
     {
         return this.mainPanel;
-    }
-
-    private void createUIComponents() {
-        panelInterpreter = interpretersComboWithBrowseButton = new InterpretersComboWithBrowseButton(ProjectManager.getInstance().getDefaultProject());
     }
 
     private static class ListCellRenderer extends ListCellRendererWrapper<ShopwareInstallerVersion> {
@@ -86,20 +80,4 @@ public class ShopwareInstallerForm {
 
         return null;
     }
-
-    public String getInterpreter() {
-        return "";
-//        String text = interpretersComboWithBrowseButton.getText();
-//        if(StringUtils.isNotBlank(text)) {
-//            return text;
-//        }
-//        return this.interpretersComboWithBrowseButton.getPhpPath();
-    }
-
-    @Nullable
-    public ValidationInfo validate()
-    {
-        return this.interpretersComboWithBrowseButton.validatePhpPath(ProjectManager.getInstance().getDefaultProject());
-    }
-
 }
