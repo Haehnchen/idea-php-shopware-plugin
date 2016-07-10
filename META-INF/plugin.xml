@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>2.1.1</version>
+  <version>2.2.0</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -46,11 +46,21 @@
         <li>Doctrine: Lifecycle event completion for subscriber</li>
         <li>ExtJs: Doctrine Model and controller targets</li>
         <li>ExtJs: Controller action linemarker and goto</li>
+        <li>Generator: Shopware project installer</li>
+        <li>Generator: Plugin boilerplates</li>
       </ul>
 
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>2.2.0 - Hackathon</h2>
+<ul>
+    <li>Add new Shopware 5.2 attribute tables @swDennis</li>
+    <li>Implement a project installer to directly install a given Shopware version @swDennis, @florianklockenkemper</li>
+    <li>Add auto complete and go to for menu.xml <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/35">#35</a>, <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/37">#37</a></li>
+    <li>Plugin generator on cli tools phar @florianklockenkemper</li>
+</ul>
 
 <h2>2.1.1</h2>
 <ul>
