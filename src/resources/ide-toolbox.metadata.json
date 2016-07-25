@@ -1,0 +1,20 @@
+{
+  "registrar":[
+    {
+      "provider":"symfony.services",
+      "language":"php",
+      "signatures":[
+        {
+          "class": "Enlight_Controller_Action",
+          "method": "get",
+          "type": "type"
+        },
+        {
+          "class": "Enlight_Plugin_Bootstrap",
+          "method": "get",
+          "type": "type"
+        }
+      ]
+    }
+  ]
+}

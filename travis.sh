@@ -2,9 +2,11 @@
 
 ideaVersion="2016.1"
 if [ "$PHPSTORM_ENV" == "2016.1" ]; then
-    ideaVersion="2016.1"
+    ideaVersion="2016.1.3"
 elif [ "$PHPSTORM_ENV" == "2016.1.2" ]; then
     ideaVersion="2016.1.3"
+elif [ "$PHPSTORM_ENV" == "2016.2" ]; then
+    ideaVersion="2016.2"
 elif [ "$PHPSTORM_ENV" == "eap" ]; then
     ideaVersion="162.1024.1"
 fi
@@ -76,6 +78,16 @@ elif [ "$PHPSTORM_ENV" == "2016.1.2" ]; then
     download "https://plugins.jetbrains.com/files/7303/24757/twig-145.258.2.zip"
     unzip -qo $travisCache/twig-145.258.2.zip -d ./plugins
 
+elif [ "$PHPSTORM_ENV" == "2016.2" ]; then
+
+    #php
+    download "https://plugins.jetbrains.com/files/6610/27035/php-162.1121.34.zip"
+    unzip -qo $travisCache/php-162.1121.34.zip -d ./plugins
+
+    #twig
+    download "https://plugins.jetbrains.com/files/7303/27028/twig-162.1121.34.zip"
+    unzip -qo $travisCache/twig-162.1121.34.zip -d ./plugins
+
 elif [ "$PHPSTORM_ENV" == "eap" ]; then
 
     #php
@@ -95,6 +107,10 @@ else
     echo "Unknown PHPSTORM_ENV value: $PHPSTORM_ENV"
     exit 1
 fi
+
+rm -f $travisCache/php-toolbox.jar
+download "https://plugins.jetbrains.com/files/8133/27005/php-toolbox.jar"
+cp $travisCache/php-toolbox.jar ./plugins
 
 rm -f $travisCache/symfony2-plugin.jar
 download "http://plugins.jetbrains.com/files/7219/26459/symfony2-plugin.jar"
