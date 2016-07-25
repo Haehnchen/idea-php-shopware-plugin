@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>2.2.0</version>
+  <version>2.2.1</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -9,9 +9,11 @@
       <br/>
       <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues">Issues</a>
 
-      <br>
-      Install <a href="http://plugins.jetbrains.com/plugin/7219">Symfony Plugin</a> and enable it per project
-      <br/><br/>
+      <h2>Installation</h2>
+      <ul>
+        <li>Install <a href="http://plugins.jetbrains.com/plugin/7219">Symfony Plugin</a> and enable it per project</li>
+        <li>[Optional] Install <a href="http://plugins.jetbrains.com/plugin/7219">PHP Toolbox</a> for extended plugin features</li>
+      </ul>
 
       <h2>Dependencies</h2>
       <ul>
@@ -48,11 +50,18 @@
         <li>ExtJs: Controller action linemarker and goto</li>
         <li>Generator: Shopware project installer</li>
         <li>Generator: Plugin boilerplates</li>
+        <li>PHP Toolbox: internal JSON configuration</li>
       </ul>
 
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>2.2.1</h2>
+<ul>
+    <li>Provide PHP Toolbox configuration to support Symfony container shortcut Enlight_Controller_Action::get, Enlight_Plugin_Bootstrap::get <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/33">#33</a></li>
+    <li>Update travis tests environment for PhpStorm 2016.2</li>
+</ul>
 
 <h2>2.2.0 - Hackathon</h2>
 <ul>
