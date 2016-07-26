@@ -7,7 +7,8 @@ Shopware Plugin
 
 IntelliJ IDEA / PhpStorm Plugin for [Shopware](http://www.shopware.de/ "Shopware")
 
-Plugin url : http://plugins.jetbrains.com/plugin/7410
+* Plugin url : http://plugins.jetbrains.com/plugin/7410
+* Changelog : [CHANGELOG](CHANGELOG.md)
 
 Dependencies
 ---------------------
