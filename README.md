@@ -9,6 +9,12 @@ IntelliJ IDEA / PhpStorm Plugin for [Shopware](http://www.shopware.de/ "Shopware
 
 Plugin url : http://plugins.jetbrains.com/plugin/7410
 
+Dependencies
+---------------------
+* [Symfony Plugin](http://plugins.jetbrains.com/plugin/7219)
+* (Optional) [PHP Annotations](https://plugins.jetbrains.com/plugin/7320) Doctrine support
+* (Optional) [PHP Toolbox](https://plugins.jetbrains.com/plugin/8133) Improved Symfony + DIC Support
+
 Documentation and tutorials
 ---------------------
 
