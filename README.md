@@ -1,4 +1,4 @@
-Shopware Plugin
+IntelliJ IDEA / PhpStorm Shopware Plugin
 ==========================
 [![Build Status](https://travis-ci.org/Haehnchen/idea-php-shopware-plugin.svg?branch=master)](https://travis-ci.org/Haehnchen/idea-php-shopware-plugin)
 [![Version](http://phpstorm.espend.de/badge/7410/version)](https://plugins.jetbrains.com/plugin/7410)
