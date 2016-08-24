@@ -41,7 +41,7 @@ public class ControllerReferenceProvider extends PsiPolyVariantReferenceBase<Psi
             }
         }, moduleName);
 
-        return PhpResolveResult.create(targets);
+        return PhpResolveResult.createResults(targets);
     }
 
     @NotNull

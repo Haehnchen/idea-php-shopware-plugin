@@ -44,7 +44,7 @@ public class ControllerActionReferenceProvider extends PsiPolyVariantReferenceBa
             }
         }, moduleName);
 
-        return PhpResolveResult.create(targets);
+        return PhpResolveResult.createResults(targets);
     }
 
     @NotNull

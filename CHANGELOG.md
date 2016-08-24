@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.2
+* PhpStorm 2016.3: Switch from PhpResolveResult#create to PsiElementResolveResult#createResults #43
+
 ## 2.2.1
 * Provide PHP Toolbox configuration to support Symfony container shortcut Enlight_Controller_Action::get, Enlight_Plugin_Bootstrap::get [#33](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/33)
 * Update travis tests environment for PhpStorm 2016.2
@@ -8,7 +11,7 @@
 * Add new Shopware 5.2 attribute tables @swDennis
 * Implement a project installer to directly install a given Shopware version @swDennis, @florianklockenkemper
 * Add auto complete and go to for menu.xml [#35](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/35), [#37](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/37)
-*  Plugin generator on cli tools phar @florianklockenkemper
+* Plugin generator on cli tools phar @florianklockenkemper
 
 ## 2.1.1
 * Fix PhpStorm 2016.2 EAP - deserialization violates equals / hashCode contract for Value parameter [#12](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/29)#29
