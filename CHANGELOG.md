@@ -1,7 +1,10 @@
 # Changelog
 
+## 2.2.3
+* Fix npe in LazySubscriberReferenceProvider.getGotoDeclarationTargets [#44](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/44)</li>
+
 ## 2.2.2
-* PhpStorm 2016.3: Switch from PhpResolveResult#create to PsiElementResolveResult#createResults #43
+* PhpStorm 2016.3: Switch from PhpResolveResult#create to PsiElementResolveResult#createResults [#43](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/43)
 
 ## 2.2.1
 * Provide PHP Toolbox configuration to support Symfony container shortcut Enlight_Controller_Action::get, Enlight_Plugin_Bootstrap::get [#33](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/33)
