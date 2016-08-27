@@ -252,10 +252,13 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
 
     @Nullable
     @Override
-    public PsiElement[] getGotoDeclarationTargets(PsiElement psiElement, int i, Editor editor) {
+    public PsiElement[] getGotoDeclarationTargets(@Nullable PsiElement psiElement, int i, Editor editor) {
+        if(psiElement == null) {
+            return new PsiElement[0];
+        }
 
         PsiElement context = psiElement.getContext();
-        if(psiElement == null || !(context instanceof StringLiteralExpression)) {
+        if(!(context instanceof StringLiteralExpression)) {
             return new PsiElement[0];
         }
 
