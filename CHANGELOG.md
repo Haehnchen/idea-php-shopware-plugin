@@ -1,7 +1,10 @@
 # Changelog
 
+## 2.4
+* Add table Name autocomplete for service "shopware_attribute.crud_service" => "CrudService" [#42](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/42)
+
 ## 2.2.3
-* Fix npe in LazySubscriberReferenceProvider.getGotoDeclarationTargets [#44](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/44)</li>
+* Fix npe in LazySubscriberReferenceProvider.getGotoDeclarationTargets [#44](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/44)
 
 ## 2.2.2
 * PhpStorm 2016.3: Switch from PhpResolveResult#create to PsiElementResolveResult#createResults [#43](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/43)
