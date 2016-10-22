@@ -24,6 +24,19 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ShopwarePhpCompletion extends CompletionContributor{
 
+    private static MethodMatcher.CallToSignature[] ATTRIBUTE_SERVICE_SIGNATURE = new MethodMatcher.CallToSignature[] {
+        new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "update"),
+    };
+
+    private static MethodMatcher.CallToSignature[] ATTRIBUTE_SERVICE_SIGNATURE_TABLES = new MethodMatcher.CallToSignature[] {
+        ATTRIBUTE_SERVICE_SIGNATURE[0],
+        new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "update"),
+        new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "get"),
+        new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "getList"),
+        new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "createAttribute"),
+        new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "changeAttribute"),
+    };
+
     public ShopwarePhpCompletion() {
 
         extend(
@@ -227,6 +240,44 @@ public class ShopwarePhpCompletion extends CompletionContributor{
             }
         );
 
-    }
 
+
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement().withParent(
+            PlatformPatterns.psiElement(StringLiteralExpression.class).inside(
+                PlatformPatterns.psiElement(ParameterList.class)
+            )),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+                    PsiElement originalPosition = parameters.getOriginalPosition();
+                    if(originalPosition == null || !ShopwareProjectComponent.isValidForProject(originalPosition)) {
+                        return;
+                    }
+
+                    PsiElement parent = originalPosition.getParent();
+                    if(!(parent instanceof StringLiteralExpression)) {
+                        return;
+                    }
+
+                    if(MethodMatcher.getMatchedSignatureWithDepth(originalPosition.getContext(), ATTRIBUTE_SERVICE_SIGNATURE_TABLES) != null) {
+                        for(String type: ShopwareUtil.MODEL_STATIC_ATTRIBUTES) {
+                            result.addElement(LookupElementBuilder.create(type).withIcon(ShopwarePluginIcons.SHOPWARE));
+                        }
+                    }
+
+                    if(MethodMatcher.getMatchedSignatureWithDepth(originalPosition.getContext(), ATTRIBUTE_SERVICE_SIGNATURE, 2) != null) {
+                        for(String type: ShopwareUtil.ATTRIBUTE_DATA_TYPES) {
+                            result.addElement(LookupElementBuilder.create(type).withIcon(ShopwarePluginIcons.SHOPWARE));
+                        }
+                    }
+
+                    if(new MethodMatcher.ArrayParameterMatcher(originalPosition.getContext(), 3).withSignature(ATTRIBUTE_SERVICE_SIGNATURE).match() != null) {
+                        for(String type: ShopwareUtil.ATTRIBUTE_BACKEND_VIEWS) {
+                            result.addElement(LookupElementBuilder.create(type).withIcon(ShopwarePluginIcons.SHOPWARE));
+                        }
+                    }
+                }
+            }
+        );
+    }
 }

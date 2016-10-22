@@ -114,6 +114,14 @@ public class ShopwareUtil {
         "module", "controller", "appendSession", "action", "fullPath", "module"
     };
 
+    final public static String[] ATTRIBUTE_DATA_TYPES = new String[] {
+        "string", "text", "html", "integer", "float", "boolean", "date", "datetime", "combobox", "single_selection", "multi_selection"
+    };
+
+    final public static String[] ATTRIBUTE_BACKEND_VIEWS = new String[] {
+        "label", "supportText", "helpText", "translatable", "displayInBackend", "entity", "position", "custom", "arrayStore"
+    };
+
     public static void collectControllerClass(Project project, ControllerClassVisitor controllerClassVisitor) {
         collectControllerClass(project, controllerClassVisitor, "Frontend" , "Backend", "Core", "Widgets");
     }
