@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.5
+* New build against PhpStorm 2016.3 libraries [#46](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/46)
+
 ## 2.4
 * Add table Name autocomplete for service "shopware_attribute.crud_service" => "CrudService" [#42](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/42)
 
