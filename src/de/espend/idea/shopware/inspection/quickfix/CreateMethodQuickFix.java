@@ -207,16 +207,8 @@ public class CreateMethodQuickFix implements LocalQuickFix {
 
                                         PhpType type = ((PhpTypedElement) psiElement).getType();
                                         for (PhpClass aClass : PhpElementsUtil.getClassFromPhpTypeSet(project, type.getTypes())) {
-                                            String presentableFQN = aClass.getPresentableFQN();
-                                            if(presentableFQN == null) {
-                                                continue;
-                                            }
-
-                                            if(!presentableFQN.startsWith("\\")) {
-                                                presentableFQN = "\\" + presentableFQN;
-                                            }
-
-                                            classes.add(presentableFQN);
+                                            // force absolute namespace
+                                            classes.add("\\" + StringUtils.stripStart(aClass.getPresentableFQN(), "\\"));
                                         }
 
                                         if(classes.size() > 0) {

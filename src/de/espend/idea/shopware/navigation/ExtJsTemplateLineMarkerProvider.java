@@ -107,15 +107,13 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
 
         addCustomModelNames(namespaces, classMap);
 
+        // @TODO: to be dropped no need as handled by symfony+annotations plugin
         for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Model\\ModelEntity")) {
-
             String className = phpClass.getPresentableFQN();
-            if(className != null && classMap.contains(className.toLowerCase())) {
+            if(classMap.contains(className.toLowerCase())) {
                 targets.add(phpClass);
             }
-
         }
-
     }
 
     private void attachController(Project project, String[] namespaces, List<PsiElement> targets) {
