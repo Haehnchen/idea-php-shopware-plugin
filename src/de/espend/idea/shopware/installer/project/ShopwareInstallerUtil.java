@@ -7,24 +7,17 @@ import com.google.gson.JsonParser;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.extensions.PluginId;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.ArrayUtil;
-import com.jetbrains.php.util.PhpConfigurationUtil;
 import de.espend.idea.shopware.installer.project.dict.ShopwareInstallerVersion;
-import fr.adrienbrault.idea.symfony2plugin.installer.dict.SymfonyInstallerVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
@@ -36,7 +29,7 @@ public class ShopwareInstallerUtil {
 
         JsonArray jsonArray = new JsonParser().parse(jsonContent).getAsJsonArray();
 
-        List<ShopwareInstallerVersion> shopwareInstallerVersions = new ArrayList<ShopwareInstallerVersion>();
+        List<ShopwareInstallerVersion> shopwareInstallerVersions = new ArrayList<>();
 
         for (JsonElement element: jsonArray) {
             JsonObject versionObject = element.getAsJsonObject();

@@ -2,16 +2,13 @@ package de.espend.idea.shopware.action.generator.utils;
 
 
 import com.intellij.execution.ExecutionException;
-import com.intellij.execution.process.*;
+import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ScriptRunnerUtil;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -21,14 +18,11 @@ import com.intellij.psi.PsiManager;
 import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.util.PhpConfigurationUtil;
 import de.espend.idea.shopware.action.generator.dict.PluginGeneratorSettings;
-import fr.adrienbrault.idea.symfony2plugin.installer.SymfonyInstallerCommandExecutor;
 import fr.adrienbrault.idea.symfony2plugin.installer.SymfonyInstallerUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.IdeHelper;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -115,7 +109,7 @@ public class PluginGeneratorUtil {
 
     @NotNull
     private static List<String> generateCommand(@NotNull PluginGeneratorSettings settings) {
-        List<String> commands = new ArrayList<String>();
+        List<String> commands = new ArrayList<>();
 
         commands.add(settings.getInterpreter());
         commands.add("sw-cli-tools.phar");

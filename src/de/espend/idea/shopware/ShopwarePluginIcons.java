@@ -1,6 +1,7 @@
 package de.espend.idea.shopware;
 
 import com.intellij.openapi.util.IconLoader;
+
 import javax.swing.*;
 
 /**

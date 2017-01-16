@@ -10,8 +10,6 @@ import com.intellij.util.Processor;
 import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
-import de.espend.idea.shopware.index.dict.ServiceResource;
-import de.espend.idea.shopware.index.dict.SubscriberInfo;
 import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
 import de.espend.idea.shopware.reference.LazySubscriberReferenceProvider;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;

@@ -1,13 +1,9 @@
 package de.espend.idea.shopware.installer.project;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.util.ui.UIUtil;
-import com.jetbrains.php.composer.InterpretersComboWithBrowseButton;
 import de.espend.idea.shopware.installer.project.dict.ShopwareInstallerVersion;
-import org.apache.commons.lang.StringUtils;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jetbrains.annotations.Nullable;
 

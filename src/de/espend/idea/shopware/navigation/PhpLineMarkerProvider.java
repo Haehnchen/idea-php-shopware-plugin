@@ -133,9 +133,9 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
 
             Map<String, Pair<String, PsiElement>> methodEvent = new HashMap<>();
 
-            HookSubscriberUtil.visitSubscriberEvents(getSubscribedEvents, (event, methodName, key) -> {
-                methodEvent.put(methodName, Pair.create(event, key));
-            });
+            HookSubscriberUtil.visitSubscriberEvents(getSubscribedEvents, (event, methodName, key) ->
+                methodEvent.put(methodName, Pair.create(event, key))
+            );
 
             for (Method method : phpClass.getOwnMethods()) {
                 if(!methodEvent.containsKey(method.getName()) || !method.getAccess().isPublic()) {
