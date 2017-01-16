@@ -30,12 +30,12 @@ public class ShopwareInstallerProjectGenerator extends WebProjectTemplate<Shopwa
     @NotNull
     @Override
     public String getName() {
-        return "Shopware Installer";
+        return "Shopware";
     }
 
     @Override
     public String getDescription() {
-        return "Shopware Installer";
+        return "Shopware";
     }
 
     @Override
