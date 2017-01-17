@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
@@ -97,23 +98,18 @@ public class PhpGoToHandler implements GotoDeclarationHandler {
         }
 
         ShopwareUtil.collectBootstrapFiles((StringLiteralExpression) parent, (virtualFile, relativePath) -> {
-
             String contents = ((StringLiteralExpression) parent).getContents();
             if(contents.endsWith("\\") || contents.endsWith("/")) {
                 contents = contents.substring(0, contents.length() - 1);
             }
 
-            if(!contents.equalsIgnoreCase(relativePath)) {
+            if(!StringUtils.stripStart(contents, "/\\").equalsIgnoreCase(relativePath)) {
                 return;
             }
 
-            PsiFile file = PsiManager.getInstance(psiElement.getProject()).findFile(virtualFile);
-            if(file != null) {
-                psiElements.add(file);
-            }
-
+            ContainerUtil.addIfNotNull(psiElements, PsiManager.getInstance(psiElement.getProject()).findFile(virtualFile));
+            ContainerUtil.addIfNotNull(psiElements, PsiManager.getInstance(psiElement.getProject()).findDirectory(virtualFile));
         });
-
     }
 
     @Nullable
