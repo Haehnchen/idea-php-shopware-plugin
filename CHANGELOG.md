@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.6
+* Drop "Installer" suffix from project generator to match default naming strategy
+* Hide comment and extend description of inspection [#47](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/47) @uehler
+* PhpClass::getPresentableFQN nullable api migration
+* Fix path references for Plugin::getPath with leading slash [#48](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/48)
+* Support config references by namespace and value [#49](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/49)
+
 ## 2.5
 * New build against PhpStorm 2016.3 libraries [#46](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/46)
 
