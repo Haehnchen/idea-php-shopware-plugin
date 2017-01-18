@@ -6,6 +6,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
@@ -13,10 +14,12 @@ import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
+import de.espend.idea.shopware.util.ConfigUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.ThemeUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
+import icons.ShopwareIcons;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,6 +38,10 @@ public class ShopwarePhpCompletion extends CompletionContributor{
         new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "getList"),
         new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "createAttribute"),
         new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "changeAttribute"),
+    };
+
+    public static MethodMatcher.CallToSignature[] CONFIG_NAMESPACE = new MethodMatcher.CallToSignature[] {
+        new MethodMatcher.CallToSignature("\\Shopware_Components_Config", "getByNamespace"),
     };
 
     public ShopwarePhpCompletion() {
@@ -276,6 +283,71 @@ public class ShopwarePhpCompletion extends CompletionContributor{
                             result.addElement(LookupElementBuilder.create(type).withIcon(ShopwarePluginIcons.SHOPWARE));
                         }
                     }
+                }
+            }
+        );
+
+        // $this->config->getByNamespace('<caret>', 'foobar');
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement().withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+                    PsiElement originalPosition = parameters.getOriginalPosition();
+                    if(originalPosition == null || !ShopwareProjectComponent.isValidForProject(originalPosition)) {
+                        return;
+                    }
+
+                    PsiElement parent = originalPosition.getParent();
+                    if(!(parent instanceof StringLiteralExpression)) {
+                        return;
+                    }
+
+                    MethodMatcher.MethodMatchParameter match = MethodMatcher.getMatchedSignatureWithDepth(parent, CONFIG_NAMESPACE);
+                    if(match == null) {
+                        return;
+                    }
+
+                    ConfigUtil.visitNamespace(originalPosition.getProject(), pair ->
+                        result.addElement(LookupElementBuilder.create(pair.getFirst())
+                            .withTypeText(pair.getSecond().getPresentableFQN(), true)
+                            .withIcon(ShopwareIcons.SHOPWARE)
+                        )
+                    );
+                }
+            }
+        );
+
+        // $this->config->getByNamespace('MyNamesapce', '<caret>');
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement().withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+                    PsiElement originalPosition = parameters.getOriginalPosition();
+                    if(originalPosition == null || !ShopwareProjectComponent.isValidForProject(originalPosition)) {
+                        return;
+                    }
+
+                    PsiElement parent = originalPosition.getParent();
+                    if(!(parent instanceof StringLiteralExpression)) {
+                        return;
+                    }
+
+                    String namespace = ConfigUtil.getNamespaceFromConfigValueParameter((StringLiteralExpression) parent);
+                    if (namespace == null) {
+                        return;
+                    }
+
+                    ConfigUtil.visitNamespaceConfigurations(originalPosition.getProject(), namespace, pair -> {
+                        XmlTag parentTag = pair.getSecond().getParentTag();
+
+                        // <element required="true" type="text"><name>foobar</name></element>
+                        String type = null;
+                        if (parentTag != null) {
+                            type = parentTag.getAttributeValue("type");
+                        }
+
+                        result.addElement(LookupElementBuilder.create(pair.getFirst()).withTypeText(type, true).withIcon(ShopwareIcons.SHOPWARE));
+                    });
                 }
             }
         );

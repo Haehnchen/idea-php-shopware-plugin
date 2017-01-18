@@ -3,16 +3,25 @@ package de.espend.idea.shopware.navigation;
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.patterns.PlatformPatterns;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import de.espend.idea.shopware.completion.ShopwarePhpCompletion;
+import de.espend.idea.shopware.util.ConfigUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.ThemeUtil;
+import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -40,7 +49,76 @@ public class PhpGoToHandler implements GotoDeclarationHandler {
             attachThemeExtend(psiElement, psiElements);
         }
 
+        if(PlatformPatterns.psiElement().withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)).accepts(psiElement)) {
+            attachNamespaceNavigation(psiElement, psiElements);
+        }
+
+        if(PlatformPatterns.psiElement().withParent(PlatformPatterns.psiElement(StringLiteralExpression.class)).accepts(psiElement)) {
+            attachNamespaceValueNavigation(psiElement, psiElements);
+        }
+
         return psiElements.toArray(new PsiElement[psiElements.size()]);
+    }
+
+    private void attachNamespaceNavigation(@NotNull PsiElement psiElement, @NotNull List<PsiElement> psiElements) {
+        PsiElement parent = psiElement.getParent();
+        if(!(parent instanceof StringLiteralExpression)) {
+            return;
+        }
+
+        String contents = ((StringLiteralExpression) parent).getContents();
+        if(StringUtils.isBlank(contents)) {
+            return;
+        }
+
+        MethodMatcher.MethodMatchParameter match = MethodMatcher.getMatchedSignatureWithDepth(parent, ShopwarePhpCompletion.CONFIG_NAMESPACE);
+        if(match == null) {
+            return;
+        }
+
+        ConfigUtil.visitNamespace(psiElement.getProject(), pair -> {
+            if(contents.equalsIgnoreCase(pair.getFirst())) {
+                PhpClass phpClass = pair.getSecond();
+                PsiElement target = phpClass;
+
+                // PhpClass or "Resources/config.xml" as target
+                PsiDirectory pluginDir = phpClass.getContainingFile().getParent();
+                if(pluginDir != null) {
+                    VirtualFile resources = VfsUtil.findRelativeFile(pluginDir.getVirtualFile(), "Resources", "config.xml");
+                    if(resources != null) {
+                        PsiFile file = PsiManager.getInstance(phpClass.getProject()).findFile(resources);
+                        if(file instanceof XmlFile) {
+                            target = file;
+                        }
+                    }
+                }
+
+                psiElements.add(target);
+            }
+        });
+    }
+
+    private void attachNamespaceValueNavigation(@NotNull PsiElement psiElement, @NotNull List<PsiElement> psiElements) {
+        PsiElement parent = psiElement.getParent();
+        if(!(parent instanceof StringLiteralExpression)) {
+            return;
+        }
+
+        String contents = ((StringLiteralExpression) parent).getContents();
+        if(StringUtils.isBlank(contents)) {
+            return;
+        }
+
+        String namespace = ConfigUtil.getNamespaceFromConfigValueParameter((StringLiteralExpression) parent);
+        if (namespace == null) {
+            return;
+        }
+
+        ConfigUtil.visitNamespaceConfigurations(psiElement.getProject(), namespace, pair -> {
+            if(contents.equalsIgnoreCase(pair.getFirst())) {
+                psiElements.add(pair.getSecond());
+            }
+        });
     }
 
     private void attachThemeJsFieldReferences(final PsiElement psiElement, final List<PsiElement> psiElements) {
