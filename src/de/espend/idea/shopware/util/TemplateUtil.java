@@ -3,19 +3,29 @@ package de.espend.idea.shopware.util;
 import com.intellij.lang.javascript.JavaScriptSupportLoader;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.PhpPsiUtil;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.smarty.SmartyFile;
 import com.jetbrains.smarty.SmartyFileType;
+import com.jetbrains.smarty.lang.SmartyTokenTypes;
 import com.jetbrains.smarty.lang.psi.SmartyTag;
+import fr.adrienbrault.idea.symfony2plugin.util.yaml.YamlHelper;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -263,4 +273,68 @@ public class TemplateUtil {
         return templateName;
     }
 
+    /**
+     * {tag attribute="foobar"}{/s}
+     */
+    @Nullable
+    public static PsiElement getTagAttributeByName(@NotNull SmartyTag tag, @NotNull String attribute) {
+        return ContainerUtil.find(YamlHelper.getChildrenFix(tag), psiElement ->
+            SmartyPattern.getAttributeKeyPattern().accepts(psiElement) && attribute.equals(psiElement.getText())
+        );
+    }
+
+    /**
+     * {tag attribute="foobar"}{/s}
+     */
+    @Nullable
+    public static String getTagAttributeValueByName(@NotNull SmartyTag tag, @NotNull String attribute) {
+        PsiElement psiAttribute = getTagAttributeByName(tag, attribute);
+        if(psiAttribute == null) {
+            return null;
+        }
+
+        PsiElement nextSibling = PhpPsiUtil.getNextSibling(psiAttribute, new Condition<PsiElement>() {
+            @Override
+            public boolean value(PsiElement psiElement) {
+                IElementType elementType = psiElement.getNode().getElementType();
+
+                return psiElement instanceof PsiWhiteSpace ||
+                    elementType == SmartyTokenTypes.EQ ||
+                    elementType == SmartyTokenTypes.DOUBLE_QUOTE ||
+                    elementType == SmartyTokenTypes.SINGLE_QUOTE;
+            }
+        });
+
+        if(nextSibling == null) {
+            return null;
+        }
+
+        String text = nextSibling.getText();
+        if(StringUtils.isNotBlank(text)) {
+            return text;
+        }
+
+        return null;
+    }
+
+    /**
+     * Find snippet namespace by tag scope and with file scope fallback
+     *
+     * {s namespace="foobar"}
+     * {namespace="foobar"}
+     */
+    @Nullable
+    public static String getSnippetNamespaceByScope(@NotNull SmartyTag smartyTag) {
+        String namespace = TemplateUtil.getTagAttributeValueByName(smartyTag, "namespace");
+        if(namespace != null) {
+            return namespace;
+        }
+
+        PsiFile containingFile = smartyTag.getContainingFile();
+        if(containingFile instanceof SmartyFile) {
+            return SnippetUtil.getFileNamespace((SmartyFile) containingFile);
+        }
+
+        return null;
+    }
 }

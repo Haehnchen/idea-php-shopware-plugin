@@ -41,6 +41,7 @@
         <li>Smarty: Support templates libraries/include paths</li>
         <li>Smarty: Blockname implements and overwrite linemarker</li>
         <li>Shopware: Theme and assets</li>
+        <li>Shopware: Snippets</li>
         <li>PHP/Smarty: Template controller references for php and smarty</li>
         <li>Symfony: Custom container loader</li>
         <li>Symfony: Shopware service container ids in subscriber</li>
@@ -173,6 +174,7 @@
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyExtendsStubIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.EventConfigGoToIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.InitResourceServiceIndex"/>
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.SnippetIndex"/>
 
       <localInspection groupPath="Shopware" shortName="Shopware" displayName="Boostrap"
                        groupName="Shopware"

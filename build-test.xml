@@ -107,6 +107,8 @@
                 <include name="**/*.json"/>
                 <include name="**/*.xlf"/>
                 <include name="**/*.xliff"/>
+                <include name="**/*.tpl"/>
+                <include name="**/*.ini"/>
             </patternset>
 
             <copy toDir="@{dest}">

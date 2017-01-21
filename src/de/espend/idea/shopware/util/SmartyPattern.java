@@ -4,9 +4,10 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiWhiteSpace;
 import com.jetbrains.smarty.lang.SmartyTokenTypes;
 import com.jetbrains.smarty.lang.psi.SmartyCompositeElementTypes;
-
+import org.jetbrains.annotations.NotNull;
 
 public class SmartyPattern {
 
@@ -163,9 +164,11 @@ public class SmartyPattern {
 
     }
 
-    public static ElementPattern<PsiElement> getNamespacePattern() {
+    /**
+     * {tag attribute="<caret>"}
+     */
+    public static ElementPattern<PsiElement> getTagAttributePattern(@NotNull String tag, @NotNull String attribute) {
         return PlatformPatterns.or(
-
             PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
                 .afterLeafSkipping(
                     PlatformPatterns.or(
@@ -174,10 +177,10 @@ public class SmartyPattern {
                         PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
                         PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
                     ),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("namespace")
+                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText(attribute)
                 )
                 .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{s"))
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tag))
                 ),
 
             PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
@@ -188,15 +191,16 @@ public class SmartyPattern {
                         PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
                         PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
                     ),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("namespace")
+                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText(attribute)
                 )
                 .withParent(
                     PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{s"))
                 )
-
         );
+    }
 
-
+    public static ElementPattern<PsiElement> getNamespacePattern() {
+        return getTagAttributePattern("s", "namespace");
     }
 
     public static PsiElementPattern.Capture<PsiElement> getVariableReference() {
@@ -205,5 +209,12 @@ public class SmartyPattern {
         );
     }
 
-
+    /**
+     * foobar="asas"
+     */
+    public static PsiElementPattern.Capture<PsiElement> getAttributeKeyPattern() {
+        return PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).beforeLeafSkipping(
+            PlatformPatterns.psiElement(PsiWhiteSpace.class), PlatformPatterns.psiElement((SmartyTokenTypes.EQ))
+        );
+    }
 }

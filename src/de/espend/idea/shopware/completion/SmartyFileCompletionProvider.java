@@ -16,14 +16,12 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.smarty.SmartyFile;
 import com.jetbrains.smarty.SmartyFileType;
+import com.jetbrains.smarty.lang.psi.SmartyTag;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.index.SmartyBlockStubIndex;
 import de.espend.idea.shopware.lookup.TemplateLookupElement;
-import de.espend.idea.shopware.util.ShopwareUtil;
-import de.espend.idea.shopware.util.SmartyBlockUtil;
-import de.espend.idea.shopware.util.SmartyPattern;
-import de.espend.idea.shopware.util.TemplateUtil;
+import de.espend.idea.shopware.util.*;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.stubs.SymfonyProcessors;
 import fr.adrienbrault.idea.symfony2plugin.templating.util.TwigTypeResolveUtil;
@@ -164,7 +162,6 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
-
                     if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
                         return;
                     }
@@ -174,9 +171,19 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                         return;
                     }
 
-                    TemplateUtil.collectFiles(psiElement.getProject(), (virtualFile, fileName) -> result.addElement(LookupElementBuilder.create(fileName.replaceFirst("[.][^.]+$", "")).withIcon(ShopwarePluginIcons.SHOPWARE)), "tpl");
+                    Set<String> strong = new HashSet<>();
+                    for (String s : SnippetUtil.getSnippetNamespaces(psiElement.getProject())) {
+                        strong.add(s);
+                        result.addElement(LookupElementBuilder.create(s).withIcon(Symfony2Icons.TRANSLATION).withTypeText("Snippet", true));
+                    }
 
+                    TemplateUtil.collectFiles(psiElement.getProject(), (VirtualFile virtualFile, String fileName) -> {
+                        String lookupString = fileName.replaceFirst("[.][^.]+$", "");
 
+                        if(!strong.contains(lookupString)) {
+                            result.addElement(LookupElementBuilder.create(lookupString).withIcon(ShopwarePluginIcons.SHOPWARE).withTypeText("Template", true));
+                        }
+                    }, "tpl");
                 }
             }
         );
@@ -295,9 +302,33 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             }
         );
 
+        extend(
+            CompletionType.BASIC, SmartyPattern.getTagAttributePattern("s", "name"),
+            new CompletionProvider<CompletionParameters>() {
+                @Override
+                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+                    PsiElement psiElement = parameters.getOriginalPosition();
+                    if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+                        return;
+                    }
+
+                    PsiElement smartyTag = psiElement.getParent();
+                    if(!(smartyTag instanceof SmartyTag)) {
+                        return;
+                    }
+
+                    String namespace = TemplateUtil.getSnippetNamespaceByScope((SmartyTag) smartyTag);
+                    if(namespace == null) {
+                        return;
+                    }
+
+                    for (String s : SnippetUtil.getSnippetKeysByNamespace(psiElement.getProject(), namespace)) {
+                        result.addElement(LookupElementBuilder.create(s).withIcon(Symfony2Icons.TRANSLATION).withTypeText(namespace, true));
+                    }
+                }
+            }
+        );
     }
-
-
 
     public static List<LookupElement> getTemplateCompletion(Project project, String... extensions) {
 
@@ -313,8 +344,4 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
         return lookupElements;
     }
-
-
-
-
 }

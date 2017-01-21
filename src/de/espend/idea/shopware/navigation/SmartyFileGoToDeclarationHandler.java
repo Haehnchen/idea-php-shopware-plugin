@@ -10,13 +10,18 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.smarty.SmartyFile;
+import com.jetbrains.smarty.lang.psi.SmartyTag;
 import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
+import de.espend.idea.shopware.util.SnippetUtil;
 import de.espend.idea.shopware.util.TemplateUtil;
+import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -59,9 +64,14 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
             attachControllerVariableGoto(sourceElement, targets);
         }
 
-        // {s namespace=frontend/foo
+        // {s namespace="frontend/foo<caret>"}
         if(SmartyPattern.getNamespacePattern().accepts(sourceElement)) {
-            attachNamespaceTagGoto(sourceElement, targets);
+            attachSnippetNamespaceTagGoto(sourceElement, targets);
+        }
+
+        // {s name="foobar<caret>" namespace="frontend/foo"}
+        if(SmartyPattern.getTagAttributePattern("s", "name").accepts(sourceElement)) {
+            attachSnippetNameTagGoto(sourceElement, targets);
         }
 
         // {action controller=Account
@@ -75,6 +85,25 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
         }
 
         return targets.toArray(new PsiElement[targets.size()]);
+    }
+
+    private void attachSnippetNameTagGoto(@NotNull PsiElement psiElement, @NotNull Collection<PsiElement> targets) {
+        String contents = psiElement.getText();
+        if(StringUtils.isBlank(contents)) {
+            return;
+        }
+
+        PsiElement parent = psiElement.getParent();
+        if(!(parent instanceof SmartyTag)) {
+            return;
+        }
+
+        String namespace = TemplateUtil.getSnippetNamespaceByScope((SmartyTag) parent);
+        if(namespace == null) {
+            return;
+        }
+
+        targets.addAll(SnippetUtil.getSnippetNameTargets(psiElement.getProject(), namespace, contents));
     }
 
     private void attachControllerVariableGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
@@ -169,11 +198,16 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
 
     }
 
-    private void attachNamespaceTagGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
+    private void attachSnippetNamespaceTagGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
 
         final Project project = sourceElement.getProject();
 
-        final String finalText = normalizeFilename(sourceElement.getText());
+        String namespace = sourceElement.getText();
+        if(StringUtils.isBlank(namespace)) {
+            return;
+        }
+
+        final String finalText = normalizeFilename(namespace);
         TemplateUtil.collectFiles(sourceElement.getProject(), (virtualFile, fileName) -> {
 
             if (!fileName.replaceFirst("[.][^.]+$", "").equals(finalText)) {
@@ -186,6 +220,7 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
             }
         }, "tpl");
 
+        psiElements.addAll(SnippetUtil.getSnippetNamespaceTargets(sourceElement.getProject(), namespace));
     }
 
     private void attachLinkFileTagGoto(PsiElement sourceElement, final List<PsiElement> psiElements) {
