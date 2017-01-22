@@ -1,7 +1,10 @@
 package de.espend.idea.shopware.util;
 
+import com.intellij.lang.javascript.psi.JSFile;
+import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementVisitor;
@@ -35,7 +38,7 @@ public class SnippetUtil {
      * {s name="foobar" namespace ="foobar/foobar"}{/s}
      */
     private static void visitSnippets(@NotNull SmartyFile file, @NotNull Consumer<ShopwareSnippet> consumer) {
-        LazyFileNamespace lazyFileNamespace = new LazyFileNamespace(file);
+        LazySmartyFileNamespace lazyFileNamespace = new LazySmartyFileNamespace(file);
 
         file.acceptChildren(new PsiRecursiveElementVisitor() {
             @Override
@@ -66,8 +69,65 @@ public class SnippetUtil {
         });
     }
 
+    /**
+     * ExtJs files
+     */
+    private static void visitSnippets(@NotNull JSFile file, @NotNull Consumer<ShopwareSnippet> consumer) {
+        LazyJavascriptFileNamespace lazyFileNamespace = new LazyJavascriptFileNamespace(file);
+
+        file.acceptChildren(new PsiRecursiveElementVisitor() {
+            @Override
+            public void visitElement(PsiElement element) {
+                if(!(element instanceof JSLiteralExpression)) {
+                    super.visitElement(element);
+                    return;
+                }
+
+                Object value = ((JSLiteralExpression) element).getValue();
+                if(!(value instanceof String)) {
+                    super.visitElement(element);
+                    return;
+                }
+
+                String text = (String) value;
+                if(text.startsWith("{s")) {
+                    visitSnippetText(element, text);
+                } else if(text.contains("{s") && text.contains("}")) {
+                    Matcher matcher = Pattern.compile("(\\{s\\s+[^{]*})").matcher(text);
+                    while(matcher.find()){
+                        visitSnippetText(element, matcher.group(1));
+                    }
+                }
+
+                super.visitElement(element);
+            }
+
+            private void visitSnippetText(PsiElement element, String text) {
+                String name = ExtJsUtil.getAttributeTagValueFromSmartyString("s", "name", text);
+                if(name != null) {
+                    String namespace = ExtJsUtil.getAttributeTagValueFromSmartyString("s", "namespace", text);
+
+                    if(namespace == null) {
+                        namespace = lazyFileNamespace.getNamespace();
+                    }
+
+                    if(namespace != null) {
+                        consumer.accept(new ShopwareSnippet(element, namespace, name));
+                    }
+                }
+            }
+        });
+    }
+
     @NotNull
     public static Collection<ShopwareSnippet> getSnippetsInFile(@NotNull SmartyFile file) {
+        Collection<ShopwareSnippet> snippets = new ArrayList<>();
+        visitSnippets(file, snippets::add);
+        return snippets;
+    }
+
+    @NotNull
+    public static Collection<ShopwareSnippet> getSnippetsInFile(@NotNull JSFile file) {
         Collection<ShopwareSnippet> snippets = new ArrayList<>();
         visitSnippets(file, snippets::add);
         return snippets;
@@ -161,7 +221,7 @@ public class SnippetUtil {
         return null;
     }
 
-    private static class LazyFileNamespace {
+    private static class LazySmartyFileNamespace {
         @NotNull
         private final SmartyFile smartyFile;
 
@@ -170,7 +230,7 @@ public class SnippetUtil {
 
         private boolean loaded = false;
 
-        LazyFileNamespace(@NotNull SmartyFile smartyFile) {
+        LazySmartyFileNamespace(@NotNull SmartyFile smartyFile) {
             this.smartyFile = smartyFile;
         }
 
@@ -184,6 +244,32 @@ public class SnippetUtil {
             loaded = true;
 
             return this.namespace = getFileNamespace(this.smartyFile);
+        }
+    }
+
+    private static class LazyJavascriptFileNamespace {
+        @NotNull
+        private final JSFile jsFile;
+
+        @Nullable
+        private String namespace = null;
+
+        private boolean loaded = false;
+
+        LazyJavascriptFileNamespace(@NotNull JSFile jsFile) {
+            this.jsFile = jsFile;
+        }
+
+        @Nullable
+        public String getNamespace() {
+            if(loaded) {
+                return this.namespace;
+            }
+
+            // for nullable loaded
+            loaded = true;
+
+            return this.namespace = ExtJsUtil.getSnippetNamespaceFromFile(this.jsFile);
         }
     }
 

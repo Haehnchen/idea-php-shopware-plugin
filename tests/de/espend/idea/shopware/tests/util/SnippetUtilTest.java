@@ -1,5 +1,6 @@
 package de.espend.idea.shopware.tests.util;
 
+import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.containers.ContainerUtil;
@@ -90,6 +91,28 @@ public class SnippetUtilTest extends ShopwareLightCodeInsightFixtureTestCase {
 
         assertNotNull(ContainerUtil.find(snippets, psiElement ->
             "widgets.ini".equals(psiElement.getContainingFile().getVirtualFile().getName())
+        ));
+    }
+
+    public void testSnippetsForBackend() {
+        PsiFile psiFile = myFixture.configureByFile("snippets.js");
+
+        Collection<ShopwareSnippet> snippetsInFile = SnippetUtil.getSnippetsInFile((JSFile) psiFile);
+
+        assertNotNull(ContainerUtil.find(snippetsInFile, snippet ->
+            "backend/foobar/namespace".equals(snippet.getNamespace()) && "start_accept".equals(snippet.getName())
+        ));
+
+        assertNotNull(ContainerUtil.find(snippetsInFile, snippet ->
+            "backend/foobar".equals(snippet.getNamespace()) && "start_accept".equals(snippet.getName())
+        ));
+
+        assertNotNull(ContainerUtil.find(snippetsInFile, snippet ->
+            "backend/foobar/namespace".equals(snippet.getNamespace()) && "filter_feature".equals(snippet.getName())
+        ));
+
+        assertNotNull(ContainerUtil.find(snippetsInFile, snippet ->
+            "foobar".equals(snippet.getNamespace()) && "filter_feature".equals(snippet.getName())
         ));
     }
 }

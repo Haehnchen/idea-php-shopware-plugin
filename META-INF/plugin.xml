@@ -161,6 +161,7 @@
       <completion.contributor language="PHP" implementationClass="de.espend.idea.shopware.reference.LazySubscriberReferenceProvider"/>
       <completion.contributor language="PHP" implementationClass="de.espend.idea.shopware.completion.ShopwarePhpCompletion"/>
       <completion.contributor language="JSON" implementationClass="de.espend.idea.shopware.completion.ShopwareJsonCompletion"/>
+      <completion.contributor language="JavaScript" implementationClass="de.espend.idea.shopware.completion.ShopwareJavaScriptCompletion"/>
       <completion.contributor language="XML" implementationClass="de.espend.idea.shopware.completion.ShopwareXmlCompletion"/>
 
       <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="de.espend.idea.shopware.navigation.ExtJsTemplateLineMarkerProvider"/>
@@ -175,6 +176,8 @@
       <fileBasedIndex implementation="de.espend.idea.shopware.index.EventConfigGoToIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.InitResourceServiceIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SnippetIndex"/>
+
+      <lang.foldingBuilder language="JavaScript" implementationClass="de.espend.idea.shopware.folding.JavascriptFoldingBuilder"/>
 
       <localInspection groupPath="Shopware" shortName="Shopware" displayName="Boostrap"
                        groupName="Shopware"

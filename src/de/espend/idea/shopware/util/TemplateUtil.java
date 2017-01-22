@@ -293,16 +293,13 @@ public class TemplateUtil {
             return null;
         }
 
-        PsiElement nextSibling = PhpPsiUtil.getNextSibling(psiAttribute, new Condition<PsiElement>() {
-            @Override
-            public boolean value(PsiElement psiElement) {
-                IElementType elementType = psiElement.getNode().getElementType();
+        PsiElement nextSibling = PhpPsiUtil.getNextSibling(psiAttribute, (Condition<PsiElement>) psiElement -> {
+            IElementType elementType = psiElement.getNode().getElementType();
 
-                return psiElement instanceof PsiWhiteSpace ||
-                    elementType == SmartyTokenTypes.EQ ||
-                    elementType == SmartyTokenTypes.DOUBLE_QUOTE ||
-                    elementType == SmartyTokenTypes.SINGLE_QUOTE;
-            }
+            return psiElement instanceof PsiWhiteSpace ||
+                elementType == SmartyTokenTypes.EQ ||
+                elementType == SmartyTokenTypes.DOUBLE_QUOTE ||
+                elementType == SmartyTokenTypes.SINGLE_QUOTE;
         });
 
         if(nextSibling == null) {

@@ -1,5 +1,8 @@
 package de.espend.idea.shopware.index;
 
+import com.intellij.lang.javascript.JavaScriptFileType;
+import com.intellij.lang.javascript.psi.JSFile;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
@@ -61,6 +64,11 @@ public class SnippetIndex extends FileBasedIndexExtension<String, Set<String>> {
                         snippets.get(namespace).addAll(iniKeys);
                     }
                 }
+            } else if (psiFile instanceof JSFile) {
+                for (ShopwareSnippet snippet : SnippetUtil.getSnippetsInFile((JSFile) psiFile)) {
+                    snippets.putIfAbsent(snippet.getNamespace(), new HashSet<>());
+                    snippets.get(snippet.getNamespace()).add(snippet.getName());
+                }
             }
 
             return snippets;
@@ -83,8 +91,10 @@ public class SnippetIndex extends FileBasedIndexExtension<String, Set<String>> {
     @NotNull
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
-        return file ->
-            file.getFileType() == SmartyFileType.INSTANCE || "ini".equalsIgnoreCase(file.getExtension());
+        return file -> {
+            FileType fileType = file.getFileType();
+            return fileType == SmartyFileType.INSTANCE || fileType == JavaScriptFileType.INSTANCE || "ini".equalsIgnoreCase(file.getExtension());
+        };
     }
 
     @Override
@@ -94,6 +104,6 @@ public class SnippetIndex extends FileBasedIndexExtension<String, Set<String>> {
 
     @Override
     public int getVersion() {
-        return 5;
+        return 1;
     }
 }

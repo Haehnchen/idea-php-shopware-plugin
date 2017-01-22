@@ -109,6 +109,7 @@
                 <include name="**/*.xliff"/>
                 <include name="**/*.tpl"/>
                 <include name="**/*.ini"/>
+                <include name="**/*.js"/>
             </patternset>
 
             <copy toDir="@{dest}">

@@ -1,5 +1,6 @@
 package de.espend.idea.shopware.tests.index;
 
+import com.intellij.lang.javascript.JavaScriptFileType;
 import de.espend.idea.shopware.index.SnippetIndex;
 import de.espend.idea.shopware.tests.ShopwareLightCodeInsightFixtureTestCase;
 
@@ -13,6 +14,7 @@ public class SnippetIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
         super.setUp();
         myFixture.copyFileToProject("snippets.tpl");
         myFixture.copyFileToProject("widgets.ini", "snippets/frontend/listing/foobar_ini/widgets.ini");
+        myFixture.copyFileToProject("javascript.js");
     }
 
     public String getTestDataPath() {
@@ -33,5 +35,9 @@ public class SnippetIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
         assertIndexContainsKeyWithValue(SnippetIndex.KEY, "frontend/listing/foobar_ini/widgets", value ->
             value.contains("swag-last-registrations/customer")
         );
+    }
+
+    public void testJavascriptCommentNamespaceSnippetsAreInIndex() {
+        assertIndexContains(SnippetIndex.KEY, "backend/namespace");
     }
 }
