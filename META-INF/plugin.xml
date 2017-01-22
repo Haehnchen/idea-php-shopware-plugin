@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>2.6</version>
+  <version>2.7</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -41,7 +41,8 @@
         <li>Smarty: Support templates libraries/include paths</li>
         <li>Smarty: Blockname implements and overwrite linemarker</li>
         <li>Shopware: Theme and assets</li>
-        <li>Shopware: Snippets</li>
+        <li>Shopware: Snippets index for template usage in backend and frontend</li>
+        <li>Shopware: Snippets references for Smarty and ExtJs files</li>
         <li>PHP/Smarty: Template controller references for php and smarty</li>
         <li>Symfony: Custom container loader</li>
         <li>Symfony: Shopware service container ids in subscriber</li>
@@ -57,6 +58,13 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>2.7</h2>
+<ul>
+    <li>Add snippet template usage und ini files index <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/53">#53</a></li>
+    <li>Add snippet references for ExtJs and Smarty files <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/53">#53</a></li>
+    <li>Provide code folding for snippets namespace comment in ExtJs</li>
+</ul>
 
 <h2>2.6</h2>
 <ul>

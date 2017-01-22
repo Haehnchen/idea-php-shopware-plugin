@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.7
+* Add snippet template usage und ini files index [#53](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/53)
+* Add snippet references for ExtJs and Smarty files [#53](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/53)
+* Provide code folding for snippets namespace comment in ExtJs
+
 ## 2.6
 * Drop "Installer" suffix from project generator to match default naming strategy
 * Hide comment and extend description of inspection [#47](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/47) @uehler
