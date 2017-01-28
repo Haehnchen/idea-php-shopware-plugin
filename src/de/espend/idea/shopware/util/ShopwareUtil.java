@@ -53,6 +53,8 @@ public class ShopwareUtil {
         AND TABLE_NAME LIKE '%attributes'
      */
     final public static String[] MODEL_STATIC_ATTRIBUTES = new String[] {
+    	"s_article_configurator_groups_attributes",
+    	"s_article_configurator_options_attributes",
         "s_article_configurator_template_prices_attributes",
         "s_article_configurator_templates_attributes",
         "s_articles_attributes",
@@ -73,6 +75,7 @@ public class ShopwareUtil {
         "s_core_customergroups_attributes",
         "s_core_paymentmeans_attributes",
         "s_emarketing_banners_attributes",
+        "s_emarketing_partner_attributes",
         "s_emarketing_vouchers_attributes",
         "s_emotion_attributes",
         "s_export_attributes",
