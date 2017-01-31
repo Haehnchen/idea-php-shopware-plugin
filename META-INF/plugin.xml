@@ -204,6 +204,15 @@
       <directoryProjectGenerator implementation="de.espend.idea.shopware.installer.project.ShopwareInstallerProjectGenerator"/>
       <projectTemplatesFactory implementation="de.espend.idea.shopware.installer.project.ShopwareInstallerTemplatesFactory"/>
 
+      <applicationService serviceImplementation="de.espend.idea.shopware.ShopwareApplicationSettings"/>
+
+      <projectConfigurable instance="de.espend.idea.shopware.ui.ShopwareSettingsForm"
+                           displayName="Shopware"
+                           id="Shopware.SettingsForm"
+                           parentId="reference.webide.settings.project.settings.php"
+                           nonDefaultProject="true"
+      />
+
   </extensions>
 
     <extensions defaultExtensionNs="fr.adrienbrault.idea.symfony2plugin.extension">

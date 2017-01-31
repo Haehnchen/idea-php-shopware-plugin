@@ -30,6 +30,7 @@ public class PluginGeneratorDialog extends JDialog {
     private JCheckBox addDummyWidgetCheckBox;
     private JCheckBox addDummyApiCheckBox;
     private JPanel panelInterpreter;
+    private JCheckBox addLegacyCheckBox;
     private InterpretersComboWithBrowseButton interpretersComboWithBrowseButton;
 
     public PluginGeneratorDialog(@NotNull Callback callback) {
@@ -75,7 +76,8 @@ public class PluginGeneratorDialog extends JDialog {
             addDummyCommandCheckBox.isSelected(),
             addDummyWidgetCheckBox.isSelected(),
             addDummyApiCheckBox.isSelected(),
-            getInterpreter()
+            getInterpreter(),
+            addLegacyCheckBox.isSelected()
         ));
 
         dispose();

@@ -10,29 +10,24 @@ public class PluginGeneratorSettings {
     @NotNull
     private final String namespace;
 
-    @NotNull
-    private final Boolean addDummyFilter;
+    private final boolean addDummyFilter;
 
-    @NotNull
-    private final Boolean addDummyFrontendController;
+    private final boolean addDummyFrontendController;
 
-    @NotNull
-    private final Boolean addDummyBackendController;
+    private final boolean addDummyBackendController;
 
-    @NotNull
-    private final Boolean addDummyModels;
+    private final boolean addDummyModels;
 
-    @NotNull
-    private final Boolean addDummyCommand;
+    private final boolean addDummyCommand;
 
-    @NotNull
-    private final Boolean addDummyWidget;
+    private final boolean addDummyWidget;
 
-    @NotNull
-    private final Boolean addDummyApi;
+    private final boolean addDummyApi;
 
     @NotNull
     private final String interpreter;
+
+    private final boolean legacyStructure;
 
     public PluginGeneratorSettings(
             @NotNull String pluginName,
@@ -44,7 +39,8 @@ public class PluginGeneratorSettings {
             @NotNull Boolean addDummyCommand,
             @NotNull Boolean addDummyWidget,
             @NotNull Boolean addDummyApi,
-            @NotNull String interpreter
+            @NotNull String interpreter,
+            @NotNull Boolean legacyStructure
     ) {
         this.pluginName = pluginName;
         this.namespace = namespace;
@@ -56,6 +52,7 @@ public class PluginGeneratorSettings {
         this.addDummyWidget = addDummyWidget;
         this.addDummyApi = addDummyApi;
         this.interpreter = interpreter;
+        this.legacyStructure = legacyStructure;
     }
 
     @NotNull
@@ -106,5 +103,9 @@ public class PluginGeneratorSettings {
     @NotNull
     public String getInterpreter() {
         return interpreter;
+    }
+
+    public boolean isLegacyStructure() {
+        return legacyStructure;
     }
 }

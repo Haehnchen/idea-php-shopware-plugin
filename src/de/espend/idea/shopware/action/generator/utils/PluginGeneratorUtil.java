@@ -1,6 +1,5 @@
 package de.espend.idea.shopware.action.generator.utils;
 
-
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessAdapter;
@@ -17,12 +16,15 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.util.ArrayUtil;
 import com.jetbrains.php.util.PhpConfigurationUtil;
+import de.espend.idea.shopware.ShopwareApplicationSettings;
 import de.espend.idea.shopware.action.generator.dict.PluginGeneratorSettings;
 import fr.adrienbrault.idea.symfony2plugin.installer.SymfonyInstallerUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.IdeHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,15 +33,40 @@ public class PluginGeneratorUtil {
 
     private static final long CHECKING_TIMEOUT_IN_MILLISECONDS = 1000L;
 
+    /**
+     * Download or locally copy cli tools phar
+     */
+    @Nullable
+    private static VirtualFile getCliToolsPharFile(@NotNull Project project) {
+        VirtualFile cliFile = VfsUtil.findFileByIoFile(new File(project.getBasePath() + "/sw-cli-tools.phar"), true);
+        if(cliFile != null) {
+            return cliFile;
+        }
+
+        String cliToolsPharUrl = ShopwareApplicationSettings.getInstance().cliToolsPharUrl;
+        // http download
+        if(cliToolsPharUrl.startsWith("http")) {
+            PhpConfigurationUtil.downloadFile(project, null, project.getBasePath(), ShopwareApplicationSettings.getInstance().cliToolsPharUrl, "sw-cli-tools.phar");
+            return VfsUtil.findFileByIoFile(new File(project.getBasePath() + "/sw-cli-tools.phar"), true);
+        }
+
+        try {
+            FileUtil.copy(
+                new File(cliToolsPharUrl),
+                new File(project.getBasePath() + "/sw-cli-tools.phar")
+            );
+        } catch (IOException ignored) {
+        }
+
+        return null;
+    }
+
     public static void installPlugin(@NotNull Project project, @NotNull PluginGeneratorSettings settings) {
 
         // download cli tools, if not existing locally
-        VirtualFile cliFile = VfsUtil.findFileByIoFile(new File(project.getBasePath() + "/sw-cli-tools.phar"), true);
+        VirtualFile cliFile = getCliToolsPharFile(project);
         if (cliFile == null) {
-            PhpConfigurationUtil.downloadFile(project, null, project.getBasePath(), "http://shopwarelabs.github.io/sw-cli-tools/sw.phar", "sw-cli-tools.phar");
-            cliFile = VfsUtil.findFileByIoFile(new File(project.getBasePath() + "/sw-cli-tools.phar"), true);
-        }
-        if (cliFile == null) {
+            showErrorNotification(project, "No CLI-Tools phar found");
             return;
         }
 
@@ -92,6 +119,7 @@ public class PluginGeneratorUtil {
         if (FileUtil.canWrite(newDir)) {
             return;
         }
+
         FileUtil.createDirectory(new File(newDir));
         FileUtil.moveDirWithContent(new File(project.getBasePath() + "/" + settings.getPluginName()), new File(newDir));
 
@@ -143,6 +171,10 @@ public class PluginGeneratorUtil {
 
         if (settings.getAddDummyApi()) {
             commands.add("--haveApi");
+        }
+
+        if (settings.isLegacyStructure()) {
+            commands.add("--legacy");
         }
 
         commands.add(settings.getPluginName());
