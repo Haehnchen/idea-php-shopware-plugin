@@ -79,6 +79,10 @@ public class ShopwareSettingsForm implements Configurable {
         updateUIFromSettings();
     }
 
+    @Override
+    public void disposeUIResources() {
+    }
+
     private void updateUIFromSettings() {
         this.cliToolsPharPathTextField.setText(
             ShopwareApplicationSettings.getInstance().cliToolsPharUrl

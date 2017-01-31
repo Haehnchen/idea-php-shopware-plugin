@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.1
+* Added new attribute tables #56 @shyim
+* Cli tools: add support for legacy option, provide configuration for cli phar url and support local path [#58](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/58)
+
 ## 2.7
 * Add snippet template usage und ini files index [#53](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/53)
 * Add snippet references for ExtJs and Smarty files [#53](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/53)
