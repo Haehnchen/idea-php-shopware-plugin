@@ -7,6 +7,7 @@ import de.espend.idea.shopware.action.generator.dict.PluginGeneratorSettings;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -87,14 +88,14 @@ public class PluginGeneratorDialog extends JDialog {
         dispose();
     }
 
-    public static PluginGeneratorDialog createAndShow(@NotNull Callback callback) {
+    public static PluginGeneratorDialog createAndShow(@Nullable Component component, @NotNull Callback callback) {
         PluginGeneratorDialog dialog = new PluginGeneratorDialog(callback);
         dialog.setTitle("Shopware: Plugin Generator");
         dialog.setIconImage(Symfony2Icons.getImage(ShopwarePluginIcons.SHOPWARE));
         dialog.pack();
 
         dialog.setMinimumSize(new Dimension(350, 250));
-        dialog.setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo(component);
         dialog.setVisible(true);
 
         return dialog;

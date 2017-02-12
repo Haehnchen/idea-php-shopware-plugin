@@ -4,6 +4,7 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.navigation.GotoRelatedItem;
+import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -111,7 +112,15 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             }
         }
 
-        return new LineMarkerInfo<>(lineMarkerTarget, lineMarkerTarget.getTextOffset(), ShopwarePluginIcons.SHOPWARE_LINEMARKER, 6, new ConstantFunction<>(title), new fr.adrienbrault.idea.symfony2plugin.dic.RelatedPopupGotoLineMarker.NavigationHandler(gotoRelatedItems));
+        return new LineMarkerInfo<>(
+            lineMarkerTarget,
+            lineMarkerTarget.getTextRange(),
+            ShopwarePluginIcons.SHOPWARE_LINEMARKER,
+            6,
+            new ConstantFunction<>(title),
+            new fr.adrienbrault.idea.symfony2plugin.dic.RelatedPopupGotoLineMarker.NavigationHandler(gotoRelatedItems),
+            GutterIconRenderer.Alignment.RIGHT
+        );
     }
 
     public void attachImplementsBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos, Set<VirtualFile> virtualFiles) {

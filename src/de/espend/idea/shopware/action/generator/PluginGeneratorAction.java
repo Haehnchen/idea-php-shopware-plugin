@@ -3,6 +3,7 @@ package de.espend.idea.shopware.action.generator;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import de.espend.idea.shopware.ShopwarePluginIcons;
@@ -35,6 +36,6 @@ public class PluginGeneratorAction extends DumbAwareAction {
             return;
         }
 
-        PluginGeneratorDialog.createAndShow(settings -> PluginGeneratorUtil.installPlugin(project, settings));
+        PluginGeneratorDialog.createAndShow(null, settings -> PluginGeneratorUtil.installPlugin(project, settings));
     }
 }

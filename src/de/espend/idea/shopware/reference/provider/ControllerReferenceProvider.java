@@ -3,10 +3,10 @@ package de.espend.idea.shopware.reference.provider;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiPolyVariantReferenceBase;
 import com.intellij.psi.ResolveResult;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.jetbrains.php.lang.psi.resolve.PhpResolveResult;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +41,7 @@ public class ControllerReferenceProvider extends PsiPolyVariantReferenceBase<Psi
             }
         }, moduleName);
 
-        return PhpResolveResult.createResults(targets);
+        return PsiElementResolveResult.createResults(targets);
     }
 
     @NotNull
