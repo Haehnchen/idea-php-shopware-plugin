@@ -1,6 +1,9 @@
 # Changelog
 
-## 2.7.1
+## 2.7.3
+* Replace deprecated api usages
+
+## 2.7.2
 * Added new attribute tables #56 @shyim
 * Cli tools: add support for legacy option, provide configuration for cli phar url and support local path [#58](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/58)
 
