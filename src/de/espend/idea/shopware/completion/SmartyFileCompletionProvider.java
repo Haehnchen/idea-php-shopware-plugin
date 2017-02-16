@@ -16,6 +16,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.smarty.SmartyFile;
 import com.jetbrains.smarty.SmartyFileType;
+import com.jetbrains.smarty.lang.SmartyTokenTypes;
 import com.jetbrains.smarty.lang.psi.SmartyTag;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
@@ -40,12 +41,23 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
-
                     if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
                         return;
                     }
 
-                    result.addAllElements(getTemplateCompletion(parameters.getPosition().getProject(), "tpl"));
+                    CompletionResultSet myResultSet = result;
+
+                    // strip prefix to provide completion:
+                    // {extends file="parent:<caret>"}
+                    PsiElement position = parameters.getPosition();
+                    if(position.getNode().getElementType() == SmartyTokenTypes.STRING_LITERAL) {
+                        String text = position.getText();
+                        if(text.toLowerCase().startsWith("parent:")) {
+                            myResultSet = result.withPrefixMatcher("");
+                        }
+                    }
+
+                    myResultSet.addAllElements(getTemplateCompletion(position.getProject(), "tpl"));
                 }
             }
         );
