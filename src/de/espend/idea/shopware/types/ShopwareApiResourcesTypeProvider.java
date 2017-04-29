@@ -45,7 +45,7 @@ public class ShopwareApiResourcesTypeProvider implements PhpTypeProvider2 {
             return null;
         }
 
-        return PhpTypeProviderUtil.getReferenceSignature((MethodReference) e, TRIM_KEY);
+        return PhpTypeProviderUtil.getReferenceSignatureByFirstParameter((MethodReference) e, TRIM_KEY);
     }
 
     @Override
@@ -81,12 +81,10 @@ public class ShopwareApiResourcesTypeProvider implements PhpTypeProvider2 {
 
         // finally search the classes
         if(new Symfony2InterfacesUtil().isCallTo((Method) phpNamedElement, "\\Shopware\\Components\\Api\\Manager", "getResource")) {
-
             PhpClass phpClass = ShopwareUtil.getResourceClass(project, parameter);
             if(phpClass != null) {
-                return Arrays.asList(phpClass);
+                return Collections.singletonList(phpClass);
             }
-
         }
 
         return phpNamedElementCollections;
