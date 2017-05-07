@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.7.4
+* Plugin PhpTypeProvider3 migration [#45](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/45)
+
 ## 2.7.3
 * Replace deprecated api usages
 

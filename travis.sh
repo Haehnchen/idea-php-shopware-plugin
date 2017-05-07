@@ -89,7 +89,7 @@ download "https://plugins.jetbrains.com/files/8133/27005/php-toolbox.jar"
 cp $travisCache/php-toolbox.jar ./plugins
 
 rm -f $travisCache/symfony2-plugin.jar
-download "https://plugins.jetbrains.com/files/7219/30192/symfony2-plugin.jar"
+download "https://jetbrains-plugins.s3.amazonaws.com/7219/34907/symfony2-plugin.jar"
 cp $travisCache/symfony2-plugin.jar ./plugins
 
 # Run the tests
