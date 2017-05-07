@@ -166,6 +166,10 @@
   <depends>com.intellij.modules.lang</depends>
   -->
 
+    <extensions defaultExtensionNs="com.jetbrains.php">
+        <typeProvider3 implementation="de.espend.idea.shopware.types.ShopwareApiResourcesTypeProvider"/>
+    </extensions>
+
   <extensions defaultExtensionNs="com.intellij">
       <psi.referenceContributor implementation="de.espend.idea.shopware.reference.EventSubscriberReferenceContributor"/>
 
@@ -186,8 +190,6 @@
       <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="de.espend.idea.shopware.navigation.ExtJsTemplateLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="Smarty" implementationClass="de.espend.idea.shopware.navigation.SmartyTemplateLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="de.espend.idea.shopware.navigation.PhpLineMarkerProvider"/>
-
-      <php.typeProvider2 implementation="de.espend.idea.shopware.types.ShopwareApiResourcesTypeProvider"/>
 
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyBlockStubIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyIncludeStubIndex"/>
