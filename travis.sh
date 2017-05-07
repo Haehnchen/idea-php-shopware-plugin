@@ -92,6 +92,10 @@ rm -f $travisCache/symfony2-plugin.jar
 download "https://jetbrains-plugins.s3.amazonaws.com/7219/34907/symfony2-plugin.jar"
 cp $travisCache/symfony2-plugin.jar ./plugins
 
+rm -f $travisCache/php-annotation.jar
+download "http://plugins.jetbrains.com/files/7320/19208/php-annotation.jar"
+cp $travisCache/php-annotation.jar ./plugins
+
 # Run the tests
 if [ "$1" = "-d" ]; then
     ant -d -f build-test.xml -DIDEA_HOME=./idea
