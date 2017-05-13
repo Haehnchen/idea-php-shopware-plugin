@@ -6,6 +6,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.XmlPatternUtil;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +37,7 @@ public class ShopwareXmlCompletion extends CompletionContributor {
         @Override
         protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
             PsiElement psiElement = completionParameters.getOriginalPosition();
-            if(psiElement == null) {
+            if(psiElement == null || !ShopwareProjectComponent.isValidForProject(psiElement)) {
                 return;
             }
 

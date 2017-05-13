@@ -3,6 +3,7 @@ package de.espend.idea.shopware.inspection;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
@@ -12,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpReturn;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,8 +31,10 @@ public class ShopwareBoostrapInspection extends LocalInspectionTool {
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(final @NotNull ProblemsHolder holder, boolean isOnTheFly) {
-
         PsiFile psiFile = holder.getFile();
+        if(!ShopwareProjectComponent.isValidForProject(psiFile)) {
+            return super.buildVisitor(holder, isOnTheFly);
+        }
 
         if("Bootstrap.php".equals(psiFile.getName())) {
             psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {

@@ -8,6 +8,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ExtJsUtil;
 import de.espend.idea.shopware.util.SnippetUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
@@ -30,7 +31,7 @@ public class ShopwareJavaScriptCompletion extends CompletionContributor {
             @Override
             protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext processingContext, @NotNull CompletionResultSet resultSet) {
                 PsiElement position = parameters.getOriginalPosition();
-                if(!Symfony2ProjectComponent.isEnabled(position)) {
+                if(!ShopwareProjectComponent.isValidForProject(position)) {
                     return;
                 }
 

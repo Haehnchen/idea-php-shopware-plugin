@@ -32,6 +32,9 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
+        if(psiElements.size() == 0 || !ShopwareProjectComponent.isValidForProject(psiElements.get(0))) {
+            return;
+        }
 
         for(PsiElement psiElement: psiElements) {
 

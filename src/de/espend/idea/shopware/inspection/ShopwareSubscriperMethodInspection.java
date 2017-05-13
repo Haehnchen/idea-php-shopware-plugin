@@ -10,6 +10,7 @@ import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.inspection.quickfix.CreateMethodQuickFix;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import org.apache.commons.lang.StringUtils;
@@ -29,8 +30,10 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(final @NotNull ProblemsHolder holder, boolean isOnTheFly) {
-
         PsiFile psiFile = holder.getFile();
+        if(!ShopwareProjectComponent.isValidForProject(psiFile)) {
+            return super.buildVisitor(holder, isOnTheFly);
+        }
 
         String name = psiFile.getName();
 

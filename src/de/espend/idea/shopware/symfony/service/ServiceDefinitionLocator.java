@@ -1,6 +1,7 @@
 package de.espend.idea.shopware.symfony.service;
 
 import com.jetbrains.php.lang.psi.elements.Method;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
 import fr.adrienbrault.idea.symfony2plugin.extension.ServiceDefinitionLocatorParameter;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,10 @@ public class ServiceDefinitionLocator implements fr.adrienbrault.idea.symfony2pl
 
     @Override
     public void locate(@NotNull String service, @NotNull ServiceDefinitionLocatorParameter parameter) {
+        if(!ShopwareProjectComponent.isValidForProject(parameter.getProject())) {
+            return;
+        }
+
         SubscriberIndexUtil.getIndexedBootstrapResources(parameter.getProject()).forEach(resource -> {
             if(!service.equalsIgnoreCase(resource.getServiceName())) {
                 return;

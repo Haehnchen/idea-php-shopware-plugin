@@ -15,6 +15,7 @@ import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.completion.ShopwarePhpCompletion;
 import de.espend.idea.shopware.util.ConfigUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
@@ -34,6 +35,9 @@ public class PhpGoToHandler implements GotoDeclarationHandler {
     @Nullable
     @Override
     public PsiElement[] getGotoDeclarationTargets(PsiElement psiElement, int i, Editor editor) {
+        if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+            return new PsiElement[0];
+        }
 
         List<PsiElement> psiElements = new ArrayList<>();
 

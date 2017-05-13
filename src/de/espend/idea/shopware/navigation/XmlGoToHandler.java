@@ -8,6 +8,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.psi.xml.XmlText;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.completion.ShopwareXmlCompletion;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.XmlPatternUtil;
@@ -24,9 +25,8 @@ public class XmlGoToHandler implements GotoDeclarationHandler {
     @Nullable
     @Override
     public PsiElement[] getGotoDeclarationTargets(@Nullable PsiElement psiElement, int i, Editor editor) {
-
-        if(psiElement == null) {
-            return null;
+        if(psiElement == null || !ShopwareProjectComponent.isValidForProject(psiElement)) {
+            return new PsiElement[0];
         }
 
         PsiElement parent = psiElement.getParent();

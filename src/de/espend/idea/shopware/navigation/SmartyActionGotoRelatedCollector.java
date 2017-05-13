@@ -5,6 +5,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import de.espend.idea.shopware.ShopwarePluginIcons;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.TemplateUtil;
 import fr.adrienbrault.idea.symfony2plugin.extension.ControllerActionGotoRelatedCollector;
 import fr.adrienbrault.idea.symfony2plugin.extension.ControllerActionGotoRelatedCollectorParameter;
@@ -21,13 +22,15 @@ import static fr.adrienbrault.idea.symfony2plugin.dic.RelatedPopupGotoLineMarker
  * @author Daniel Espendiller <daniel@espendiller.net>
  */
 public class SmartyActionGotoRelatedCollector implements ControllerActionGotoRelatedCollector {
-
-    public static String underscore(String str){
+    private static String underscore(String str){
         return StringUtils.capitalize(str).replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
     }
 
     @Override
     public void collectGotoRelatedItems(ControllerActionGotoRelatedCollectorParameter parameter) {
+        if(!ShopwareProjectComponent.isValidForProject(parameter.getProject())) {
+            return;
+        }
 
         PhpClass phpClass = parameter.getMethod().getContainingClass();
         if(phpClass == null) {

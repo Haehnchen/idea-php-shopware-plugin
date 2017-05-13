@@ -1,5 +1,6 @@
 package de.espend.idea.shopware.symfony.service;
 
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import fr.adrienbrault.idea.symfony2plugin.extension.ServiceCollector;
 import fr.adrienbrault.idea.symfony2plugin.extension.ServiceCollectorParameter;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +20,10 @@ public class DefaultServiceCollector implements ServiceCollector {
 
     @Override
     public void collectServices(@NotNull ServiceCollectorParameter.Service parameter) {
+        if(!ShopwareProjectComponent.isValidForProject(parameter.getProject())) {
+            return;
+        }
+
         DEFAULTS.forEach(parameter::add);
     }
 

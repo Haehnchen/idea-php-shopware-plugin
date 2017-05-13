@@ -34,7 +34,7 @@ import java.util.*;
  */
 public class LazySubscriberReferenceProvider extends CompletionContributor implements GotoDeclarationHandler {
 
-    public static final List<String> DOCTRINE_LIFECYCLES = Arrays.asList("prePersist", "postPersist", "preUpdate", "postUpdate", "preRemove", "postRemove");
+    private static final List<String> DOCTRINE_LIFECYCLES = Arrays.asList("prePersist", "postPersist", "preUpdate", "postUpdate", "preRemove", "postRemove");
     private static List<String> HOOK_EVENTS = Arrays.asList("after", "before", "replace");
 
     private static final Key<CachedValue<String[]>> HOOK_CACHE = new Key<>("SW_HOOK_CACHE");
@@ -78,15 +78,6 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
                 )
             ),
             new CompletionProvider<CompletionParameters>() {
-
-                private String toCamelCase(String value, boolean startWithLowerCase) {
-                    String[] strings = org.apache.commons.lang.StringUtils.split(value.toLowerCase(), "_");
-                    for (int i = startWithLowerCase ? 1 : 0; i < strings.length; i++) {
-                        strings[i] = org.apache.commons.lang.StringUtils.capitalize(strings[i]);
-                    }
-                    return org.apache.commons.lang.StringUtils.join(strings);
-                }
-
                 @Override
                 protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
 
@@ -253,7 +244,7 @@ public class LazySubscriberReferenceProvider extends CompletionContributor imple
     @Nullable
     @Override
     public PsiElement[] getGotoDeclarationTargets(@Nullable PsiElement psiElement, int i, Editor editor) {
-        if(psiElement == null) {
+        if(psiElement == null || !ShopwareProjectComponent.isValidForProject(psiElement)) {
             return new PsiElement[0];
         }
 

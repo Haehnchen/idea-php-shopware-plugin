@@ -7,6 +7,7 @@ import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.index.dict.BootstrapResource;
 import de.espend.idea.shopware.index.dict.ServiceResource;
 import de.espend.idea.shopware.index.utils.SubscriberIndexUtil;
@@ -28,6 +29,9 @@ public class ServiceCollector implements fr.adrienbrault.idea.symfony2plugin.ext
 
     @Override
     public void collectServices(@NotNull ServiceCollectorParameter.Service arg) {
+        if(!ShopwareProjectComponent.isValidForProject(arg.getProject())) {
+            return;
+        }
 
         // cache
         CachedValue<Collection<ServiceInterface>> cache = arg.getProject().getUserData(SERVICE_CACHE);
@@ -43,6 +47,9 @@ public class ServiceCollector implements fr.adrienbrault.idea.symfony2plugin.ext
 
     @Override
     public void collectIds(@NotNull ServiceCollectorParameter.Id arg) {
+        if(!ShopwareProjectComponent.isValidForProject(arg.getProject())) {
+            return;
+        }
 
         // cache
         CachedValue<Collection<String>> cache = arg.getProject().getUserData(SERVICE_NAME_CACHE);

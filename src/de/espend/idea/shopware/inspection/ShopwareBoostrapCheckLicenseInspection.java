@@ -13,6 +13,7 @@ import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpReturn;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,25 +26,21 @@ public class ShopwareBoostrapCheckLicenseInspection extends LocalInspectionTool 
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(final @NotNull ProblemsHolder holder, boolean isOnTheFly) {
+        PsiFile psiFile = holder.getFile();
+        if(!ShopwareProjectComponent.isValidForProject(psiFile)) {
+            return super.buildVisitor(holder, isOnTheFly);
+        }
 
-        final PsiFile psiFile = holder.getFile();
-
-        /**
-         * Only run inspection if the file is a bootstrap.php, then iterate over each element in class.
-         */
+        // Only run inspection if the file is a bootstrap.php, then iterate over each element in class.
         if ("Bootstrap.php".equals(psiFile.getName())) {
             psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
                 @Override
                 public void visitElement(PsiElement element) {
-                    /**
-                     * We only want elements that are methods, nothing else...
-                     */
+                    // We only want elements that are methods, nothing else...
                     if (element instanceof Method) {
 
                         if (CHECK_LICENSE_METHOD_NAME.equals(((Method) element).getName())) {
-                            /**
-                             * Check if method is not empty.
-                             */
+                             // Check if method is not empty.
                             String methodName = ((Method) element).getName();
                             if (PsiTreeUtil.collectElementsOfType(element, PhpReturn.class).size() == 0) {
                                 PsiElement psiElement = PsiElementUtils.getChildrenOfType(element, PlatformPatterns.psiElement(PhpTokenTypes.IDENTIFIER).withText(methodName));
@@ -52,15 +49,11 @@ public class ShopwareBoostrapCheckLicenseInspection extends LocalInspectionTool 
                                 }
                             }
 
-                            /**
-                             * Check if checkLicense-method is actually called.
-                             */
+                            // Check if checkLicense-method is actually called.
                             final int[] counterOfFoundCallsOfCheckLicense = {0};
                             final ArrayList<String> checkLicenseCalledFrom = new ArrayList<>();
 
-                            /**
-                             * Count occurrences of calls and where it is called
-                             */
+                            // Count occurrences of calls and where it is called
                             psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
                                 public void visitElement(PsiElement element) {
 
@@ -72,31 +65,25 @@ public class ShopwareBoostrapCheckLicenseInspection extends LocalInspectionTool 
                                         }
                                     }
 
-                                    /**
-                                     * Super must be called at the end.
-                                     */
+                                    // Super must be called at the end.
                                     super.visitElement(element);
                                 }
                             });
 
-                            /**
-                             * Handle the situation when no call was found, or not from install()
-                             */
+                            // Handle the situation when no call was found, or not from install()
                             if (0 == counterOfFoundCallsOfCheckLicense[0] || !checkLicenseCalledFrom.contains("install")) {
                                 // todo: add english wiki page!!
                                 String descriptionTemplate = "This method should be called at least once from install()-function.";
                                 holder.registerProblem(element, descriptionTemplate, ProblemHighlightType.GENERIC_ERROR);
                             }
                         }
-
                     }
+
                     super.visitElement(element);
                 }
             });
-
         }
 
         return super.buildVisitor(holder, isOnTheFly);
     }
-
 }

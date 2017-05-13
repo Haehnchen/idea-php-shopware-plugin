@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
+import de.espend.idea.shopware.ShopwareProjectComponent;
 import de.espend.idea.shopware.util.ExtJsUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,10 @@ public class JavascriptFoldingBuilder extends FoldingBuilderEx {
     @NotNull
     @Override
     public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement psiElement, @NotNull Document document, boolean b) {
+        if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
+            return new FoldingDescriptor[0];
+        }
+
         Collection<FoldingDescriptor> foldingDescriptors = new ArrayList<>();
 
         for (PsiElement element : psiElement.getChildren()) {

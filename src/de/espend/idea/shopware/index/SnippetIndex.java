@@ -37,7 +37,7 @@ public class SnippetIndex extends FileBasedIndexExtension<String, Set<String>> {
     @Override
     public DataIndexer<String, Set<String>, FileContent> getIndexer() {
         return inputData -> {
-            if(!Symfony2ProjectComponent.isEnabledForIndex(inputData.getProject())) {
+            if(!Symfony2ProjectComponent.isEnabled(inputData.getProject())) {
                 return Collections.emptyMap();
             }
 

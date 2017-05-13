@@ -107,21 +107,23 @@ public class ShopwareProjectComponent implements ProjectComponent {
     }
 
     public static boolean isValidForProject(@Nullable PsiElement psiElement) {
-        if(psiElement == null) return false;
-
-        if(Symfony2ProjectComponent.isEnabled(psiElement)) {
+        if(ApplicationManager.getApplication().isUnitTestMode()) {
             return true;
         }
 
-        if(VfsUtil.findRelativeFile(psiElement.getProject().getBaseDir(), "engine", "Shopware", "Kernel.php") != null) {
+        return psiElement != null && isValidForProject(psiElement.getProject());
+    }
+
+    public static boolean isValidForProject(@Nullable Project project) {
+        if(project == null || Symfony2ProjectComponent.isEnabled(project)) {
             return true;
         }
 
-        if(PhpElementsUtil.getClassInterface(psiElement.getProject(), "\\Enlight_Controller_Action") != null) {
+        if(VfsUtil.findRelativeFile(project.getBaseDir(), "engine", "Shopware", "Kernel.php") != null) {
             return true;
         }
 
-        return false;
+        return PhpElementsUtil.getClassInterface(project, "\\Enlight_Controller_Action") != null;
     }
 
 
