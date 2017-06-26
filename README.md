@@ -16,7 +16,7 @@ Changelog   | [CHANGELOG](CHANGELOG.md)
 Dependencies
 ---------------------
 * [Symfony Plugin](https://plugins.jetbrains.com/plugin/7219)
-* (Optional) [PHP Annotations](https://plugins.jetbrains.com/plugin/7320) Doctrine support
+* (Required) [PHP Annotations](https://plugins.jetbrains.com/plugin/7320) Doctrine support
 * (Optional) [PHP Toolbox](https://plugins.jetbrains.com/plugin/8133) Improved Symfony + DIC Support
 
 Documentation and tutorials
