@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.jetbrains.php.lang.PhpFileType;
+import de.espend.idea.license.LicenseApplication;
 import de.espend.idea.shopware.index.EventConfigGoToIndex;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
@@ -115,6 +116,11 @@ public class ShopwareProjectComponent implements ProjectComponent {
     }
 
     public static boolean isValidForProject(@Nullable Project project) {
+        LicenseApplication component = ApplicationManager.getApplication().getComponent(LicenseApplication.class);
+        if(component == null || !component.isLicensed()) {
+            return false;
+        }
+
         if(project == null || Symfony2ProjectComponent.isEnabled(project)) {
             return true;
         }

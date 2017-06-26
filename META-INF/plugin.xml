@@ -231,6 +231,7 @@
                            nonDefaultProject="true"
       />
 
+      <applicationService serviceImplementation="de.espend.idea.license.LicenseApplicationSettings"/>
   </extensions>
 
     <extensions defaultExtensionNs="fr.adrienbrault.idea.symfony2plugin.extension">
@@ -252,15 +253,17 @@
     <depends>JavaScript</depends>
     <depends optional="true">de.espend.idea.php.toolbox</depends>
 
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
-
     <project-components>
         <component>
             <implementation-class>de.espend.idea.shopware.ShopwareProjectComponent</implementation-class>
         </component>
     </project-components>
+
+    <application-components>
+        <component>
+            <implementation-class>de.espend.idea.license.LicenseApplication</implementation-class>
+        </component>
+    </application-components>
 
   <actions>
       <group id="ShopwareGroup" text="Shopware" popup="false">
