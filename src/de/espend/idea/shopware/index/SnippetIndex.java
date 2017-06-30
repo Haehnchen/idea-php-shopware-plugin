@@ -3,7 +3,6 @@ package de.espend.idea.shopware.index;
 import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.psi.PsiFile;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
@@ -22,6 +21,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class SnippetIndex extends FileBasedIndexExtension<String, Set<String>> {
 
     public static final ID<String, Set<String>> KEY = ID.create("de.espend.idea.shopware.snippets");
@@ -41,17 +43,17 @@ public class SnippetIndex extends FileBasedIndexExtension<String, Set<String>> {
                 return Collections.emptyMap();
             }
 
-            final Map<String, Set<String>> snippets = new THashMap<>();
+            Map<String, Set<String>> snippets = new THashMap<>();
 
-            PsiFile psiFile = inputData.getPsiFile();
-            if (psiFile instanceof SmartyFile) {
+            FileType fileType = inputData.getFileType();
+            if (fileType == SmartyFileType.INSTANCE && inputData.getPsiFile() instanceof SmartyFile) {
                 // template files
 
-                for (ShopwareSnippet snippet : SnippetUtil.getSnippetsInFile((SmartyFile) psiFile)) {
+                for (ShopwareSnippet snippet : SnippetUtil.getSnippetsInFile((SmartyFile) inputData.getPsiFile())) {
                     snippets.putIfAbsent(snippet.getNamespace(), new HashSet<>());
                     snippets.get(snippet.getNamespace()).add(snippet.getName());
                 }
-            } else if ("ini".equalsIgnoreCase((inputData.getFile().getExtension()))) {
+            } else if (inputData.getFileName().endsWith(".ini")) {
                 // ini files
 
                 String presentableUrl = inputData.getFile().getUrl();
@@ -64,8 +66,8 @@ public class SnippetIndex extends FileBasedIndexExtension<String, Set<String>> {
                         snippets.get(namespace).addAll(iniKeys);
                     }
                 }
-            } else if (psiFile instanceof JSFile) {
-                for (ShopwareSnippet snippet : SnippetUtil.getSnippetsInFile((JSFile) psiFile)) {
+            } else if (fileType  == JavaScriptFileType.INSTANCE && inputData.getPsiFile() instanceof JSFile) {
+                for (ShopwareSnippet snippet : SnippetUtil.getSnippetsInFile((JSFile) inputData.getPsiFile())) {
                     snippets.putIfAbsent(snippet.getNamespace(), new HashSet<>());
                     snippets.get(snippet.getNamespace()).add(snippet.getName());
                 }
