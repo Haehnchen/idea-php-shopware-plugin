@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.7.5
+* Fix exception in INI files / snippet indexing [#62](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/62)
+
 ## 2.7.4
 * Plugin PhpTypeProvider3 migration [#45](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/45)
 
