@@ -1,7 +1,7 @@
 <idea-plugin url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>2.7.5</version>
+  <version>2.7.6</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
   <description><![CDATA[
@@ -52,6 +52,11 @@
     ]]></description>
 
   <change-notes><![CDATA[
+
+<h2>2.7.6</h2>
+<ul>
+    <li>Fix regression in controller action related file collector by implementing __invoke support into Symfony plugin <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/63">#63</a></li>
+</ul>
 
 <h2>2.7.5</h2>
 <ul>

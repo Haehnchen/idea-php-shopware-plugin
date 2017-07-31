@@ -7,6 +7,7 @@ import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.intellij.util.io.VoidDataExternalizer;
 import com.jetbrains.smarty.SmartyFileType;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.TemplateUtil;
@@ -38,7 +39,7 @@ public class SmartyIncludeStubIndex extends FileBasedIndexExtension<String, Void
 
             @NotNull
             @Override
-            public Map<String, Void> map(FileContent inputData) {
+            public Map<String, Void> map(@NotNull FileContent inputData) {
                 final Map<String, Void> map = new THashMap<>();
 
                 PsiFile psiFile = inputData.getPsiFile();
@@ -77,16 +78,19 @@ public class SmartyIncludeStubIndex extends FileBasedIndexExtension<String, Void
         };
     }
 
+    @NotNull
     @Override
     public KeyDescriptor<String> getKeyDescriptor() {
         return this.myKeyDescriptor;
     }
 
+    @NotNull
     @Override
     public DataExternalizer<Void> getValueExternalizer() {
-        return ScalarIndexExtension.VOID_DATA_EXTERNALIZER;
+        return VoidDataExternalizer.INSTANCE;
     }
 
+    @NotNull
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
         return file -> file.getFileType() == SmartyFileType.INSTANCE;
