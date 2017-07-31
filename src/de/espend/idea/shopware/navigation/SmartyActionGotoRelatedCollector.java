@@ -3,6 +3,7 @@ package de.espend.idea.shopware.navigation;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
@@ -12,7 +13,7 @@ import fr.adrienbrault.idea.symfony2plugin.extension.ControllerActionGotoRelated
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +33,16 @@ public class SmartyActionGotoRelatedCollector implements ControllerActionGotoRel
             return;
         }
 
-        PhpClass phpClass = parameter.getMethod().getContainingClass();
+        Method method = parameter.getMethod();
+        String methodName = method.getName();
+
+        // we support only "fooAction" here
+        // __invoke like in Symfony are ignored
+        if(!methodName.endsWith("Action")) {
+            return;
+        }
+
+        PhpClass phpClass = method.getContainingClass();
         if(phpClass == null) {
             return;
         }
@@ -49,17 +59,14 @@ public class SmartyActionGotoRelatedCollector implements ControllerActionGotoRel
         String moduleName = underscore(matcher.group(1));
         String controller = underscore(matcher.group(2));
 
-        String methodName = parameter.getMethod().getName();
-
         // ajaxLoginAction > ajax_login
         String methodNameNormalize = underscore(methodName.substring(0, methodName.length() - 6));
 
-        final String templateName = String.format("%s/%s/%s.tpl", moduleName, controller, methodNameNormalize);
-        final Project project = parameter.getProject();
-        final List<PsiFile> psiFiles = new ArrayList<>();
+        String templateName = String.format("%s/%s/%s.tpl", moduleName, controller, methodNameNormalize);
+        Project project = parameter.getProject();
+        Collection<PsiFile> psiFiles = new ArrayList<>();
 
         TemplateUtil.collectFiles(project, (virtualFile, fileName) -> {
-
             if (!fileName.equals(templateName)) {
                 return;
             }
@@ -77,7 +84,5 @@ public class SmartyActionGotoRelatedCollector implements ControllerActionGotoRel
         for(PsiFile psiFile: psiFiles) {
             parameter.add(new PopupGotoRelatedItem(psiFile, psiFile.getVirtualFile().getUrl()).withIcon(ShopwarePluginIcons.SHOPWARE, ShopwarePluginIcons.SHOPWARE_LINEMARKER));
         }
-
     }
-
 }
