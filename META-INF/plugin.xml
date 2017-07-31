@@ -56,6 +56,7 @@
 <h2>2.7.6</h2>
 <ul>
     <li>Fix regression in controller action related file collector by implementing __invoke support into Symfony plugin <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/63">#63</a></li>
+    <li>Replace deprecated ScalarIndexExtension usage in index process</li>
 </ul>
 
 <h2>2.7.5</h2>
