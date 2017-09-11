@@ -4,6 +4,7 @@ IntelliJ IDEA / PhpStorm Shopware Plugin
 [![Version](http://phpstorm.espend.de/badge/7410/version)](https://plugins.jetbrains.com/plugin/7410)
 [![Downloads](http://phpstorm.espend.de/badge/7410/downloads)](https://plugins.jetbrains.com/plugin/7410)
 [![Downloads last month](http://phpstorm.espend.de/badge/7410/last-month)](https://plugins.jetbrains.com/plugin/7410)
+[![Donate to this project using Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/DanielEspendiller)
 
 IntelliJ IDEA / PhpStorm Plugin for [Shopware](http://www.shopware.de/ "Shopware")
 
