@@ -146,9 +146,7 @@ public class SnippetUtil {
 
     @NotNull
     public static Set<String> getSnippetNamespaces(@NotNull Project project) {
-        SymfonyProcessors.CollectProjectUniqueKeys processor = new SymfonyProcessors.CollectProjectUniqueKeys(project, SnippetIndex.KEY);
-        FileBasedIndex.getInstance().processAllKeys(SnippetIndex.KEY, processor, project);
-        return processor.getResult();
+        return SymfonyProcessors.createResult(project, SnippetIndex.KEY);
     }
 
     @NotNull

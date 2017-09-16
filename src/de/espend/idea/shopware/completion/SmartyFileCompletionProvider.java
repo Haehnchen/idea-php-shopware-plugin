@@ -106,9 +106,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
                     }
 
                     // weak block on file include; use index here
-                    SymfonyProcessors.CollectProjectUniqueKeys ymlProjectProcessor = new SymfonyProcessors.CollectProjectUniqueKeys(containingFile.getProject(), SmartyBlockStubIndex.KEY);
-                    FileBasedIndex.getInstance().processAllKeys(SmartyBlockStubIndex.KEY, ymlProjectProcessor, containingFile.getProject());
-                    for(String s: ymlProjectProcessor.getResult()) {
+                    for(String s: SymfonyProcessors.createResult(containingFile.getProject(), SmartyBlockStubIndex.KEY)) {
                         Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(SmartyBlockStubIndex.KEY, s, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(containingFile.getProject()), SmartyFileType.INSTANCE));
 
                         LookupElementBuilder lookupElementBuilder = LookupElementBuilder.create(s).withIcon(ShopwarePluginIcons.SHOPWARE_WEAK);
