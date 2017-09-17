@@ -101,7 +101,7 @@ download "http://phpstorm.espend.de/files/proxy/plugins/php-toolbox.jar"
 cp $travisCache/php-toolbox.jar ./plugins
 
 rm -f $travisCache/symfony2-plugin.jar
-download "https://jetbrains-plugins.s3.amazonaws.com/7219/34907/symfony2-plugin.jar"
+download "https://download.plugins.jetbrains.com/7219/38822/symfony2-plugin.jar"
 cp $travisCache/symfony2-plugin.jar ./plugins
 
 rm -f $travisCache/php-annotation.jar
