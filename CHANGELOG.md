@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.8
+* Removed deprecated Symfony Plugin usages
+
 ## 2.7.6
 * Fix regression in controller action related file collector by implementing __invoke support into Symfony plugin [#63](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/63)
 * Replace deprecated ScalarIndexExtension usage in index process
