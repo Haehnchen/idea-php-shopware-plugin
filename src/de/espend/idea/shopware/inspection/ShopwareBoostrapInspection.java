@@ -3,12 +3,10 @@ package de.espend.idea.shopware.inspection;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -36,30 +34,28 @@ public class ShopwareBoostrapInspection extends LocalInspectionTool {
             return super.buildVisitor(holder, isOnTheFly);
         }
 
-        if("Bootstrap.php".equals(psiFile.getName())) {
-            psiFile.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
-                @Override
-                public void visitElement(PsiElement element) {
-                    if(element instanceof Method) {
-
-                        String methodName = ((Method) element).getName();
-                        if(INSTALL_METHODS.contains(((Method) element).getName())) {
-                            if(PsiTreeUtil.collectElementsOfType(element, PhpReturn.class).size() == 0) {
-                                PsiElement psiElement = PsiElementUtils.getChildrenOfType(element, PlatformPatterns.psiElement(PhpTokenTypes.IDENTIFIER).withText(methodName));
-                                if(psiElement != null) {
-                                    holder.registerProblem(psiElement, "Shopware need return statement", ProblemHighlightType.GENERIC_ERROR);
-                                }
-                            }
-                        }
-
-                    }
-                    super.visitElement(element);
-                }
-            });
-
+        if(!"Bootstrap.php".equals(psiFile.getName())) {
+            return super.buildVisitor(holder, isOnTheFly);
         }
 
-        return super.buildVisitor(holder, isOnTheFly);
-    }
+        return new PsiElementVisitor() {
+            @Override
+            public void visitElement(PsiElement element) {
+                if(element instanceof Method) {
+                    String methodName = ((Method) element).getName();
+                    if(INSTALL_METHODS.contains(((Method) element).getName())) {
+                        if(PsiTreeUtil.collectElementsOfType(element, PhpReturn.class).size() == 0) {
+                            PsiElement psiElement = PsiElementUtils.getChildrenOfType(element, PlatformPatterns.psiElement(PhpTokenTypes.IDENTIFIER).withText(methodName));
+                            if(psiElement != null) {
+                                holder.registerProblem(psiElement, "Shopware need return statement", ProblemHighlightType.GENERIC_ERROR);
+                            }
+                        }
+                    }
 
+                }
+
+                super.visitElement(element);
+            }
+        };
+    }
 }
