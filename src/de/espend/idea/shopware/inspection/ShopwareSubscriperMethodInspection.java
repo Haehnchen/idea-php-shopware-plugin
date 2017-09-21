@@ -31,6 +31,7 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
     @Override
     public PsiElementVisitor buildVisitor(final @NotNull ProblemsHolder holder, boolean isOnTheFly) {
         PsiFile psiFile = holder.getFile();
+
         if(!ShopwareProjectComponent.isValidForProject(psiFile)) {
             return super.buildVisitor(holder, isOnTheFly);
         }
@@ -42,14 +43,14 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
             return super.buildVisitor(holder, isOnTheFly);
         }
 
-        psiFile.acceptChildren(new MySubscriberRecursiveElementWalkingVisitor(holder));
-        return super.buildVisitor(holder, isOnTheFly);
+        return new MySubscriberRecursiveElementWalkingVisitor(holder);
     }
 
     private static class MyBootstrapRecursiveElementWalkingVisitor extends PsiRecursiveElementWalkingVisitor {
+        @NotNull
         private final ProblemsHolder holder;
 
-        public MyBootstrapRecursiveElementWalkingVisitor(ProblemsHolder holder) {
+        private MyBootstrapRecursiveElementWalkingVisitor(@NotNull ProblemsHolder holder) {
             this.holder = holder;
         }
 
@@ -58,10 +59,11 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
             if(element instanceof MethodReference && "subscribeEvent".equals(((MethodReference) element).getName())) {
                 visitMethodReference((MethodReference) element);
             }
+
             super.visitElement(element);
         }
 
-        public void visitMethodReference(final MethodReference reference) {
+        private void visitMethodReference(@NotNull MethodReference reference) {
 
             if(reference.getParameters().length < 2 || !(reference.getParameters()[1] instanceof StringLiteralExpression)) {
                 return;
@@ -122,16 +124,16 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
      *  'Shopware_Controllers_Frontend_Account::ajaxLogoutAction::before' => 'onFrontendLogout'
      * );
      */
-    private static class MySubscriberRecursiveElementWalkingVisitor extends PsiRecursiveElementWalkingVisitor {
+    private static class MySubscriberRecursiveElementWalkingVisitor extends PsiElementVisitor {
+        @NotNull
         private final ProblemsHolder holder;
 
-        public MySubscriberRecursiveElementWalkingVisitor(ProblemsHolder holder) {
+        private MySubscriberRecursiveElementWalkingVisitor(@NotNull ProblemsHolder holder) {
             this.holder = holder;
         }
 
         @Override
         public void visitElement(PsiElement element) {
-
             if(element instanceof StringLiteralExpression) {
                 String subscriperName = getHashKey((StringLiteralExpression) element);
                 if(subscriperName != null) {
@@ -151,7 +153,7 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
             super.visitElement(element);
         }
 
-        public void visitSubscriber(PhpClass phpClass, final StringLiteralExpression element, String subscriperName) {
+        private void visitSubscriber(@NotNull PhpClass phpClass, @NotNull StringLiteralExpression element, @NotNull String subscriperName) {
 
             final String contents = element.getContents();
             if(StringUtils.isBlank(contents)) {
@@ -184,7 +186,7 @@ public class ShopwareSubscriperMethodInspection extends LocalInspectionTool {
         }
     }
 
-    public static String getHashKey(@NotNull StringLiteralExpression psiElement) {
+    private static String getHashKey(@NotNull StringLiteralExpression psiElement) {
 
         PsiElement arrayValue = psiElement.getParent();
         if(arrayValue != null && arrayValue.getNode().getElementType() == PhpElementTypes.ARRAY_VALUE) {
