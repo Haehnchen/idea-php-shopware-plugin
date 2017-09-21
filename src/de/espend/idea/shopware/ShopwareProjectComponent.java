@@ -27,9 +27,9 @@ import java.util.*;
  */
 public class ShopwareProjectComponent implements ProjectComponent {
 
-    public static final int DUMPER_PERIODE = 600 * 1000;
+    private static final int DUMPER_PERIODE = 600 * 1000;
 
-    final Project project;
+    private final Project project;
     private Timer timer;
 
     public ShopwareProjectComponent(Project project) {

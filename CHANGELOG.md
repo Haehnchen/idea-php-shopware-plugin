@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.8.1
+* Use PsiElementVisitor callback for all plugin inspections
+
 ## 2.8
 * Removed deprecated Symfony Plugin usages
 
