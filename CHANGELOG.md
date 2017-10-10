@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.8.2
+* Fix binary incompatibility of plugin
+
 ## 2.8.1
 * Use PsiElementVisitor callback for all plugin inspections
 
