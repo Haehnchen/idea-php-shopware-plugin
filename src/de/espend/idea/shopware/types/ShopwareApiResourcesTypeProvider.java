@@ -11,7 +11,6 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.Settings;
-import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpTypeProviderUtil;
 import org.jetbrains.annotations.Nullable;
@@ -80,7 +79,7 @@ public class ShopwareApiResourcesTypeProvider implements PhpTypeProvider3 {
         }
 
         // finally search the classes
-        if(new Symfony2InterfacesUtil().isCallTo((Method) phpNamedElement, "\\Shopware\\Components\\Api\\Manager", "getResource")) {
+        if(PhpElementsUtil.isMethodInstanceOf((Method) phpNamedElement, "\\Shopware\\Components\\Api\\Manager", "getResource")) {
             PhpClass phpClass = ShopwareUtil.getResourceClass(project, parameter);
             if(phpClass != null) {
                 return Collections.singletonList(phpClass);

@@ -21,7 +21,6 @@ import de.espend.idea.shopware.reference.provider.SmartyTemplateProvider;
 import de.espend.idea.shopware.reference.provider.StringReferenceProvider;
 import de.espend.idea.shopware.util.HookSubscriberUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
-import fr.adrienbrault.idea.symfony2plugin.Symfony2InterfacesUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import fr.adrienbrault.idea.symfony2plugin.util.PsiElementUtils;
@@ -202,7 +201,7 @@ public class EventSubscriberReferenceContributor extends PsiReferenceContributor
                         return new PsiReference[0];
                     }
 
-                    if(!new Symfony2InterfacesUtil().isCallTo((MethodReference) parameterList.getContext(), "\\Enlight_Controller_Router", "assemble")) {
+                    if(PhpElementsUtil.isMethodReferenceInstanceOf((MethodReference) parameterList.getContext(), "\\Enlight_Controller_Router", "assemble")) {
                         return new PsiReference[0];
                     }
 
