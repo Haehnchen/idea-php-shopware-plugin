@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.8.3
+* Symfony Plugin compatibility release because of dropped Symfony2InterfacesUtil class
+
 ## 2.8.2
 * Fix binary incompatibility of plugin
 
