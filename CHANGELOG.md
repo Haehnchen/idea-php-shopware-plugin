@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.9
+* Optimize performance LineMarkerProvider targets must be attached to leaf elements [#69](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/69)
+
 ## 2.8.3
 * Symfony Plugin compatibility release because of dropped Symfony2InterfacesUtil class
 
