@@ -123,8 +123,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
         );
     }
 
-    public void attachImplementsBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos, Set<VirtualFile> virtualFiles) {
-
+    private void attachImplementsBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos, Set<VirtualFile> virtualFiles) {
         if(virtualFiles.size() == 0) {
             return;
         }
@@ -171,12 +170,9 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
             setTooltipText("Navigate to block");
 
         lineMarkerInfos.add(builder.createLineMarkerInfo(psiElement));
-
-
     }
 
     private void getImplementedBlocks(final Project project, VirtualFile virtualFile, final Set<VirtualFile> templatePathFiles, int depth) {
-
         if(templatePathFiles.contains(virtualFile) || depth-- <= 0) {
             return;
         }
