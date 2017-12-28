@@ -3,12 +3,14 @@ package de.espend.idea.shopware.navigation;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NotNullLazyValue;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -23,6 +25,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class PhpLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
@@ -32,7 +37,6 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, final @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
-
         if(psiElements.size() == 0 || !ShopwareProjectComponent.isValidForProject(psiElements.get(0))) {
             return;
         }
@@ -67,7 +71,6 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
         containingFile.accept(new PsiRecursiveElementWalkingVisitor() {
             @Override
             public void visitElement(PsiElement element) {
-
                 if(!(element instanceof MethodReference)) {
                     super.visitElement(element);
                     return;
@@ -91,11 +94,8 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
 
                                 methodTargets.get(methodName).add(parameters[1]);
                                 methodTargets.get(methodName).addAll(HookSubscriberUtil.getAllHookTargets(project, subscriberName));
-
                             }
-
                         }
-
                     }
                 }
 
@@ -111,7 +111,13 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
                     setTargets(method.getValue()).
                     setTooltipText("Related Targets");
 
-                lineMarkerInfos.add(builder.createLineMarkerInfo(methods.get(method.getKey())));
+                Method psiMethod = methods.get(method.getKey());
+
+                // attach linemarker to leaf item which is our function name for performance reasons
+                ASTNode node = psiMethod.getNode().findChildByType(PhpTokenTypes.IDENTIFIER);
+                if(node != null) {
+                    lineMarkerInfos.add(builder.createLineMarkerInfo(node.getPsi()));
+                }
             }
         }
     }
@@ -147,13 +153,16 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
                     setTargets(new MyCollectionNotNullLazyValue(result.getSecond(), result.getFirst())).
                     setTooltipText("Related Targets");
 
-                lineMarkerInfos.add(builder.createLineMarkerInfo(method));
+                // attach linemarker to leaf item which is our function name for performance reasons
+                ASTNode node = method.getNode().findChildByType(PhpTokenTypes.IDENTIFIER);
+                if(node != null) {
+                    lineMarkerInfos.add(builder.createLineMarkerInfo(node.getPsi()));
+                }
             }
         }
     }
 
     private static class MyCollectionNotNullLazyValue extends NotNullLazyValue<Collection<? extends PsiElement>> {
-
         @NotNull
         private final PsiElement event;
 
