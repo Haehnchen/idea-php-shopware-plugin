@@ -1,9 +1,7 @@
 package de.espend.idea.shopware.action.generator;
 
-
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import de.espend.idea.shopware.ShopwarePluginIcons;
@@ -11,6 +9,9 @@ import de.espend.idea.shopware.action.generator.ui.PluginGeneratorDialog;
 import de.espend.idea.shopware.action.generator.utils.PluginGeneratorUtil;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class PluginGeneratorAction extends DumbAwareAction {
 
     public PluginGeneratorAction() {

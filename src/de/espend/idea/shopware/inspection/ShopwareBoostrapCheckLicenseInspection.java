@@ -19,6 +19,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class ShopwareBoostrapCheckLicenseInspection extends LocalInspectionTool {
 
     final private static String CHECK_LICENSE_METHOD_NAME = "checkLicense";

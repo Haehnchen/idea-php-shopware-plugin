@@ -32,6 +32,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class TemplateUtil {
 
     public static void collectFiles(Project project, SmartyTemplateVisitor smartyTemplateVisitor) {

@@ -2,6 +2,9 @@ package de.espend.idea.shopware.action.generator.dict;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class PluginGeneratorSettings {
 
     @NotNull

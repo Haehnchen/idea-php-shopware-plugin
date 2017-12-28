@@ -15,6 +15,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class PluginGeneratorDialog extends JDialog {
     @NotNull
     private final Callback callback;

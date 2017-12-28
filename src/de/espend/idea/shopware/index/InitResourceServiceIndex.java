@@ -26,6 +26,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class InitResourceServiceIndex extends FileBasedIndexExtension<String, Set<String>> {
 
     public static final ID<String, Set<String>> KEY = ID.create("de.espend.idea.shopware.init_resource2");

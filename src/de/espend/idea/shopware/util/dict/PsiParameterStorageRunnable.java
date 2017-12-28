@@ -19,6 +19,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class PsiParameterStorageRunnable implements Runnable {
 
     private final Project project;

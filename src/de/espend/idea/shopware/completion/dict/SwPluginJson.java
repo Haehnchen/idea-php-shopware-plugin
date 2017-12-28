@@ -3,6 +3,9 @@ package de.espend.idea.shopware.completion.dict;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class SwPluginJson {
 
     private String name;

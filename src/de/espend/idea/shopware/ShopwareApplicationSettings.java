@@ -7,6 +7,9 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 @State(name = "ShopwarePlugin", storages = @Storage(id = "shopware-plugin", file = "$APP_CONFIG$/shopware.app.xml"))
 public class ShopwareApplicationSettings implements PersistentStateComponent<ShopwareApplicationSettings> {
 

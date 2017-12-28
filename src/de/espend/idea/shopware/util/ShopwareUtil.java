@@ -25,6 +25,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class ShopwareUtil {
 
     public static Set<String> PLUGIN_CONFIGS = ContainerUtil.newHashSet();

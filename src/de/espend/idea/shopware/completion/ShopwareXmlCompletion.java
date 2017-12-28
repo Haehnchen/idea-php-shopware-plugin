@@ -13,6 +13,9 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class ShopwareXmlCompletion extends CompletionContributor {
 
     public ShopwareXmlCompletion() {

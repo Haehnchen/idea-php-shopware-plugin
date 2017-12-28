@@ -6,6 +6,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlTokenType;
 import fr.adrienbrault.idea.symfony2plugin.config.xml.XmlHelper;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class XmlPatternUtil {
 
     /**

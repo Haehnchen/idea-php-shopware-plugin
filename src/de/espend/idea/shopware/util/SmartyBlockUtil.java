@@ -8,6 +8,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 
 import java.util.*;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class SmartyBlockUtil {
 
     public static List<SmartyBlock> collectFileBlocks(PsiFile psiFile, final Map<VirtualFile, String> map, List<SmartyBlock> blockNameSet, int depth) {

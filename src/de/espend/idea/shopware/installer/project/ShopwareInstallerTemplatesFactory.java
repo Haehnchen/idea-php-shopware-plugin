@@ -5,6 +5,9 @@ import com.intellij.platform.ProjectTemplate;
 import com.intellij.platform.ProjectTemplatesFactory;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class ShopwareInstallerTemplatesFactory extends ProjectTemplatesFactory {
 
     @NotNull

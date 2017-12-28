@@ -25,6 +25,9 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class ShopwareInstallerProjectGenerator extends WebProjectTemplate<ShopwareInstallerSettings> {
     @Nls
     @NotNull

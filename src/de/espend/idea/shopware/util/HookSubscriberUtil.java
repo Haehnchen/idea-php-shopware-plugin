@@ -19,6 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class HookSubscriberUtil {
 
     public static Set<String> NOTIFY_EVENTS = ContainerUtil.newHashSet();

@@ -1,5 +1,8 @@
 package de.espend.idea.shopware.completion.dict;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class SwPluginProperty {
     private String type;
     private String description;

@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class PluginGeneratorUtil {
 
     private static final long CHECKING_TIMEOUT_IN_MILLISECONDS = 1000L;
