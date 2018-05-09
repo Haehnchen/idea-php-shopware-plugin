@@ -34,6 +34,7 @@ public class ShopwarePhpCompletion extends CompletionContributor{
     private static MethodMatcher.CallToSignature[] ATTRIBUTE_SERVICE_SIGNATURE_TABLES = new MethodMatcher.CallToSignature[] {
         ATTRIBUTE_SERVICE_SIGNATURE[0],
         new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "update"),
+        new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "delete"),
         new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "get"),
         new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "getList"),
         new MethodMatcher.CallToSignature("\\Shopware\\Bundle\\AttributeBundle\\Service\\CrudService", "createAttribute"),
