@@ -1,0 +1,55 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
+buildscript {
+    repositories {
+        mavenCentral()
+
+        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
+    }
+}
+
+plugins {
+    id "org.jetbrains.intellij" version "0.3.3"
+    id 'com.palantir.git-version' version "0.9.1"
+}
+
+apply plugin: 'idea'
+apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'java'
+
+intellij {
+    version ideaVersion
+    pluginName 'Shopware Plugin'
+    plugins = [
+            "com.jetbrains.php:${phpPluginVersion}",
+            'CSS',
+            'java-i18n',
+            'properties',
+            'yaml',
+            'JavaScriptLanguage',
+            "fr.adrienbrault.idea.symfony2plugin:${symfonyPluginVersion}",
+            "de.espend.idea.php.toolbox:${toolboxPluginVersion}",
+            "de.espend.idea.php.annotation:${annotationPluginVersion}",
+            "com.jetbrains.twig:${twigPluginVersion}",
+            "PsiViewer:${psiViewerPluginVersion}"
+    ]
+    downloadSources !Boolean.valueOf(System.getenv('CI'))
+
+    publishPlugin {
+        username System.getenv('IJ_REPO_USERNAME')
+        password System.getenv('IJ_REPO_PASSWORD')
+    }
+
+    patchPluginXml {
+        sinceBuild '173'
+    }
+}
+
+group 'de.espend.idea.shopware'
+version gitVersion()
+
+wrapper {
+    gradleVersion '4.3.1'
+}
+
+test.testLogging.exceptionFormat = TestExceptionFormat.FULL

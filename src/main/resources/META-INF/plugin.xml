@@ -1,0 +1,175 @@
+<idea-plugin url="https://github.com/Haehnchen/idea-php-shopware-plugin">
+  <id>de.espend.idea.shopware</id>
+  <name>Shopware Plugin</name>
+  <version>2.9</version>
+  <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
+
+    <depends>com.jetbrains.php</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>fr.adrienbrault.idea.symfony2plugin</depends>
+    <depends>JavaScript</depends>
+    <depends optional="true">de.espend.idea.php.toolbox</depends>
+
+  <description><![CDATA[
+      <h1>Shopware Plugin</h1><br>
+      <br/>
+      <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues">Issues</a> | <a href="https://www.paypal.me/DanielEspendiller">Donate</a>
+
+      <h2>Installation</h2>
+      <ul>
+        <li>Install <a href="https://plugins.jetbrains.com/plugin/7219">Symfony Plugin</a> and enable it per project</li>
+        <li>(Required) Install <a href="https://plugins.jetbrains.com/plugin/7320">PHP Annotations</a></li>
+        <li>(Optional) Install <a href="https://plugins.jetbrains.com/plugin/8133">PHP Toolbox</a></li>
+      </ul>
+
+      <h2>Features</h2>
+      <ul>
+        <li>PHP: Subscriber name completion for controller/hooks/events</li>
+        <li>PHP: Type provider for Manager::getResources</li>
+        <li>PHP: Event and method references for subscriber events</li>
+        <li>PHP: Magic method type provider</li>
+        <li>PHP: Bootstrap::getInfo, Bootstrap::Path, ModelManager::addAttribute/generateAttributeModels</li>
+        <li>PHP: Enlight_Controller_Router::assemble array parameter</li>
+        <li>PHP: Custom config and event name indexer</li>
+        <li>PHP: Quickfix for subscriber method generation and content</li>
+        <li>PHP: Linemarker for subscriber methods</li>
+        <li>Smarty: References for files, controller, actions, widgets</li>
+        <li>Smarty: Block references on extends path</li>
+        <li>Smarty: Namespace tag support</li>
+        <li>Smarty: Blockname and include indexer</li>
+        <li>Smarty: Template include, extends linemarker</li>
+        <li>Smarty: Support templates libraries/include paths</li>
+        <li>Smarty: Blockname implements and overwrite linemarker</li>
+        <li>Shopware: Theme and assets</li>
+        <li>Shopware: Snippets index for template usage in backend and frontend</li>
+        <li>Shopware: Snippets references for Smarty and ExtJs files</li>
+        <li>PHP/Smarty: Template controller references for php and smarty</li>
+        <li>Symfony: Custom container loader</li>
+        <li>Symfony: Shopware service container ids in subscriber</li>
+        <li>Doctrine: Extension for Symfony Plugin</li>
+        <li>Doctrine: Lifecycle event completion for subscriber</li>
+        <li>ExtJs: Doctrine Model and controller targets</li>
+        <li>ExtJs: Controller action linemarker and goto</li>
+        <li>Generator: Shopware project installer</li>
+        <li>Generator: Plugin boilerplates</li>
+        <li>PHP Toolbox: internal JSON configuration</li>
+      </ul>
+
+    ]]></description>
+
+  <change-notes>
+<![CDATA[
+
+<ul>
+    <li>Optimize performance LineMarkerProvider targets must be attached to leaf elements <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/69">#69</a></li>
+</ul>
+
+<br/>
+<a href="https://github.com/Haehnchen/idea-php-shopware-plugin/blob/master/CHANGELOG.md">see full changelog</a> | <a href="https://www.paypal.me/DanielEspendiller">Donate</a>
+]]>
+  </change-notes>
+
+  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="171.3780"/>
+
+  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+    <extensions defaultExtensionNs="com.jetbrains.php">
+        <typeProvider3 implementation="de.espend.idea.shopware.types.ShopwareApiResourcesTypeProvider"/>
+    </extensions>
+
+  <extensions defaultExtensionNs="com.intellij">
+      <psi.referenceContributor implementation="de.espend.idea.shopware.reference.EventSubscriberReferenceContributor"/>
+
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.ExtJsGoToDeclarationHandler"/>
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyFileGoToDeclarationHandler"/>
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.SmartyBlockGoToHandler"/>
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.reference.LazySubscriberReferenceProvider"/>
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.PhpGoToHandler"/>
+      <gotoDeclarationHandler implementation="de.espend.idea.shopware.navigation.XmlGoToHandler"/>
+
+      <completion.contributor language="Smarty" implementationClass="de.espend.idea.shopware.completion.SmartyFileCompletionProvider"/>
+      <completion.contributor language="PHP" implementationClass="de.espend.idea.shopware.reference.LazySubscriberReferenceProvider"/>
+      <completion.contributor language="PHP" implementationClass="de.espend.idea.shopware.completion.ShopwarePhpCompletion"/>
+      <completion.contributor language="JSON" implementationClass="de.espend.idea.shopware.completion.ShopwareJsonCompletion"/>
+      <completion.contributor language="JavaScript" implementationClass="de.espend.idea.shopware.completion.ShopwareJavaScriptCompletion"/>
+      <completion.contributor language="XML" implementationClass="de.espend.idea.shopware.completion.ShopwareXmlCompletion"/>
+
+      <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="de.espend.idea.shopware.navigation.ExtJsTemplateLineMarkerProvider"/>
+      <codeInsight.lineMarkerProvider language="Smarty" implementationClass="de.espend.idea.shopware.navigation.SmartyTemplateLineMarkerProvider"/>
+      <codeInsight.lineMarkerProvider language="PHP" implementationClass="de.espend.idea.shopware.navigation.PhpLineMarkerProvider"/>
+
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyBlockStubIndex"/>
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyIncludeStubIndex"/>
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.SmartyExtendsStubIndex"/>
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.EventConfigGoToIndex"/>
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.InitResourceServiceIndex"/>
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.SnippetIndex"/>
+
+      <lang.foldingBuilder language="JavaScript" implementationClass="de.espend.idea.shopware.folding.JavascriptFoldingBuilder"/>
+
+      <localInspection groupPath="Shopware" shortName="Shopware" displayName="Boostrap"
+                       groupName="Shopware"
+                       enabledByDefault="true" level="WARNING"
+                       implementationClass="de.espend.idea.shopware.inspection.ShopwareBoostrapInspection"/>
+      <localInspection groupPath="Shopware" shortName="ShopwareBoostrapCheckLicense" displayName="BoostrapCheckLicense"
+                       groupName="Shopware"
+                       enabledByDefault="true" level="WARNING"
+                       implementationClass="de.espend.idea.shopware.inspection.ShopwareBoostrapCheckLicenseInspection"/>
+
+      <localInspection groupPath="Shopware" shortName="ShopwareSubscriperMethodInspection" displayName="ShopwareSubscriperMethodInspection"
+                       groupName="Shopware"
+                       enabledByDefault="true" level="WARNING"
+                       implementationClass="de.espend.idea.shopware.inspection.ShopwareSubscriperMethodInspection"/>
+
+      <directoryProjectGenerator implementation="de.espend.idea.shopware.installer.project.ShopwareInstallerProjectGenerator"/>
+      <projectTemplatesFactory implementation="de.espend.idea.shopware.installer.project.ShopwareInstallerTemplatesFactory"/>
+
+      <applicationService serviceImplementation="de.espend.idea.shopware.ShopwareApplicationSettings"/>
+
+      <projectConfigurable instance="de.espend.idea.shopware.ui.ShopwareSettingsForm"
+                           displayName="Shopware"
+                           id="Shopware.SettingsForm"
+                           parentId="reference.webide.settings.project.settings.php"
+                           nonDefaultProject="true"
+      />
+
+  </extensions>
+
+    <extensions defaultExtensionNs="fr.adrienbrault.idea.symfony2plugin.extension">
+        <DoctrineModelProvider implementation="de.espend.idea.shopware.symfony.ShopwareDoctrineModelProvider"/>
+        <ControllerActionGotoRelatedCollector implementation="de.espend.idea.shopware.navigation.SmartyActionGotoRelatedCollector"/>
+        <MethodSignatureTypeProviderExtension implementation="de.espend.idea.shopware.types.EnlightTypeProviderExtension"/>
+        <ServiceCollector implementation="de.espend.idea.shopware.symfony.service.ServiceCollector"/>
+        <ServiceCollector implementation="de.espend.idea.shopware.symfony.service.DefaultServiceCollector"/>
+        <ServiceDefinitionLocator implementation="de.espend.idea.shopware.symfony.service.ServiceDefinitionLocator"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="de.espend.idea.php.toolbox.extension">
+        <JsonStreamResource implementation="de.espend.idea.shopware.external.InternalJsonStreamResource"/>
+    </extensions>
+
+  <application-components>
+    <!-- Add your application components here -->
+  </application-components>
+
+    <project-components>
+        <component>
+            <implementation-class>de.espend.idea.shopware.ShopwareProjectComponent</implementation-class>
+        </component>
+    </project-components>
+
+  <actions>
+      <group id="ShopwareGroup" text="Shopware" popup="false">
+          <group id="ShopwareGroupPlugin" class="com.intellij.ide.actions.NonTrivialActionGroup" text="Shopware" popup="true" icon="ShopwareIcons.SHOPWARE">
+              <action id="ShopwareNewPlugin" class="de.espend.idea.shopware.action.generator.PluginGeneratorAction"/>
+          </group>
+          <add-to-group group-id="NewGroup" anchor="last"/>
+      </group>
+  </actions>
+
+</idea-plugin>
