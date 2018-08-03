@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.4/engine/Shopware/Components/Plugin/schema/menu.xsd">
+    <entries>
+        <entry>
+            <name>MenuName</name>
+            <label lang="en">Menu Label</label>
+            <label lang="de">Menu Label</label>
+            <controller>MyController</controller>
+            <action>index</action>
+            <class>sprite-metronome</class>
+            <parent identifiedBy="controller">Marketing</parent>
+            <children>
+                <entry>
+                    <name>Child Menu</name>
+                    <label lang="en">Child menu</label>
+                    <label lang="de">Kindmenü</label>
+                    <controller>MyController</controller>
+                    <action>detail</action>
+                    <class>sprite-application-block</class>
+                </entry>
+            </children>
+        </entry>
+    </entries>
+</menu>
