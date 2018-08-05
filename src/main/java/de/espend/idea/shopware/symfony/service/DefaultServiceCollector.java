@@ -16,6 +16,8 @@ public class DefaultServiceCollector implements ServiceCollector {
     private static Map<String, String> DEFAULTS = new HashMap<String, String>() {{
         put("bootstrap", "Shopware_Bootstrap");
         put("application", "Shopware");
+        put("shop", "Shopware\\Models\\Shop\\Shop");
+        put("db_connection", "\\PDO");
     }};
 
     @Override
