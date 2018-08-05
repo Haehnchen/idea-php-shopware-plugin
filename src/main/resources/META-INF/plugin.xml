@@ -1,7 +1,7 @@
 <idea-plugin url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware Plugin</name>
-  <version>2.9</version>
+  <version>3.0</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
     <depends>com.jetbrains.php</depends>
@@ -61,7 +61,9 @@
 <![CDATA[
 
 <ul>
-    <li>Optimize performance LineMarkerProvider targets must be attached to leaf elements <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/69">#69</a></li>
+    <li>Migrate project structure to gradle @cedricziel <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/75">#75</a></li>
+    <li>Added table autocomplete to delete method @shyim <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/72">#72</a></li>
+    <li>Add menu items to creating plugin specific config files @shyim <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/77">#77</a></li>
 </ul>
 
 <br/>

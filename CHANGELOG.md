@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0
+* Migrate project structure to gradle @cedricziel [#75](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/75)
+* Added table autocomplete to delete method @shyim [#72](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/72)
+* Add menu items to creating plugin specific config files @shyim [#77](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/77)
+
 ## 2.9
 * Optimize performance LineMarkerProvider targets must be attached to leaf elements [#69](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/69)
 
