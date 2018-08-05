@@ -167,6 +167,10 @@
       <group id="ShopwareGroup" text="Shopware" popup="false">
           <group id="ShopwareGroupPlugin" class="com.intellij.ide.actions.NonTrivialActionGroup" text="Shopware" popup="true" icon="ShopwareIcons.SHOPWARE">
               <action id="ShopwareNewPlugin" class="de.espend.idea.shopware.action.generator.PluginGeneratorAction"/>
+              <action id="ShopwarePluginXml" class="de.espend.idea.shopware.action.generator.NewPluginXmlAction"/>
+              <action id="ShopwareCronjobXml" class="de.espend.idea.shopware.action.generator.NewCronjobXmlAction"/>
+              <action id="ShopwareMenuXml" class="de.espend.idea.shopware.action.generator.NewMenuXmlAction"/>
+              <action id="ShopwareConfigXml" class="de.espend.idea.shopware.action.generator.NewConfigXmlAction"/>
           </group>
           <add-to-group group-id="NewGroup" anchor="last"/>
       </group>
