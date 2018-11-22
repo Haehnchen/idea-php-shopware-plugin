@@ -61,8 +61,13 @@ public class PluginGeneratorDialog extends JDialog {
         this.namespaceComboBox.addItem("Frontend");
         this.namespaceComboBox.addItem("Core");
         this.namespaceComboBox.addItem("Backend");
+        this.namespaceComboBox.setEnabled(false);
 
         this.namespaceComboBox.setSelectedIndex(0);
+
+        this.addLegacyCheckBox.addActionListener(e -> {
+            this.namespaceComboBox.setEnabled(((JCheckBox) e.getSource()).isSelected());
+        });
     }
 
     private void onOK() {

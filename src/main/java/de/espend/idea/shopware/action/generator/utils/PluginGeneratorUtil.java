@@ -146,8 +146,6 @@ public class PluginGeneratorUtil {
         commands.add("sw-cli-tools.phar");
         commands.add("plugin:create");
 
-        commands.add("--namespace=" + settings.getNamespace());
-
         if (settings.getAddDummyFilter()) {
             commands.add("--haveFilter");
         }
@@ -178,6 +176,7 @@ public class PluginGeneratorUtil {
 
         if (settings.isLegacyStructure()) {
             commands.add("--legacy");
+            commands.add("--namespace=" + settings.getNamespace());
         }
 
         commands.add(settings.getPluginName());
