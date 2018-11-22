@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.1
+* Revert "revert "Extend default services [#78](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/78)"" (Daniel Espendiller)
+* Fix plugin command, fixes [#50](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/50) (Shyim)
+* Load plugin view folders, fixes [#52](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/52) (Shyim)
+
 ## 3.0
 * Migrate project structure to gradle @cedricziel [#75](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/75)
 * Added table autocomplete to delete method @shyim [#72](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/72)
