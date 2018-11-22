@@ -27,6 +27,12 @@ Documentation and tutorials
 * Shopware: [Shopware Plugin für PhpStorm](https://de.shopware.com/shopware-plugin-fuer-phpstorm/)
 * Slides: [PhpStorm: Symfony2 Plugin](https://www.slideshare.net/Haehnchen/phpstorm-symfony2-plugin)
 
+
+Build and Deployment
+---------------------
+
+We have an automated build script via Gradle that includes upload to JetBrains plugin repository see [MAINTENANCE.md](MAINTENANCE.md) for details 
+
 Screenshots
 ---------------------
 
