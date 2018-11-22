@@ -180,7 +180,33 @@ public class TemplateUtil {
                     }
                 });
             }
+        }
 
+        Collection<PhpClass> newPluginPhpClasses = PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Plugin");
+        for(PhpClass phpClass: newPluginPhpClasses) {
+
+            PsiDirectory psiDirectory = phpClass.getContainingFile().getContainingDirectory();
+            final VirtualFile virtualViewDir = VfsUtil.findRelativeFile("Resources/views", psiDirectory.getVirtualFile());
+            if(virtualViewDir != null) {
+                VfsUtil.visitChildrenRecursively(virtualViewDir, new VirtualFileVisitor() {
+                    @Override
+                    public boolean visitFile(@NotNull VirtualFile file) {
+
+                        if(!isValidTemplateFile(file, exts)) {
+                            return true;
+                        }
+
+                        String frontendName = VfsUtil.getRelativePath(file, virtualViewDir, '/');
+                        if(frontendName == null) {
+                            return true;
+                        }
+
+                        smartyTemplateVisitor.visitFile(file, frontendName);
+
+                        return true;
+                    }
+                });
+            }
         }
     }
 
