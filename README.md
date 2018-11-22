@@ -8,11 +8,12 @@ IntelliJ IDEA / PhpStorm Shopware Plugin
 
 IntelliJ IDEA / PhpStorm Plugin for [Shopware](http://www.shopware.de/ "Shopware")
 
-Key         | Value
------------ | -----------
-Plugin Url  | https://plugins.jetbrains.com/plugin/7410
-ID          | de.espend.idea.shopware
-Changelog   | [CHANGELOG](CHANGELOG.md)
+Key                  | Value
+-------------------  | -------------------
+Plugin Url           | https://plugins.jetbrains.com/plugin/7410
+ID                   | de.espend.idea.shopware
+Changelog            | [CHANGELOG](CHANGELOG.md)
+Build and Deployment | [MAINTENANCE](MAINTENANCE.md)
 
 Dependencies
 ---------------------
