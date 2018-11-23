@@ -1,6 +1,7 @@
 package de.espend.idea.shopware.util;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
@@ -9,7 +10,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.*;
 import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
@@ -29,6 +30,8 @@ import java.util.regex.Pattern;
  * @author Daniel Espendiller <daniel@espendiller.net>
  */
 public class ShopwareUtil {
+
+    private static Key<CachedValue<Set<String>>> PLUGIN_FILESYSTEM_KEY = new Key<>("SHOPWARE_FILESYSTEM_PLUGINS");
 
     public static Set<String> PLUGIN_CONFIGS = ContainerUtil.newHashSet();
 
@@ -387,5 +390,32 @@ public class ShopwareUtil {
         }
 
         return null;
+    }
+
+    public static Set<String> getPluginsWithFilesystem(@NotNull Project project)
+    {
+        CachedValue<Set<String>> cachedPluginFilesystem = project.getUserData(PLUGIN_FILESYSTEM_KEY);
+        if (cachedPluginFilesystem != null && cachedPluginFilesystem.hasUpToDateValue()) {
+            return cachedPluginFilesystem.getValue();
+        }
+
+        CachedValue<Set<String>> cachedValue = CachedValuesManager.getManager(project).createCachedValue(() -> {
+            Set<String> plugins = new HashSet<>();
+
+            Collection<PhpClass> prefixFilesystem = PhpIndex.getInstance(project).getClassesByFQN(ShopwareFQDN.PREFIX_FILESYSTEM);
+
+            // If PrefixFilesystem does not exist, we have not running Shopware 5.5 where the new services are implemented
+            if (!prefixFilesystem.isEmpty()) {
+                for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses(ShopwareFQDN.PLUGIN_BOOTSTRAP)) {
+                    plugins.add(phpClass.getName());
+                }
+            }
+
+            return CachedValueProvider.Result.create(plugins, PsiModificationTracker.MODIFICATION_COUNT);
+        }, false);
+
+        project.putUserData(PLUGIN_FILESYSTEM_KEY, cachedValue);
+
+        return cachedValue.getValue();
     }
 }

@@ -1,6 +1,8 @@
 package de.espend.idea.shopware.symfony.service;
 
 import de.espend.idea.shopware.ShopwareProjectComponent;
+import de.espend.idea.shopware.util.ShopwareFQDN;
+import de.espend.idea.shopware.util.ShopwareUtil;
 import fr.adrienbrault.idea.symfony2plugin.extension.ServiceCollector;
 import fr.adrienbrault.idea.symfony2plugin.extension.ServiceCollectorParameter;
 import org.jetbrains.annotations.NotNull;
@@ -27,10 +29,22 @@ public class DefaultServiceCollector implements ServiceCollector {
         }
 
         DEFAULTS.forEach(parameter::add);
+
+        for (String pluginName : ShopwareUtil.getPluginsWithFilesystem(parameter.getProject())) {
+            String camelCaseName = ShopwareUtil.toCamelCase(pluginName, true);
+            parameter.add(camelCaseName + ".filesystem.private", ShopwareFQDN.PREFIX_FILESYSTEM);
+            parameter.add(camelCaseName + ".filesystem.public",  ShopwareFQDN.PREFIX_FILESYSTEM);
+        }
     }
 
     @Override
     public void collectIds(@NotNull ServiceCollectorParameter.Id parameter) {
         parameter.addAll(DEFAULTS.keySet());
+
+        for (String pluginName : ShopwareUtil.getPluginsWithFilesystem(parameter.getProject())) {
+            String camelCaseName = ShopwareUtil.toCamelCase(pluginName, true);
+            parameter.add(camelCaseName + ".filesystem.private");
+            parameter.add(camelCaseName + ".filesystem.public");
+        }
     }
 }
