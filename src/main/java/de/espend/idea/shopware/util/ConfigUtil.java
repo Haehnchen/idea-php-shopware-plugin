@@ -28,13 +28,13 @@ import java.util.function.Consumer;
 public class ConfigUtil {
 
     public static void visitNamespace(@NotNull Project project, @NotNull Consumer<Pair<String, PhpClass>> pairConsumer) {
-        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Plugin")) {
+        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses(ShopwareFQDN.PLUGIN_BOOTSTRAP)) {
             pairConsumer.accept(Pair.create(phpClass.getName(), phpClass));
         }
     }
 
     public static void visitNamespaceConfigurations(@NotNull Project project, @NotNull String namespace, @NotNull Consumer<Pair<String, XmlTag>> pairConsumer) {
-        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Plugin")) {
+        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses(ShopwareFQDN.PLUGIN_BOOTSTRAP)) {
             if(!namespace.equalsIgnoreCase(phpClass.getName())) {
                 continue;
             }
