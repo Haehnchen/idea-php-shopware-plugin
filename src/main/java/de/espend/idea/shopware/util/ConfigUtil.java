@@ -4,22 +4,24 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
+import com.intellij.psi.*;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.smarty.SmartyFile;
+import com.jetbrains.smarty.lang.psi.SmartyTag;
 import de.espend.idea.shopware.completion.ShopwarePhpCompletion;
+import de.espend.idea.shopware.util.dict.ShopwareSnippet;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.function.Consumer;
 
 /**
@@ -102,5 +104,35 @@ public class ConfigUtil {
         }
 
         return namespace;
+    }
+
+    @NotNull
+    public static Collection<String> getConfigsInFile(@NotNull SmartyFile file) {
+        Collection<String> configs = new ArrayList<>();
+        visitSnippets(file, configs);
+        return configs;
+    }
+
+    /**
+     * {s name="foobar" namespace ="foobar/foobar"}{/s}
+     */
+    private static void visitSnippets(@NotNull SmartyFile file, @NotNull Collection<String> configs) {
+        file.acceptChildren(new PsiRecursiveElementVisitor() {
+            @Override
+            public void visitElement(PsiElement element) {
+                if(!SmartyPattern.getTagAttributePattern("config", "name", false).accepts(element)) {
+                    super.visitElement(element);
+                    return;
+                }
+
+                String name = TemplateUtil.getTagAttributeValueByName((SmartyTag) element.getParent(), "name");
+
+                if (!configs.contains(name)) {
+                    configs.add(name);
+                }
+
+                super.visitElement(element);
+            }
+        });
     }
 }

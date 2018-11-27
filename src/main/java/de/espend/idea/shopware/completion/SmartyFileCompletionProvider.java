@@ -20,12 +20,14 @@ import com.jetbrains.smarty.lang.SmartyTokenTypes;
 import com.jetbrains.smarty.lang.psi.SmartyTag;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
+import de.espend.idea.shopware.index.ConfigIndex;
 import de.espend.idea.shopware.index.SmartyBlockStubIndex;
 import de.espend.idea.shopware.lookup.TemplateLookupElement;
 import de.espend.idea.shopware.util.*;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.stubs.SymfonyProcessors;
 import fr.adrienbrault.idea.symfony2plugin.templating.util.TwigTypeResolveUtil;
+import icons.ShopwareIcons;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -288,6 +290,12 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
                     for(String config: ShopwareUtil.PLUGIN_CONFIGS) {
                         result.addElement(LookupElementBuilder.create(config).withIcon(Symfony2Icons.CONFIG_VALUE));
+                    }
+
+                    for (Set<String> configValues : FileBasedIndex.getInstance().getValues(ConfigIndex.KEY, "all", GlobalSearchScope.allScope(parameters.getOriginalPosition().getProject()))) {
+                        for (String config : configValues) {
+                            result.addElement(LookupElementBuilder.create(config).withIcon(ShopwareIcons.SHOPWARE));
+                        }
                     }
 
                 }

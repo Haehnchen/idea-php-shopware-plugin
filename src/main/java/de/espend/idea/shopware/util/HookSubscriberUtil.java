@@ -24,8 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class HookSubscriberUtil {
 
-    public static Set<String> NOTIFY_EVENTS = ContainerUtil.newHashSet();
-
     final private static Set<String> CORE_CLASSES = new HashSet<String>() {{
         addAll(Arrays.asList("sCms", "sCore", "sAdmin", "sOrder", "sBasket", "sExport", "sSystem", "sArticles", "sMarketing", "sCategories", "sCategories", "sNewsletter", "sConfigurator", "sRewriteTable"));
     }};
