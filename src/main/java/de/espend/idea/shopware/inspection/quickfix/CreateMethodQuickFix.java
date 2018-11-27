@@ -26,10 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +37,7 @@ public class CreateMethodQuickFix implements LocalQuickFix {
 
     private final StringLiteralExpression context;
     private final GeneratorContainer generatorContainer;
+    private List<String> ormEvents = Arrays.asList("prePersist", "preRemove", "preUpdate", "postPersist", "postUpdate", "postRemove");
 
     public CreateMethodQuickFix(StringLiteralExpression context, GeneratorContainer generatorContainer) {
         this.context = context;
@@ -66,6 +64,8 @@ public class CreateMethodQuickFix implements LocalQuickFix {
             return;
         }
 
+        boolean isOrmEvent = false;
+
         int insertPos = method.getTextRange().getEndOffset();
 
         // Enlight_Controller_Action_PostDispatch_Frontend_Blog
@@ -73,10 +73,18 @@ public class CreateMethodQuickFix implements LocalQuickFix {
         if(generatorContainer.getHookName() != null && generatorContainer.getHookName().contains("::")) {
             // Enlight_Controller_Action::dispatch::replace
             typeHint = "Enlight_Hook_HookArgs";
+
+            for (String ormEvent : ormEvents) {
+                if (generatorContainer.getHookName().endsWith(ormEvent)) {
+                    // Shopware\Models\Article\Article::postRemove
+                    typeHint = "Enlight_Event_EventArgs";
+                    isOrmEvent = true;
+                }
+            }
         }
 
         PsiFile containingFile = method.getContainingFile();
-        if(containingFile instanceof PhpFile && PhpCodeInsightUtil.collectNamespaces((PhpFile) containingFile).size() > 0) {
+        if(containingFile instanceof PhpFile && PhpCodeInsightUtil.collectNamespaces(containingFile).size() > 0) {
             typeHint = "\\" + typeHint;
         }
 
@@ -99,20 +107,27 @@ public class CreateMethodQuickFix implements LocalQuickFix {
         }
 
         if(subjectDoc != null) {
-            stringBuilder.append("/** @var \\").append(StringUtils.stripStart(subjectDoc, "\\")).append(" $subject */\n");
-            stringBuilder.append("$subject = $args->getSubject();\n");
+            if (isOrmEvent) {
+                stringBuilder.append("/** @var \\").append(StringUtils.stripStart(subjectDoc, "\\")).append(" $entity */\n");
+                stringBuilder.append("$entity = $args->get('entity');\n");
+            } else {
+                stringBuilder.append("/** @var \\").append(StringUtils.stripStart(subjectDoc, "\\")).append(" $subject */\n");
+                stringBuilder.append("$subject = $args->getSubject();\n");
+            }
         }
 
-        if(generatorContainer.getHookName() != null && generatorContainer.getHookName().contains("::")) {
-            stringBuilder.append("\n");
-            stringBuilder.append("$return = $args->getReturn();\n");
+        if (!isOrmEvent) {
+            if(generatorContainer.getHookName() != null && generatorContainer.getHookName().contains("::")) {
+                stringBuilder.append("\n");
+                stringBuilder.append("$return = $args->getReturn();\n");
 
-            attachVariablesInScope(project, stringBuilder);
+                attachVariablesInScope(project, stringBuilder);
 
-            stringBuilder.append("\n");
-            stringBuilder.append("$args->setReturn($return);\n");
-        } else {
-            attachVariablesInScope(project, stringBuilder);
+                stringBuilder.append("\n");
+                stringBuilder.append("$args->setReturn($return);\n");
+            } else {
+                attachVariablesInScope(project, stringBuilder);
+            }
         }
 
         if(generatorContainer.getHookName() != null) {
