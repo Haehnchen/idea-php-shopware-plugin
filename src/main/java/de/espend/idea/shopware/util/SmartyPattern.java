@@ -202,6 +202,29 @@ public class SmartyPattern {
         );
     }
 
+    /**
+     * {tag attribute="<caret>"}
+     */
+    public static ElementPattern<PsiElement> getTagAttributePattern(@NotNull String tag, @NotNull String attribute, boolean fallback) {
+        if (fallback) {
+            return getTagAttributePattern(tag, attribute);
+        }
+
+        return PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
+                .afterLeafSkipping(
+                PlatformPatterns.or(
+                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
+                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
+                ),
+                PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText(attribute)
+        )
+                .withParent(
+                        PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tag))
+                );
+    }
+
     public static ElementPattern<PsiElement> getNamespacePattern() {
         return getTagAttributePattern("s", "namespace");
     }
