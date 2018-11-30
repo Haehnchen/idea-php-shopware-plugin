@@ -100,7 +100,8 @@ public class ShopwareUtil {
         "s_user_addresses_attributes",
         "s_user_attributes",
         "s_user_billingaddress_attributes",
-        "s_user_shippingaddress_attributes"
+        "s_user_shippingaddress_attributes",
+        "s_core_shops_attributes"
     };
 
     final public static String[] MODEL_STATIC_ATTRIBUTE_TYPES = new String[] {
