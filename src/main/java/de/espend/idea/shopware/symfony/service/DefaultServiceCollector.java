@@ -35,6 +35,11 @@ public class DefaultServiceCollector implements ServiceCollector {
             parameter.add(camelCaseName + ".filesystem.private", ShopwareFQDN.PREFIX_FILESYSTEM);
             parameter.add(camelCaseName + ".filesystem.public",  ShopwareFQDN.PREFIX_FILESYSTEM);
         }
+
+        for (String pluginName : ShopwareUtil.getPluginsWithLogger(parameter.getProject())) {
+            String camelCaseName = ShopwareUtil.toCamelCase(pluginName, true);
+            parameter.add(camelCaseName + ".logger", ShopwareFQDN.SHOPWARE_LOGGER);
+        }
     }
 
     @Override
@@ -45,6 +50,11 @@ public class DefaultServiceCollector implements ServiceCollector {
             String camelCaseName = ShopwareUtil.toCamelCase(pluginName, true);
             parameter.add(camelCaseName + ".filesystem.private");
             parameter.add(camelCaseName + ".filesystem.public");
+        }
+
+        for (String pluginName : ShopwareUtil.getPluginsWithLogger(parameter.getProject())) {
+            String camelCaseName = ShopwareUtil.toCamelCase(pluginName, true);
+            parameter.add(camelCaseName + ".logger");
         }
     }
 }
