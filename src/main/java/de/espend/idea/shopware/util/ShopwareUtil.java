@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 public class ShopwareUtil {
 
     private static Key<CachedValue<Set<String>>> PLUGIN_FILESYSTEM_KEY = new Key<>("SHOPWARE_FILESYSTEM_PLUGINS");
+    private static Key<CachedValue<Set<String>>> PLUGIN_LOGGER_KEY = new Key<>("SHOPWARE_LOGGER_PLUGINS");
 
     public static Set<String> PLUGIN_CONFIGS = ContainerUtil.newHashSet();
 
@@ -416,6 +417,33 @@ public class ShopwareUtil {
         }, false);
 
         project.putUserData(PLUGIN_FILESYSTEM_KEY, cachedValue);
+
+        return cachedValue.getValue();
+    }
+
+    public static Set<String> getPluginsWithLogger(@NotNull Project project)
+    {
+        CachedValue<Set<String>> cachedPluginLogger = project.getUserData(PLUGIN_LOGGER_KEY);
+        if (cachedPluginLogger != null && cachedPluginLogger.hasUpToDateValue()) {
+            return cachedPluginLogger.getValue();
+        }
+
+        CachedValue<Set<String>> cachedValue = CachedValuesManager.getManager(project).createCachedValue(() -> {
+            Set<String> plugins = new HashSet<>();
+
+            Collection<PhpClass> loggerCompilerPass = PhpIndex.getInstance(project).getClassesByFQN(ShopwareFQDN.PLUGIN_LOGGER_COMPILERPASS);
+
+            // Feature detection is CompilerPass available
+            if (!loggerCompilerPass.isEmpty()) {
+                for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses(ShopwareFQDN.PLUGIN_BOOTSTRAP)) {
+                    plugins.add(phpClass.getName());
+                }
+            }
+
+            return CachedValueProvider.Result.create(plugins, PsiModificationTracker.MODIFICATION_COUNT);
+        }, false);
+
+        project.putUserData(PLUGIN_LOGGER_KEY, cachedValue);
 
         return cachedValue.getValue();
     }
