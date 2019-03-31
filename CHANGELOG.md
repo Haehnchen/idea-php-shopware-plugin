@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.1
+* Add plugin logger, fixes [#90](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/90) (Soner Sayakci)
+* Add s_core_shops_attributes (Shyim)
+* Add plugin parameter, fixes [#76](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/76) (Shyim)
+* Fix create method on model doctrine events (Shyim)
+* Remove check license inspection (Shyim)
+* Add plugin services from Shopware 5.5 (Soner Sayakci)
+
 ## 3.1
 * Revert "revert "Extend default services [#78](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/78)"" (Daniel Espendiller)
 * Fix plugin command, fixes [#50](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/50) (Shyim)
