@@ -5,4 +5,5 @@ public class ShopwareFQDN {
     public static String PREFIX_FILESYSTEM = "\\Shopware\\Components\\Filesystem\\PrefixFilesystem";
     public static String PLUGIN_LOGGER_COMPILERPASS = "\\Shopware\\Components\\DependencyInjection\\Compiler\\PluginLoggerCompilerPass";
     public static String SHOPWARE_LOGGER = "\\Shopware\\Components\\Logger";
+    public static String SHOPWARE_CONFIG = "\\Shopware_Components_Config";
 }
