@@ -4,6 +4,7 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementVisitor;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.containers.HashSet;
@@ -16,11 +17,11 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.smarty.SmartyFile;
 import com.jetbrains.smarty.SmartyFileType;
 import de.espend.idea.shopware.util.ConfigUtil;
+import de.espend.idea.shopware.util.ShopwareFQDN;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
 import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.externalizer.StringSetDataExternalizer;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import gnu.trove.THashMap;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -111,83 +112,63 @@ public class ConfigIndex extends FileBasedIndexExtension<String, Set<String>> {
 
         @Override
         public void visitElement(PsiElement element) {
-            if(!(element instanceof Parameter)) {
+            if(!(element instanceof MethodReference)) {
                 super.visitElement(element);
                 return;
             }
 
-            ClassReference classReference = null;
-
-            for(PsiElement loopElement : element.getChildren()) {
-                ClassReference classReferenceLoop = ObjectUtils.tryCast(loopElement, ClassReference.class);
-                if(classReferenceLoop == null) {
-                    return;
-                }
-
-                String fqn = StringUtils.stripStart(classReferenceLoop.getFQN(), "\\");
-                if(fqn.equals("Shopware_Components_Config")) {
-                    classReference = classReferenceLoop;
-                    break;
-                }
-            }
-
-            if (classReference == null) {
+            MethodReference methodReference = (MethodReference) element;
+            if (!METHODS.contains(methodReference.getName())) {
+                super.visitElement(element);
                 return;
             }
 
-            Parameter parentOfType = PsiTreeUtil.getParentOfType(classReference, Parameter.class);
-            if(parentOfType == null) {
+            if (!(shouldIndex(element.getFirstChild()))) {
+                super.visitElement(element);
                 return;
             }
 
-            final String name = parentOfType.getName();
+            String firstArgument = PhpElementsUtil.getFirstArgumentStringValue(methodReference);
 
-            Method method = PsiTreeUtil.getParentOfType(classReference, Method.class);
-            if(method == null) {
+
+            if (firstArgument.isEmpty()) {
+                super.visitElement(element);
                 return;
             }
 
-            method.accept(new MyMethodVariableVisitor(name, map));
-
+            map.get("all").add(firstArgument);
             super.visitElement(element);
         }
     }
 
-    private class MyMethodVariableVisitor extends PsiRecursiveElementVisitor {
+    private Boolean shouldIndex(PsiElement element)
+    {
+        if (element instanceof FieldReference) {
+            FieldReference fieldReference = (FieldReference) element;
 
-        @NotNull
-        private final String name;
-
-        @NotNull
-        private final Map<String, Set<String>> result;
-
-        MyMethodVariableVisitor(@NotNull String name, @NotNull Map<String, Set<String>> result) {
-            this.name = name;
-            this.result = result;
+            for(String reference : fieldReference.getType().getTypes()) {
+                if (reference.equals(ShopwareFQDN.SHOPWARE_CONFIG)) {
+                    return true;
+                }
+            }
         }
 
-        @Override
-        public void visitElement(PsiElement element) {
-            if(!(element instanceof Variable) || !name.equals(((Variable) element).getName())) {
-                super.visitElement(element);
-                return;
+        if (element instanceof MethodReference) {
+            for(String reference : ((MethodReference) element).getType().getTypes()) {
+                if (reference.equals(ShopwareFQDN.SHOPWARE_CONFIG)) {
+                    return true;
+                }
             }
-
-            MethodReference methodReference = ObjectUtils.tryCast(element.getParent(), MethodReference.class);
-            if(methodReference == null || !METHODS.contains(methodReference.getName())) {
-                super.visitElement(element);
-                return;
-            }
-
-            String value = PhpElementsUtil.getFirstArgumentStringValue(methodReference);
-            if(value == null) {
-                super.visitElement(element);
-                return;
-            }
-
-            result.get("all").add(value);
-
-            super.visitElement(element);
         }
+
+        if (element instanceof Variable) {
+            for(String reference : ((Variable) element).getType().getTypes()) {
+                if (reference.equals(ShopwareFQDN.SHOPWARE_CONFIG)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
