@@ -1,7 +1,7 @@
 <idea-plugin url="https://github.com/Haehnchen/idea-php-shopware-plugin">
   <id>de.espend.idea.shopware</id>
   <name>Shopware</name>
-  <version>3.1.1</version>
+  <version>3.2.0</version>
   <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
 
     <depends>com.jetbrains.php</depends>
@@ -11,7 +11,8 @@
     <depends optional="true">de.espend.idea.php.toolbox</depends>
 
   <description><![CDATA[
-      <h1>Shopware Plugin</h1><br>
+      Support for Shopware
+
       <br/>
       <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues">Issues</a> | <a href="https://www.paypal.me/DanielEspendiller">Donate</a>
 
@@ -57,28 +58,8 @@
 
     ]]></description>
 
-  <change-notes>
-<![CDATA[
-
-<ul>
-    <li>Migrate project structure to gradle @cedricziel <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/75">#75</a></li>
-    <li>Added table autocomplete to delete method @shyim <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/72">#72</a></li>
-    <li>Add menu items to creating plugin specific config files @shyim <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues/77">#77</a></li>
-</ul>
-
-<br/>
-<a href="https://github.com/Haehnchen/idea-php-shopware-plugin/blob/master/CHANGELOG.md">see full changelog</a> | <a href="https://www.paypal.me/DanielEspendiller">Donate</a>
-]]>
-  </change-notes>
-
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="182.0"/>
-
-  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
+  <idea-version since-build="191.0"/>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider3 implementation="de.espend.idea.shopware.types.ShopwareApiResourcesTypeProvider"/>

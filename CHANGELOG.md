@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.0
+* Remove "Plugin" from plugin name (Daniel Espendiller)
+* Add IntelliJ plugin icon (Daniel Espendiller)
+
 ## 3.1.1
 * Add plugin logger, fixes [#90](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/90) (Soner Sayakci)
 * Add s_core_shops_attributes (Shyim)
