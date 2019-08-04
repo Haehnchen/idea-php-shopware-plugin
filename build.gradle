@@ -3,13 +3,21 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 buildscript {
     repositories {
         mavenCentral()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+        maven {
+            url 'https://dl.bintray.com/jetbrains/intellij-plugin-service'
+        }
 
-        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
+    }
+    dependencies {
+        classpath "org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.5.0-SNAPSHOT"
     }
 }
 
 plugins {
-    id "org.jetbrains.intellij" version "0.3.11"
+    id "org.jetbrains.intellij" version "0.4.9"
     id 'com.palantir.git-version' version "0.11.0"
 }
 
@@ -30,12 +38,20 @@ intellij {
             'properties',
             'yaml',
             'JavaScriptLanguage',
+            "java",
             "fr.adrienbrault.idea.symfony2plugin:${symfonyPluginVersion}",
             "de.espend.idea.php.toolbox:${toolboxPluginVersion}",
             "de.espend.idea.php.annotation:${annotationPluginVersion}",
-            "com.jetbrains.twig:${twigPluginVersion}",
-            "PsiViewer:${psiViewerPluginVersion}"
+            "com.jetbrains.twig:${twigPluginVersion}"
     ]
+
+    // Can't instantiate configurable for PHP Toolbox
+    // at de.espend.idea.php.toolbox.ui.application.ToolboxApplicationForm.<init>(ToolboxApplicationForm.java:26)
+    tasks {
+        "buildSearchableOptions" {
+            enabled = false
+        }
+    }
 }
 
 publishPlugin {
@@ -44,7 +60,7 @@ publishPlugin {
 }
 
 patchPluginXml {
-    sinceBuild '173'
+    sinceBuild '192'
     changeNotes = htmlFixer('src/main/resources/META-INF/change-notes.html')
 }
 
@@ -58,7 +74,7 @@ if (details.isCleanTag) {
 }
 
 wrapper {
-    gradleVersion '5.4.1'
+    gradleVersion '5.5.1'
 }
 
 test.testLogging.exceptionFormat = TestExceptionFormat.FULL
