@@ -11,6 +11,7 @@ public class SmartyFileCompletionProviderTest extends ShopwareLightCodeInsightFi
         super.setUp();
         myFixture.copyFileToProject("widgets.ini", "snippets/foobar/widgets.ini");
         myFixture.copyFileToProject("config.tpl");
+        myFixture.copyFileToProject("classes.php");
     }
 
     public String getTestDataPath() {
@@ -62,5 +63,43 @@ public class SmartyFileCompletionProviderTest extends ShopwareLightCodeInsightFi
         );
 
         */
+    }
+
+    public void testCompletionForActionController() {
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{action module=widgets controller=<caret> action=shopMenu}",
+            "Listing"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{action module=widgets controller=\"<caret>\" action=shopMenu}",
+            "Listing"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{action module=widgets controller='<caret>' action=shopMenu}",
+            "Listing"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{action module=frontend controller='<caret>' action=shopMenu}",
+            "FrontendListing"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{action module=\"frontend\" controller='<caret>' action=shopMenu}",
+            "FrontendListing"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{action module='frontend' controller='<caret>' action=shopMenu}",
+            "FrontendListing"
+        );
     }
 }

@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -144,11 +145,12 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
         final Project project = sourceElement.getProject();
 
         final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
+
         ShopwareUtil.collectControllerClass(project, (phpClass, moduleName, controllerName) -> {
-            if (controllerName.toLowerCase().equals(finalText)) {
+            if (controllerName.equalsIgnoreCase(finalText)) {
                 psiElements.add(phpClass);
             }
-        }, "Widgets");
+        }, TemplateUtil.findControllerModuleFromTagContext(sourceElement));
 
     }
 

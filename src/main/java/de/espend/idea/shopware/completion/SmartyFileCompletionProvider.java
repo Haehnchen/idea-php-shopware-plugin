@@ -262,16 +262,16 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             CompletionType.BASIC, SmartyPattern.getActionControllerPattern(),
             new CompletionProvider<CompletionParameters>() {
                 @Override
-                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
-
-                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                protected void addCompletions(final @NotNull CompletionParameters parameters, @NotNull ProcessingContext context, final @NotNull CompletionResultSet result) {
+                    PsiElement originalPosition = parameters.getOriginalPosition();
+                    if(originalPosition == null || !ShopwareProjectComponent.isValidForProject(originalPosition)) {
                         return;
                     }
 
-                    PsiElement psiElement = parameters.getOriginalPosition();
-
-                    ShopwareUtil.collectControllerClass(psiElement.getProject(), (phpClass, moduleName, controllerName) -> result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON)), "Widgets");
-
+                    ShopwareUtil.collectControllerClass(originalPosition.getProject(), (phpClass, moduleName, controllerName) ->
+                            result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON)),
+                        TemplateUtil.findControllerModuleFromTagContext(originalPosition)
+                    );
                 }
             }
         );
@@ -282,7 +282,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             CompletionType.BASIC, SmartyPattern.getConfigPattern(),
             new CompletionProvider<CompletionParameters>() {
                 @Override
-                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
+                protected void addCompletions(final @NotNull CompletionParameters parameters, @NotNull ProcessingContext context, final @NotNull CompletionResultSet result) {
 
                     if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
                         return;
