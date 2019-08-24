@@ -362,4 +362,17 @@ public class TemplateUtil {
 
         return null;
     }
+
+    public static String findControllerModuleFromTagContext(@NotNull PsiElement psiElement) {
+        String module = null;
+        PsiElement smartyTag = psiElement.getParent();
+        if (smartyTag instanceof SmartyTag) {
+            String moduleValue = TemplateUtil.getTagAttributeValueByName((SmartyTag) smartyTag, "module");
+            if (StringUtils.isNotBlank(moduleValue)) {
+                module = moduleValue;
+            }
+        }
+
+        return module != null ? module : "Widgets";
+    }
 }

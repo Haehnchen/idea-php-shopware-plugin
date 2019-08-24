@@ -142,9 +142,7 @@ public class ShopwareUtil {
                 String controller = matcher.group(2);
                 controllerClassVisitor.visitClass(phpClass, moduleName, controller);
             }
-
         }
-
     }
 
     public interface ControllerClassVisitor {
