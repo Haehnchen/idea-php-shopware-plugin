@@ -3,6 +3,7 @@ package de.espend.idea.shopware.util;
 import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
@@ -10,6 +11,8 @@ import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.FileBasedIndexImpl;
+import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.smarty.SmartyFile;
 import com.jetbrains.smarty.lang.psi.SmartyTag;
 import de.espend.idea.shopware.index.SnippetIndex;
@@ -24,6 +27,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -118,6 +122,9 @@ public class SnippetUtil {
         });
     }
 
+    /**
+     * This call should only used inside index process
+     */
     @NotNull
     public static Collection<ShopwareSnippet> getSnippetsInFile(@NotNull SmartyFile file) {
         Collection<ShopwareSnippet> snippets = new ArrayList<>();
@@ -125,6 +132,9 @@ public class SnippetUtil {
         return snippets;
     }
 
+    /**
+     * This call should only used inside index process
+     */
     @NotNull
     public static Collection<ShopwareSnippet> getSnippetsInFile(@NotNull JSFile file) {
         Collection<ShopwareSnippet> snippets = new ArrayList<>();
@@ -151,12 +161,15 @@ public class SnippetUtil {
     @NotNull
     public static Collection<PsiElement> getSnippetNameTargets(@NotNull Project project, @NotNull String namespace, @NotNull String name) {
         Set<VirtualFile> files = new HashSet<>();
-        for (VirtualFile virtualFile : FileBasedIndex.getInstance().getContainingFiles(SnippetIndex.KEY, namespace, GlobalSearchScope.allScope(project))) {
-            // only support snippet files, to jump to template usage
-            if(!"ini".equalsIgnoreCase(virtualFile.getExtension())) {
-                continue;
-            }
 
+        // filter ini files for targets
+        Set<VirtualFile> collect = FileBasedIndex.getInstance().getContainingFiles(SnippetIndex.KEY, namespace, GlobalSearchScope.allScope(project))
+            .stream()
+            .filter(virtualFile -> "ini".equalsIgnoreCase(virtualFile.getExtension()))
+            .collect(Collectors.toSet());
+
+        // after collect search index again
+        for (VirtualFile virtualFile : collect) {
             FileBasedIndex.getInstance().processValues(SnippetIndex.KEY, namespace, virtualFile, (virtualFile1, value) -> {
                 if(value.contains(name)) {
                     files.add(virtualFile);
@@ -200,10 +213,26 @@ public class SnippetUtil {
     }
 
     /**
+     * The the snippets namespace based on the file scope
+     *
+     * - {namespace name='frontend/plugins/payment/sepa'}
+     * - Find on Theme.php scope: "foo/Theme.php" => "frontend/plugins/payment/sepa"
+     */
+    @Nullable
+    static String getFileNamespace(@NotNull SmartyFile file) {
+        String namespace = getFileNamespaceViaInlineNamespace(file);
+        if (namespace != null) {
+            return namespace;
+        }
+
+        return getFileNamespaceViaPath(file);
+    }
+
+    /**
      * {namespace name='frontend/plugins/payment/sepa'}
      */
     @Nullable
-    public static String getFileNamespace(@NotNull SmartyFile file) {
+    public static String getFileNamespaceViaInlineNamespace(@NotNull SmartyFile file) {
         for (PsiElement psiElement : file.getChildren()) {
             if(psiElement instanceof SmartyTag && "namespace".equals(((SmartyTag) psiElement).getTagName())) {
                 String name = TemplateUtil.getTagAttributeValueByName((SmartyTag) psiElement, "name");
@@ -212,6 +241,46 @@ public class SnippetUtil {
                 }
 
                 return name;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find on Theme.php scope: "foo/Theme.php" => "frontend/plugins/payment/sepa"
+     * Find on Plugin.php scope: "foo/Plugin.php" => "Resources/views/frontend/plugins/payment/sepa"
+     */
+    @Nullable
+    public static String getFileNamespaceViaPath(@NotNull SmartyFile file) {
+        VirtualFile parent = file.getVirtualFile().getParent();
+
+        // "foo/Theme.php" => "frontend/plugins/payment/sepa"
+        for(PhpClass phpClass: PhpIndex.getInstance(file.getProject()).getAllSubclasses("\\Shopware\\Components\\Theme")) {
+            VirtualFile virtualFile = phpClass.getContainingFile().getVirtualFile().getParent();
+            String relativePath = VfsUtil.findRelativePath(virtualFile, parent, '/');
+
+            if(relativePath != null) {
+                return relativePath + "/" + file.getVirtualFile().getNameWithoutExtension();
+            }
+        }
+
+        // "foo/Plugin.php" => "foo/Resources/views/frontend/plugins/payment/sepa"
+        for(PhpClass phpClass: PhpIndex.getInstance(file.getProject()).getAllSubclasses("\\Shopware\\Components\\Plugin")) {
+            VirtualFile virtualFile = phpClass.getContainingFile().getVirtualFile().getParent();
+            if(virtualFile == null) {
+                continue;
+            }
+
+            VirtualFile views = VfsUtil.findRelativeFile(virtualFile, "Resources", "views");
+            if(views == null) {
+                continue;
+            }
+
+            String relativePath = VfsUtil.findRelativePath(views, parent, '/');
+
+            if(relativePath != null) {
+                return relativePath + "/" + file.getVirtualFile().getNameWithoutExtension();
             }
         }
 
@@ -240,7 +309,7 @@ public class SnippetUtil {
             // for nullable loaded
             loaded = true;
 
-            return this.namespace = getFileNamespace(this.smartyFile);
+            return this.namespace = getFileNamespaceViaInlineNamespace(this.smartyFile);
         }
     }
 
