@@ -302,20 +302,21 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             }
         );
 
+        // {action module='frontend' controller="account" action="partnerStatisticMenuItem"}
         extend(
             CompletionType.BASIC, SmartyPattern.getActionActionPattern(),
             new CompletionProvider<CompletionParameters>() {
                 @Override
-                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
-
-                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                protected void addCompletions(final @NotNull CompletionParameters parameters, @NotNull ProcessingContext context, final @NotNull CompletionResultSet result) {
+                    PsiElement originalPosition = parameters.getOriginalPosition();
+                    if(originalPosition == null || !ShopwareProjectComponent.isValidForProject(originalPosition)) {
                         return;
                     }
 
-                    PsiElement psiElement = parameters.getOriginalPosition();
-
-                    ShopwareUtil.collectControllerActionSmartyWrapper(psiElement, (method, methodStripped, moduleName, controllerName) -> result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName).withIcon(PhpIcons.METHOD_ICON)), "Widgets");
-
+                    ShopwareUtil.collectControllerActionSmartyWrapper(originalPosition, (method, methodStripped, moduleName, controllerName) ->
+                            result.addElement(LookupElementBuilder.create(method.getName().substring(0, method.getName().length() - 6)).withTypeText(moduleName + ":" + controllerName).withIcon(PhpIcons.METHOD_ICON)),
+                        TemplateUtil.findControllerModuleFromTagContext(originalPosition)
+                    );
                 }
             }
         );

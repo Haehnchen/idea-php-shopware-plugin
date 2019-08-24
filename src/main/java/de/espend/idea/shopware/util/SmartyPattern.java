@@ -75,6 +75,9 @@ public class SmartyPattern {
         return getTagAttributePattern("url", "action");
     }
 
+    /**
+     * {action module='frontend' controller="account" action="partnerStatisticMenuItem"}
+     */
     public static ElementPattern<PsiElement> getActionActionPattern() {
         return getTagAttributePattern("action", "action");
     }

@@ -169,10 +169,10 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
 
         final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
         ShopwareUtil.collectControllerActionSmartyWrapper(sourceElement, (method, methodStripped, moduleName, controllerName) -> {
-            if(methodStripped.toLowerCase().equals(finalText)) {
+            if(methodStripped.toLowerCase().equals(finalText) || finalText.equalsIgnoreCase(fr.adrienbrault.idea.symfony2plugin.util.StringUtils.underscore(methodStripped))) {
                 psiElements.add(method);
             }
-        }, "Widgets");
+        }, TemplateUtil.findControllerModuleFromTagContext(sourceElement));
 
     }
 

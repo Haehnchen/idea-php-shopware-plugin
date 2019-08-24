@@ -1,6 +1,7 @@
 package de.espend.idea.shopware.tests.navigation;
 
 import com.intellij.patterns.PlatformPatterns;
+import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.smarty.SmartyFileType;
 import de.espend.idea.shopware.tests.ShopwareLightCodeInsightFixtureTestCase;
@@ -71,6 +72,38 @@ public class SmartyFileGoToDeclarationHandlerTest extends ShopwareLightCodeInsig
             SmartyFileType.INSTANCE,
             "{action module='frontend' controller=Fronten<caret>dListing action=shopMenu}",
             PlatformPatterns.psiElement(PhpClass.class)
+        );
+    }
+
+    public void testCompletionForActionControllerActionName() {
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{action module=widgets controller=Listing action=topS<caret>eller}",
+            PlatformPatterns.psiElement(Method.class)
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{action module=widgets controller=Listing action='topS<caret>eller'}",
+            PlatformPatterns.psiElement(Method.class)
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{action module=\"widgets\" controller='Listing' action=\"topS<caret>eller\"}",
+            PlatformPatterns.psiElement(Method.class)
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{action module=frontend controller=FrontendListing action=topSellerFr<caret>ontend}",
+            PlatformPatterns.psiElement(Method.class)
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{action module=frontend controller=FrontendListing action=top_selle<caret>r_frontend}",
+            PlatformPatterns.psiElement(Method.class)
         );
     }
 }
