@@ -56,8 +56,8 @@ public class SnippetIndex extends FileBasedIndexExtension<String, Set<String>> {
             } else if (inputData.getFileName().endsWith(".ini")) {
                 // ini files
 
-                String presentableUrl = inputData.getFile().getUrl();
-                int i = presentableUrl.lastIndexOf("/snippets/");
+                String presentableUrl = inputData.getFile().getUrl().replace("\\", "/");
+                int i = presentableUrl.toLowerCase().lastIndexOf("/snippets/");
                 if(i > 0) {
                     Set<String> iniKeys = SnippetUtil.getIniKeys(inputData.getContentAsText().toString());
                     if(iniKeys.size() > 0) {
