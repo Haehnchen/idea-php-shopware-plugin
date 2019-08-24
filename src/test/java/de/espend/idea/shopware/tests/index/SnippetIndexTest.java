@@ -11,6 +11,7 @@ public class SnippetIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
         super.setUp();
         myFixture.copyFileToProject("snippets.tpl");
         myFixture.copyFileToProject("widgets.ini", "snippets/frontend/listing/foobar_ini/widgets.ini");
+        myFixture.copyFileToProject("foobar.ini", "SnIPPeTS/frontend/listing/foobar_ini/foobar.ini");
         myFixture.copyFileToProject("javascript.js");
     }
 
@@ -19,7 +20,7 @@ public class SnippetIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
     }
 
     public void testTemplateUsageSnippetsAreInIndex() {
-        assertIndexContains(SnippetIndex.KEY, "frontend/foobar", "frontend/detail/actions");
+        assertIndexContains(SnippetIndex.KEY, "frontend/foobar", "frontend/detail/actions", "frontend/listing/foobar_ini/foobar");
 
         assertIndexContainsKeyWithValue(SnippetIndex.KEY, "frontend/foobar", value ->
             value.contains("FO-O/BAR")
@@ -27,6 +28,10 @@ public class SnippetIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
 
         assertIndexContainsKeyWithValue(SnippetIndex.KEY, "frontend/detail/actions", value ->
             value.contains("DetailLinkNotepad")
+        );
+
+        assertIndexContainsKeyWithValue(SnippetIndex.KEY, "frontend/listing/foobar_ini/foobar", value ->
+            value.contains("foobar2")
         );
     }
 
