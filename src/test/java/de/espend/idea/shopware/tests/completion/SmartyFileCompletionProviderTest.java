@@ -10,6 +10,7 @@ public class SmartyFileCompletionProviderTest extends ShopwareLightCodeInsightFi
     public void setUp() throws Exception {
         super.setUp();
         myFixture.copyFileToProject("widgets.ini", "snippets/foobar/widgets.ini");
+        myFixture.copyFileToProject("config.tpl");
     }
 
     public String getTestDataPath() {
@@ -30,5 +31,36 @@ public class SmartyFileCompletionProviderTest extends ShopwareLightCodeInsightFi
             "{s namespace='<caret>'}{/s}",
             "foobar/widgets"
         );
+    }
+
+    public void testCompletionForConfig() {
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{config name=\"<caret>\"}",
+            "SmartyVoteDisableQuote"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{config name=\'<caret>\'}",
+            "SmartyVoteDisableQuote"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{config name=<caret>}",
+            "SmartyVoteDisableQuote"
+        );
+
+        /*
+        Not working:
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{$captchaName = {config name=<caret>}}",
+            "SmartyVoteDisableQuote"
+        );
+
+        */
     }
 }

@@ -55,120 +55,33 @@ public class SmartyPattern {
         );
     }
 
-    public static PsiElementPattern.Capture<PsiElement> getLinkFilePattern() {
-        return PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
-            .afterLeafSkipping(
-                PlatformPatterns.or(
-                    PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
-                ),
-                PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("file")
-            )
-            .withParent(
-                PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{link"))
-            );
+    public static ElementPattern<PsiElement> getLinkFilePattern() {
+        return getTagAttributePattern("link", "file");
     }
 
-    public static PsiElementPattern.Capture<PsiElement> getConfigPattern() {
-        return PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
-            .afterLeafSkipping(
-                PlatformPatterns.or(
-                    PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
-                ),
-                PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("name")
-            )
-            .withParent(
-                PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{config"))
-            );
+    public static ElementPattern<PsiElement> getConfigPattern() {
+        return getTagAttributePattern("config", "name");
     }
 
-    public static ElementPattern<PsiElement> getControllerPattern() {
-        return getControllerPattern("url");
+    public static ElementPattern<PsiElement> getUrlControllerPattern() {
+        return getTagAttributePattern("url", "controller");
     }
 
-    public static ElementPattern<PsiElement> getControllerPattern(String tagName) {
-        return PlatformPatterns.or(
-
-            PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
-                .afterLeafSkipping(
-                    PlatformPatterns.or(
-                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
-                    ),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("controller")
-                )
-                .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tagName))
-                ),
-
-            PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
-                .afterLeafSkipping(
-                    PlatformPatterns.or(
-                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
-                    ),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("controller")
-                )
-                .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tagName))
-                )
-
-        );
-
-
+    public static ElementPattern<PsiElement> getActionControllerPattern() {
+        return getTagAttributePattern("action", "controller");
     }
 
     public static ElementPattern<PsiElement> getControllerActionPattern() {
-        return getControllerActionPattern("url");
+        return getTagAttributePattern("url", "action");
     }
 
-    public static ElementPattern<PsiElement> getControllerActionPattern(String tagName) {
-        return PlatformPatterns.or(
-
-            PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
-                .afterLeafSkipping(
-                    PlatformPatterns.or(
-                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
-                    ),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("action")
-                )
-                .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tagName))
-                ),
-
-            PlatformPatterns.psiElement(SmartyTokenTypes.STRING_LITERAL)
-                .afterLeafSkipping(
-                    PlatformPatterns.or(
-                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
-                    ),
-                    PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText("action")
-                )
-                .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tagName))
-                )
-
-        );
-
-
+    public static ElementPattern<PsiElement> getActionActionPattern() {
+        return getTagAttributePattern("action", "action");
     }
 
     /**
      * {tag attribute="<caret>"}
+     * {tag attribute=<caret>}
      */
     public static ElementPattern<PsiElement> getTagAttributePattern(@NotNull String tag, @NotNull String attribute) {
         return PlatformPatterns.or(
@@ -197,32 +110,9 @@ public class SmartyPattern {
                     PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText(attribute)
                 )
                 .withParent(
-                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{s"))
+                    PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tag))
                 )
         );
-    }
-
-    /**
-     * {tag attribute="<caret>"}
-     */
-    public static ElementPattern<PsiElement> getTagAttributePattern(@NotNull String tag, @NotNull String attribute, boolean fallback) {
-        if (fallback) {
-            return getTagAttributePattern(tag, attribute);
-        }
-
-        return PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
-                .afterLeafSkipping(
-                PlatformPatterns.or(
-                        PlatformPatterns.psiElement(SmartyTokenTypes.EQ),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.WHITE_SPACE),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.SINGLE_QUOTE),
-                        PlatformPatterns.psiElement(SmartyTokenTypes.DOUBLE_QUOTE)
-                ),
-                PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).withText(attribute)
-        )
-                .withParent(
-                        PlatformPatterns.psiElement(SmartyCompositeElementTypes.TAG).withText(PlatformPatterns.string().startsWith("{" + tag))
-                );
     }
 
     public static ElementPattern<PsiElement> getNamespacePattern() {
@@ -238,7 +128,7 @@ public class SmartyPattern {
     /**
      * foobar="asas"
      */
-    public static PsiElementPattern.Capture<PsiElement> getAttributeKeyPattern() {
+    static PsiElementPattern.Capture<PsiElement> getAttributeKeyPattern() {
         return PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).beforeLeafSkipping(
             PlatformPatterns.psiElement(PsiWhiteSpace.class), PlatformPatterns.psiElement((SmartyTokenTypes.EQ))
         );

@@ -120,7 +120,7 @@ public class ConfigUtil {
         file.acceptChildren(new PsiRecursiveElementVisitor() {
             @Override
             public void visitElement(PsiElement element) {
-                if(!SmartyPattern.getTagAttributePattern("config", "name", false).accepts(element)) {
+                if(!SmartyPattern.getTagAttributePattern("config", "name").accepts(element)) {
                     super.visitElement(element);
                     return;
                 }

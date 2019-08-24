@@ -11,6 +11,7 @@ public class ConfigIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
     public void setUp() throws Exception {
         super.setUp();
         myFixture.copyFileToProject("sAdmin.php");
+        myFixture.copyFileToProject("config.tpl");
     }
 
     public String getTestDataPath() {
@@ -42,6 +43,18 @@ public class ConfigIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
 
         assertIndexContainsKeyWithValue(ConfigIndex.KEY, "all", value ->
             value.contains("variableConfigCfg")
+        );
+
+        assertIndexContainsKeyWithValue(ConfigIndex.KEY, "all", value ->
+            value.contains("SmartyVoteDisable")
+        );
+
+        assertIndexContainsKeyWithValue(ConfigIndex.KEY, "all", value ->
+            value.contains("SmartyVoteDisableQuote")
+        );
+
+        assertIndexContainsKeyWithValue(ConfigIndex.KEY, "all", value ->
+            value.contains("captchaMethod")
         );
     }
 }

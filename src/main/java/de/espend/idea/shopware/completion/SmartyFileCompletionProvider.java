@@ -152,7 +152,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
         );
 
         extend(
-            CompletionType.BASIC, SmartyPattern.getControllerPattern(),
+            CompletionType.BASIC, SmartyPattern.getUrlControllerPattern(),
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
@@ -259,7 +259,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
 
         // {action controller=Emotion action=getAvailability articleId=$sArticle.articleID}
         extend(
-            CompletionType.BASIC, SmartyPattern.getControllerPattern("action"),
+            CompletionType.BASIC, SmartyPattern.getActionControllerPattern(),
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
@@ -303,7 +303,7 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
         );
 
         extend(
-            CompletionType.BASIC, SmartyPattern.getControllerActionPattern("action"),
+            CompletionType.BASIC, SmartyPattern.getActionActionPattern(),
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
