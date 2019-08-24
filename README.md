@@ -21,6 +21,12 @@ Dependencies
 * (Required) [PHP Annotations](https://plugins.jetbrains.com/plugin/7320) Doctrine support
 * (Optional) [PHP Toolbox](https://plugins.jetbrains.com/plugin/8133) Improved Symfony + DIC Support
 
+Versions
+---------------------
+
+* **4.x** >= Shopware 5 + Shopware 6 (Platform) 
+* **3.x** <= Shopware 5
+
 Documentation and tutorials
 ---------------------
 
