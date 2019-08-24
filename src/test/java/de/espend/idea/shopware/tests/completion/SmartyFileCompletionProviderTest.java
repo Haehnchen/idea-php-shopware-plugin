@@ -128,4 +128,38 @@ public class SmartyFileCompletionProviderTest extends ShopwareLightCodeInsightFi
             "topSellerFrontend"
         );
     }
+
+    public void testCompletionForUrlController() {
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{url controller=<caret>}",
+            "FrontendListing"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{url controller='<caret>'}",
+            "FrontendListing"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{url controller=\"<caret>\"}",
+            "FrontendListing"
+        );
+    }
+
+    public void testCompletionForUrlControllerAction() {
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{url controller=FrontendListing action='<caret>'}",
+            "topSellerFrontend"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{url controller=FrontendListing action=<caret>}",
+            "topSellerFrontend"
+        );
+    }
 }

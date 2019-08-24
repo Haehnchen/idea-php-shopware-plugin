@@ -75,7 +75,7 @@ public class SmartyFileGoToDeclarationHandlerTest extends ShopwareLightCodeInsig
         );
     }
 
-    public void testCompletionForActionControllerActionName() {
+    public void testNavigationFForActionControllerActionName() {
         assertNavigationMatch(
             SmartyFileType.INSTANCE,
             "{action module=widgets controller=Listing action=topS<caret>eller}",
@@ -103,6 +103,40 @@ public class SmartyFileGoToDeclarationHandlerTest extends ShopwareLightCodeInsig
         assertNavigationMatch(
             SmartyFileType.INSTANCE,
             "{action module=frontend controller=FrontendListing action=top_selle<caret>r_frontend}",
+            PlatformPatterns.psiElement(Method.class)
+        );
+    }
+
+    public void testNavigationForUrlController() {
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{url controller=Fronten<caret>dListing}",
+            PlatformPatterns.psiElement(PhpClass.class)
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{url controller='Fronten<caret>dListing'}",
+            PlatformPatterns.psiElement(PhpClass.class)
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{url controller='fronten<caret>d_listing'}",
+            PlatformPatterns.psiElement(PhpClass.class)
+        );
+    }
+
+    public void testNavigationForUrlControllerAction() {
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{url controller=FrontendListing action=topSelle<caret>rFrontend}",
+            PlatformPatterns.psiElement(Method.class)
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{url controller=FrontendListing action=top_seller<caret>_frontend}",
             PlatformPatterns.psiElement(Method.class)
         );
     }

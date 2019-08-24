@@ -134,7 +134,7 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
 
         final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
         ShopwareUtil.collectControllerClass(project, (phpClass, moduleName, controllerName) -> {
-            if (controllerName.toLowerCase().equals(finalText)) {
+            if (finalText.equalsIgnoreCase(controllerName) || finalText.equalsIgnoreCase(fr.adrienbrault.idea.symfony2plugin.util.StringUtils.underscore(controllerName))) {
                 psiElements.add(phpClass);
             }
         });
@@ -158,7 +158,7 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
 
         final String finalText = normalizeFilename(sourceElement.getText()).toLowerCase();
         ShopwareUtil.collectControllerActionSmartyWrapper(sourceElement, (method, methodStripped, moduleName, controllerName) -> {
-            if(methodStripped.toLowerCase().equals(finalText)) {
+            if(finalText.equalsIgnoreCase(methodStripped) || finalText.equalsIgnoreCase(fr.adrienbrault.idea.symfony2plugin.util.StringUtils.underscore(methodStripped))) {
                 psiElements.add(method);
             }
         });
