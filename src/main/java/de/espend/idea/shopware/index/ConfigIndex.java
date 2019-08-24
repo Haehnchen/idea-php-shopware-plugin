@@ -4,16 +4,15 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementVisitor;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.ObjectUtils;
 import com.intellij.util.containers.HashSet;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
-import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.FieldReference;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.Variable;
 import com.jetbrains.smarty.SmartyFile;
 import com.jetbrains.smarty.SmartyFileType;
 import de.espend.idea.shopware.util.ConfigUtil;
@@ -22,6 +21,7 @@ import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
 import fr.adrienbrault.idea.symfony2plugin.stubs.indexes.externalizer.StringSetDataExternalizer;
 import fr.adrienbrault.idea.symfony2plugin.util.PhpElementsUtil;
 import gnu.trove.THashMap;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -30,6 +30,7 @@ import java.util.Set;
 
 /**
  * @author Soner Sayakci <s.sayakci@gmail.com>
+ * @author Daniel Espendiller <daniel@espendiller.net>
  */
 public class ConfigIndex extends FileBasedIndexExtension<String, Set<String>> {
 
@@ -123,15 +124,13 @@ public class ConfigIndex extends FileBasedIndexExtension<String, Set<String>> {
                 return;
             }
 
-            if (!(shouldIndex(element.getFirstChild()))) {
+            String firstArgument = PhpElementsUtil.getFirstArgumentStringValue(methodReference);
+            if (StringUtils.isBlank(firstArgument)) {
                 super.visitElement(element);
                 return;
             }
 
-            String firstArgument = PhpElementsUtil.getFirstArgumentStringValue(methodReference);
-
-
-            if (firstArgument.isEmpty()) {
+            if (!shouldIndex(element.getFirstChild())) {
                 super.visitElement(element);
                 return;
             }
@@ -141,28 +140,31 @@ public class ConfigIndex extends FileBasedIndexExtension<String, Set<String>> {
         }
     }
 
-    private Boolean shouldIndex(PsiElement element)
-    {
+    private Boolean shouldIndex(PsiElement element) {
         if (element instanceof FieldReference) {
-            FieldReference fieldReference = (FieldReference) element;
-
-            for(String reference : fieldReference.getType().getTypes()) {
+            for(String reference : ((FieldReference) element).resolveLocalType().getTypes()) {
                 if (reference.equals(ShopwareFQDN.SHOPWARE_CONFIG)) {
                     return true;
                 }
             }
-        }
+        } else if (element instanceof MethodReference) {
+            String name = ((MethodReference) element).getName();
+            if (name != null && name.equalsIgnoreCase("config")) {
+                return true;
+            }
 
-        if (element instanceof MethodReference) {
-            for(String reference : ((MethodReference) element).getType().getTypes()) {
+            for(String reference : ((MethodReference) element).resolveLocalType().getTypes()) {
                 if (reference.equals(ShopwareFQDN.SHOPWARE_CONFIG)) {
                     return true;
                 }
             }
-        }
+        } else if (element instanceof Variable) {
+            String name = ((Variable) element).getName();
+            if (name.equalsIgnoreCase("config") || name.equalsIgnoreCase("cfg")) {
+                return true;
+            }
 
-        if (element instanceof Variable) {
-            for(String reference : ((Variable) element).getType().getTypes()) {
+            for(String reference : ((Variable) element).resolveLocalType().getTypes()) {
                 if (reference.equals(ShopwareFQDN.SHOPWARE_CONFIG)) {
                     return true;
                 }

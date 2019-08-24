@@ -1,12 +1,12 @@
 package de.espend.idea.shopware.tests.index;
 
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndex;
 import de.espend.idea.shopware.index.ConfigIndex;
 import de.espend.idea.shopware.tests.ShopwareLightCodeInsightFixtureTestCase;
 
-import java.util.Set;
-
+/**
+ * @author Soner Sayakci <s.sayakci@gmail.com>
+ * @author Daniel Espendiller <daniel@espendiller.net>
+ */
 public class ConfigIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
     public void setUp() throws Exception {
         super.setUp();
@@ -20,22 +20,28 @@ public class ConfigIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
     public void testPropertyUsageInClass() {
         assertIndexContains(ConfigIndex.KEY, "all");
 
-        for (Set<String> configValues : FileBasedIndex.getInstance().getValues(ConfigIndex.KEY, "all", GlobalSearchScope.allScope(this.getProject()))) {
-            for (String value: configValues) {
-                System.out.println(value);
-            }
-        }
-
         assertIndexContainsKeyWithValue(ConfigIndex.KEY, "all", value ->
-                value.contains("sBASEFILE")
+            value.contains("sBASEFILE")
         );
 
         assertIndexContainsKeyWithValue(ConfigIndex.KEY, "all", value ->
-                value.contains("globalConfig")
+            value.contains("globalConfig")
         );
 
         assertIndexContainsKeyWithValue(ConfigIndex.KEY, "all", value ->
-                value.contains("variableConfig")
+            value.contains("variableConfig")
+        );
+
+        assertIndexContainsKeyWithValue(ConfigIndex.KEY, "all", value ->
+            value.contains("variableConfigFo")
+        );
+
+        assertIndexContainsKeyWithValue(ConfigIndex.KEY, "all", value ->
+            value.contains("foo_incomplete")
+        );
+
+        assertIndexContainsKeyWithValue(ConfigIndex.KEY, "all", value ->
+            value.contains("variableConfigCfg")
         );
     }
 }

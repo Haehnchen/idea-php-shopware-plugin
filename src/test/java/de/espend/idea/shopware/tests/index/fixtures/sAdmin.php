@@ -23,8 +23,12 @@ class sAdmin {
         $this->config->get('sBASEFILE');
         Shopware()->Config()->get('globalConfig');
 
-        $config = $this->config;
+        Fo()->Config()->get('foo_incomplete');
 
+        $foo = $this->config;
+
+        $foo->get('variableConfigFo');
         $config->get('variableConfig');
+        $cfg->get('variableConfigCfg');
     }
 }
