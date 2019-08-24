@@ -155,16 +155,15 @@ public class SmartyFileCompletionProvider extends CompletionContributor  {
             CompletionType.BASIC, SmartyPattern.getUrlControllerPattern(),
             new CompletionProvider<CompletionParameters>() {
                 @Override
-                protected void addCompletions(final @NotNull CompletionParameters parameters, ProcessingContext context, final @NotNull CompletionResultSet result) {
-
-                    if(!ShopwareProjectComponent.isValidForProject(parameters.getOriginalPosition())) {
+                protected void addCompletions(final @NotNull CompletionParameters parameters, @NotNull ProcessingContext context, final @NotNull CompletionResultSet result) {
+                    PsiElement psiElement = parameters.getOriginalPosition();
+                    if(psiElement == null || !ShopwareProjectComponent.isValidForProject(psiElement)) {
                         return;
                     }
 
-                    PsiElement psiElement = parameters.getOriginalPosition();
-
-                    ShopwareUtil.collectControllerClass(psiElement.getProject(), (phpClass, moduleName, controllerName) -> result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON)));
-
+                    ShopwareUtil.collectControllerClass(psiElement.getProject(), (phpClass, moduleName, controllerName)
+                        -> result.addElement(LookupElementBuilder.create(controllerName).withTypeText(moduleName).withIcon(PhpIcons.METHOD_ICON))
+                    );
                 }
             }
         );
