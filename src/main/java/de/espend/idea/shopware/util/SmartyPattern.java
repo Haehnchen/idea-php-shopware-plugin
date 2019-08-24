@@ -1,12 +1,15 @@
 package de.espend.idea.shopware.util;
 
 import com.intellij.patterns.ElementPattern;
+import com.intellij.patterns.PatternCondition;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.util.ProcessingContext;
 import com.jetbrains.smarty.lang.SmartyTokenTypes;
 import com.jetbrains.smarty.lang.psi.SmartyCompositeElementTypes;
+import com.jetbrains.smarty.lang.psi.SmartyTag;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -135,5 +138,21 @@ public class SmartyPattern {
         return PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER).beforeLeafSkipping(
             PlatformPatterns.psiElement(PsiWhiteSpace.class), PlatformPatterns.psiElement((SmartyTokenTypes.EQ))
         );
+    }
+
+    /**
+     * {tag}
+     */
+    public static ElementPattern<PsiElement> getSmartyTagPattern(@NotNull String tag) {
+        return PlatformPatterns.psiElement(SmartyTokenTypes.IDENTIFIER)
+            .afterLeaf(PlatformPatterns.psiElement(SmartyTokenTypes.START_TAG_START))
+            .withParent(
+                PlatformPatterns.psiElement(SmartyTag.class).with(new PatternCondition<SmartyTag>("Smarty: Tag Name") {
+                    @Override
+                    public boolean accepts(@NotNull SmartyTag smartyTag, ProcessingContext processingContext) {
+                        return tag.equalsIgnoreCase(smartyTag.getTagName());
+                    }
+                })
+            );
     }
 }

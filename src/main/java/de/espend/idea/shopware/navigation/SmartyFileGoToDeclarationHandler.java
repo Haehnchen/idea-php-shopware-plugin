@@ -16,13 +16,13 @@ import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.SmartyPattern;
 import de.espend.idea.shopware.util.SnippetUtil;
 import de.espend.idea.shopware.util.TemplateUtil;
+import fr.adrienbrault.idea.symfony2plugin.util.yaml.YamlHelper;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -40,9 +40,35 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
 
         final List<PsiElement> targets = new ArrayList<>();
 
-        // {link file='frontend/_resources/styles/framework.css'}
-        if(SmartyPattern.getLinkFilePattern().accepts(sourceElement)) {
-            attachLinkFileTagGoto(sourceElement, targets);
+        // {url controller=Account
+        if(SmartyPattern.getUrlControllerPattern().accepts(sourceElement)) {
+            attachControllerNameGoto(sourceElement, targets);
+        }
+
+        // {url<caret>...}
+        if(SmartyPattern.getSmartyTagPattern("url").accepts(sourceElement)) {
+            for (PsiElement child : YamlHelper.getChildrenFix(sourceElement.getParent())) {
+                if (SmartyPattern.getUrlControllerPattern().accepts(child)) {
+                    attachControllerNameGoto(child, targets);
+                }
+
+                if (SmartyPattern.getControllerActionPattern().accepts(child)) {
+                    attachControllerActionNameGoto(child, targets);
+                }
+            }
+        }
+
+        // {action<caret>...}
+        if(SmartyPattern.getSmartyTagPattern("action").accepts(sourceElement)) {
+            for (PsiElement child : YamlHelper.getChildrenFix(sourceElement.getParent())) {
+                if (SmartyPattern.getActionControllerPattern().accepts(child)) {
+                    attachWidgetControllerNameGoto(child, targets);
+                }
+
+                if (SmartyPattern.getActionActionPattern().accepts(child)) {
+                    attachWidgetsControllerActionNameGoto(child, targets);
+                }
+            }
         }
 
         // {extends file="frontend/register/index.tpl"}
