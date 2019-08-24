@@ -92,6 +92,7 @@
       <fileBasedIndex implementation="de.espend.idea.shopware.index.EventConfigGoToIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.InitResourceServiceIndex"/>
       <fileBasedIndex implementation="de.espend.idea.shopware.index.SnippetIndex"/>
+      <fileBasedIndex implementation="de.espend.idea.shopware.index.ConfigIndex"/>
 
       <lang.foldingBuilder language="JavaScript" implementationClass="de.espend.idea.shopware.folding.JavascriptFoldingBuilder"/>
 

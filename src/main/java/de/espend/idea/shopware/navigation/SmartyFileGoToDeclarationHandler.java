@@ -50,7 +50,7 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
         }
 
         // {url controller=Account
-        if(SmartyPattern.getControllerPattern().accepts(sourceElement)) {
+        if(SmartyPattern.getUrlControllerPattern().accepts(sourceElement)) {
             attachControllerNameGoto(sourceElement, targets);
         }
 
@@ -75,12 +75,12 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
         }
 
         // {action controller=Account
-        if(SmartyPattern.getControllerPattern("action").accepts(sourceElement)) {
+        if(SmartyPattern.getActionControllerPattern().accepts(sourceElement)) {
             attachWidgetControllerNameGoto(sourceElement, targets);
         }
 
         // {action controller=Account action=foobar
-        if(SmartyPattern.getControllerActionPattern("action").accepts(sourceElement)) {
+        if(SmartyPattern.getActionActionPattern().accepts(sourceElement)) {
             attachWidgetsControllerActionNameGoto(sourceElement, targets);
         }
 

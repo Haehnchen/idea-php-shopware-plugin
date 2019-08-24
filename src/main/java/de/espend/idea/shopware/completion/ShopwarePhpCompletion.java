@@ -5,15 +5,18 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
 import de.espend.idea.shopware.ShopwarePluginIcons;
 import de.espend.idea.shopware.ShopwareProjectComponent;
+import de.espend.idea.shopware.index.ConfigIndex;
 import de.espend.idea.shopware.util.ConfigUtil;
 import de.espend.idea.shopware.util.ShopwareUtil;
 import de.espend.idea.shopware.util.ThemeUtil;
@@ -21,6 +24,8 @@ import fr.adrienbrault.idea.symfony2plugin.Symfony2Icons;
 import fr.adrienbrault.idea.symfony2plugin.util.MethodMatcher;
 import icons.ShopwareIcons;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
 
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
@@ -66,6 +71,12 @@ public class ShopwarePhpCompletion extends CompletionContributor{
                         for(String type: ShopwareUtil.PLUGIN_CONFIGS) {
                             result.addElement(LookupElementBuilder.create(type).withIcon(Symfony2Icons.CONFIG_VALUE));
                         }
+
+                        for (Set<String> configValues : FileBasedIndex.getInstance().getValues(ConfigIndex.KEY, "all", GlobalSearchScope.allScope(originalPosition.getProject()))) {
+                            for (String config : configValues) {
+                                result.addElement(LookupElementBuilder.create(config).withIcon(ShopwareIcons.SHOPWARE));
+                            }
+                        }
                     }
 
                     if(new MethodMatcher.StringParameterRecursiveMatcher(originalPosition.getContext(), 0).withSignature("\\Shopware\\Models\\Config\\Form", "setElement").match() != null) {
@@ -97,7 +108,6 @@ public class ShopwarePhpCompletion extends CompletionContributor{
                             result.addElement(LookupElementBuilder.create(type).withIcon(ShopwarePluginIcons.SHOPWARE));
                         }
                     }
-
                 }
             }
         );
