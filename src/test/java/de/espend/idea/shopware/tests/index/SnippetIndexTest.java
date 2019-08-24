@@ -24,6 +24,10 @@ public class SnippetIndexTest extends ShopwareLightCodeInsightFixtureTestCase {
         assertIndexContainsKeyWithValue(SnippetIndex.KEY, "frontend/foobar", value ->
             value.contains("FO-O/BAR")
         );
+
+        assertIndexContainsKeyWithValue(SnippetIndex.KEY, "frontend/detail/actions", value ->
+            value.contains("DetailLinkNotepad")
+        );
     }
 
     public void testIniSnippetsAreInIndex() {
