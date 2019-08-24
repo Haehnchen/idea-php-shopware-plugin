@@ -140,4 +140,32 @@ public class SmartyFileGoToDeclarationHandlerTest extends ShopwareLightCodeInsig
             PlatformPatterns.psiElement(Method.class)
         );
     }
+
+    public void testNavigationForUrlTag() {
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{ur<caret>l controller=FrontendListing action=top_seller_frontend}",
+            PlatformPatterns.psiElement(Method.class)
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{ur<caret>l controller=FrontendListing action=top_seller_frontend}",
+            PlatformPatterns.psiElement(PhpClass.class)
+        );
+    }
+
+    public void testNavigationForActionTag() {
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{act<caret>ion module=frontend controller=FrontendListing action=top_seller_frontend}",
+            PlatformPatterns.psiElement(Method.class)
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{act<caret>ion module=frontend controller=FrontendListing action=top_seller_frontend}",
+            PlatformPatterns.psiElement(PhpClass.class)
+        );
+    }
 }
