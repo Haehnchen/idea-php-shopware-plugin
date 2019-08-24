@@ -59,6 +59,13 @@ public class SnippetUtilTest extends ShopwareLightCodeInsightFixtureTestCase {
         assertEquals("frontend/test/foobar/namespace2", SnippetUtil.getFileNamespaceViaPath((SmartyFile) PsiManager.getInstance(getProject()).findFile(virtualFile)));
     }
 
+    public void testGetFileNamespaceViaPathPluginBootstrapContext() {
+        VirtualFile virtualFile = myFixture.copyFileToProject("namespace.tpl", "foo2/Views/frontend/test/foobar/namespace3.tpl");
+        myFixture.copyFileToProject("Bootstrap.php", "foo2/Bootstrap.php");
+
+        assertEquals("frontend/test/foobar/namespace3", SnippetUtil.getFileNamespaceViaPath((SmartyFile) PsiManager.getInstance(getProject()).findFile(virtualFile)));
+    }
+
     public void testGetIniKeys() {
         PsiFile psiFile = myFixture.configureByFile("widgets.ini");
         Set<String> iniKeys = SnippetUtil.getIniKeys(psiFile.getText());

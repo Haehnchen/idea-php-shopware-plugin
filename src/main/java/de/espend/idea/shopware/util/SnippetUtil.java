@@ -284,6 +284,29 @@ public class SnippetUtil {
             }
         }
 
+        // "foo/Bootstrap.php" => "foo/Views"
+        for(PhpClass phpClass: PhpIndex.getInstance(file.getProject()).getAllSubclasses("Shopware_Components_Plugin_Bootstrap")) {
+            VirtualFile virtualFile = phpClass.getContainingFile().getVirtualFile().getParent();
+            if(virtualFile == null) {
+                continue;
+            }
+
+            VirtualFile views = VfsUtil.findRelativeFile(virtualFile, "Views");
+            if(views == null) {
+                views = VfsUtil.findRelativeFile(virtualFile, "views");
+            }
+
+            if(views == null) {
+                continue;
+            }
+
+            String relativePath = VfsUtil.findRelativePath(views, parent, '/');
+
+            if(relativePath != null) {
+                return relativePath + "/" + file.getVirtualFile().getNameWithoutExtension();
+            }
+        }
+
         return null;
     }
 
