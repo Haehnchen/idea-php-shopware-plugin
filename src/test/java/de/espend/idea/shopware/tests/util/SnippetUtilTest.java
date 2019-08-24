@@ -1,8 +1,10 @@
 package de.espend.idea.shopware.tests.util;
 
 import com.intellij.lang.javascript.psi.JSFile;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.smarty.SmartyFile;
 import de.espend.idea.shopware.tests.ShopwareLightCodeInsightFixtureTestCase;
@@ -40,7 +42,21 @@ public class SnippetUtilTest extends ShopwareLightCodeInsightFixtureTestCase {
 
     public void testGetFileNamespace() {
         PsiFile psiFile = myFixture.configureByFile("namespace.tpl");
-        assertEquals("frontend/listing/box_article", SnippetUtil.getFileNamespace((SmartyFile) psiFile));
+        assertEquals("frontend/listing/box_article", SnippetUtil.getFileNamespaceViaInlineNamespace((SmartyFile) psiFile));
+    }
+
+    public void testGetFileNamespaceViaPathThemeContext() {
+        VirtualFile virtualFile = myFixture.copyFileToProject("namespace.tpl", "foo/frontend/test/foobar/namespace.tpl");
+        myFixture.copyFileToProject("Theme.php", "foo/Theme.php");
+
+        assertEquals("frontend/test/foobar/namespace", SnippetUtil.getFileNamespaceViaPath((SmartyFile) PsiManager.getInstance(getProject()).findFile(virtualFile)));
+    }
+
+    public void testGetFileNamespaceViaPathPluginContext() {
+        VirtualFile virtualFile = myFixture.copyFileToProject("namespace.tpl", "foo2/Resources/views/frontend/test/foobar/namespace2.tpl");
+        myFixture.copyFileToProject("Plugin.php", "foo2/Plugin.php");
+
+        assertEquals("frontend/test/foobar/namespace2", SnippetUtil.getFileNamespaceViaPath((SmartyFile) PsiManager.getInstance(getProject()).findFile(virtualFile)));
     }
 
     public void testGetIniKeys() {
