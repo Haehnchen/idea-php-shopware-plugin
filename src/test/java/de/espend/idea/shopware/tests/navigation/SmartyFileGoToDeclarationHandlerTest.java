@@ -35,6 +35,40 @@ public class SmartyFileGoToDeclarationHandlerTest extends ShopwareLightCodeInsig
             "{s name='swag-last-registr<caret>ations/customer' namespace='foobar/widgets'}{/s}",
             PlatformPatterns.psiFile()
         );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{s name=\"swag-last-registr<caret>ations/customer\" namespace='foobar/widgets'}{/s}",
+            PlatformPatterns.psiFile()
+        );
+    }
+
+    public void testNavigationForSnippetNamespaceInFile() {
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{namespace name=\"foobar/<caret>widgets\"}",
+            PlatformPatterns.psiFile()
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{namespace name='foobar/<caret>widgets'}",
+            PlatformPatterns.psiFile()
+        );
+    }
+
+    public void testNavigationForSnippetNamespaceInFileNamespaceClick() {
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{name<caret>space name=\"foobar/widgets\"}",
+            PlatformPatterns.psiFile()
+        );
+
+        assertNavigationMatch(
+            SmartyFileType.INSTANCE,
+            "{name<caret>space name='foobar/widgets'}",
+            PlatformPatterns.psiFile()
+        );
     }
 
     public void testNavigationForActionController() {
