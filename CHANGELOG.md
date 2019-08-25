@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.3.0
+* snippet file namespace navigation and autocomplete (Daniel Espendiller)
+* support Shopware\_Components\_Plugin\_Bootstrap::Views folder for snippet namespace scope (Daniel Espendiller)
+* make snippets folder index case insensitive (Daniel Espendiller)
+* extract snippets namespace from folder structure (Daniel Espendiller)
+* allow directly Smarty tag navigation for "url" and "action" (Daniel Espendiller)
+* provide better controller action completion and navigation (Daniel Espendiller)
+* better smarty controller completion (Daniel Espendiller)
+* fix using non used local types in index scope for get config values; also getting provide some typeless extractions (Daniel Espendiller)
+* Add Config Index (Shyim)
+
 ## 3.2.0
 * Remove "Plugin" from plugin name (Daniel Espendiller)
 * Add IntelliJ plugin icon (Daniel Espendiller)
