@@ -4,7 +4,6 @@ import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.smarty.SmartyFile;
 import de.espend.idea.shopware.tests.ShopwareLightCodeInsightFixtureTestCase;
@@ -47,23 +46,31 @@ public class SnippetUtilTest extends ShopwareLightCodeInsightFixtureTestCase {
 
     public void testGetFileNamespaceViaPathThemeContext() {
         VirtualFile virtualFile = myFixture.copyFileToProject("namespace.tpl", "foo/frontend/test/foobar/namespace.tpl");
+        VirtualFile virtualFile2 = myFixture.copyFileToProject("namespace.tpl", "foo2/frontend/test/foobar/namespace.tpl");
+        VirtualFile virtualFile3 = myFixture.copyFileToProject("namespace.tpl", "foo2/frontend2/test/foobar/namespace.tpl");
         myFixture.copyFileToProject("Theme.php", "foo/Theme.php");
 
-        assertEquals("frontend/test/foobar/namespace", SnippetUtil.getFileNamespaceViaPath((SmartyFile) PsiManager.getInstance(getProject()).findFile(virtualFile)));
+        assertEquals("frontend/test/foobar/namespace", SnippetUtil.getFileNamespaceViaPath(getProject(), virtualFile));
+        assertNull(SnippetUtil.getFileNamespaceViaPath(getProject(), virtualFile2));
+        assertNull(SnippetUtil.getFileNamespaceViaPath(getProject(), virtualFile3));
     }
 
     public void testGetFileNamespaceViaPathPluginContext() {
         VirtualFile virtualFile = myFixture.copyFileToProject("namespace.tpl", "foo2/Resources/views/frontend/test/foobar/namespace2.tpl");
+        VirtualFile virtualFile2 = myFixture.copyFileToProject("namespace.tpl", "foo3/Resources/views/frontend/test/foobar/namespace2.tpl");
         myFixture.copyFileToProject("Plugin.php", "foo2/Plugin.php");
 
-        assertEquals("frontend/test/foobar/namespace2", SnippetUtil.getFileNamespaceViaPath((SmartyFile) PsiManager.getInstance(getProject()).findFile(virtualFile)));
+        assertEquals("frontend/test/foobar/namespace2", SnippetUtil.getFileNamespaceViaPath(getProject(), virtualFile));
+        assertNull(SnippetUtil.getFileNamespaceViaPath(getProject(), virtualFile2));
     }
 
     public void testGetFileNamespaceViaPathPluginBootstrapContext() {
         VirtualFile virtualFile = myFixture.copyFileToProject("namespace.tpl", "foo2/Views/frontend/test/foobar/namespace3.tpl");
+        VirtualFile virtualFile2 = myFixture.copyFileToProject("namespace.tpl", "foo3/Resources/views/frontend/test/foobar/namespace2.tpl");
         myFixture.copyFileToProject("Bootstrap.php", "foo2/Bootstrap.php");
 
-        assertEquals("frontend/test/foobar/namespace3", SnippetUtil.getFileNamespaceViaPath((SmartyFile) PsiManager.getInstance(getProject()).findFile(virtualFile)));
+        assertEquals("frontend/test/foobar/namespace3", SnippetUtil.getFileNamespaceViaPath(getProject(), virtualFile));
+        assertNull(SnippetUtil.getFileNamespaceViaPath(getProject(), virtualFile2));
     }
 
     public void testGetIniKeys() {

@@ -225,7 +225,7 @@ public class SnippetUtil {
             return namespace;
         }
 
-        return getFileNamespaceViaPath(file);
+        return getFileNamespaceViaPath(file.getProject(), file.getVirtualFile());
     }
 
     /**
@@ -252,21 +252,21 @@ public class SnippetUtil {
      * Find on Plugin.php scope: "foo/Plugin.php" => "Resources/views/frontend/plugins/payment/sepa"
      */
     @Nullable
-    public static String getFileNamespaceViaPath(@NotNull SmartyFile file) {
-        VirtualFile parent = file.getVirtualFile().getParent();
+    public static String getFileNamespaceViaPath(@NotNull Project project, @NotNull VirtualFile file) {
+        VirtualFile parent = file.getParent();
 
         // "foo/Theme.php" => "frontend/plugins/payment/sepa"
-        for(PhpClass phpClass: PhpIndex.getInstance(file.getProject()).getAllSubclasses("\\Shopware\\Components\\Theme")) {
+        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Theme")) {
             VirtualFile virtualFile = phpClass.getContainingFile().getVirtualFile().getParent();
-            String relativePath = VfsUtil.findRelativePath(virtualFile, parent, '/');
+            String relativePath = VfsUtil.getRelativePath(parent, virtualFile);
 
             if(relativePath != null) {
-                return relativePath + "/" + file.getVirtualFile().getNameWithoutExtension();
+                return relativePath + "/" + file.getNameWithoutExtension();
             }
         }
 
         // "foo/Plugin.php" => "foo/Resources/views/frontend/plugins/payment/sepa"
-        for(PhpClass phpClass: PhpIndex.getInstance(file.getProject()).getAllSubclasses("\\Shopware\\Components\\Plugin")) {
+        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Plugin")) {
             VirtualFile virtualFile = phpClass.getContainingFile().getVirtualFile().getParent();
             if(virtualFile == null) {
                 continue;
@@ -277,15 +277,15 @@ public class SnippetUtil {
                 continue;
             }
 
-            String relativePath = VfsUtil.findRelativePath(views, parent, '/');
+            String relativePath = VfsUtil.getRelativePath(parent, views);
 
             if(relativePath != null) {
-                return relativePath + "/" + file.getVirtualFile().getNameWithoutExtension();
+                return relativePath + "/" + file.getNameWithoutExtension();
             }
         }
 
         // "foo/Bootstrap.php" => "foo/Views"
-        for(PhpClass phpClass: PhpIndex.getInstance(file.getProject()).getAllSubclasses("Shopware_Components_Plugin_Bootstrap")) {
+        for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("Shopware_Components_Plugin_Bootstrap")) {
             VirtualFile virtualFile = phpClass.getContainingFile().getVirtualFile().getParent();
             if(virtualFile == null) {
                 continue;
@@ -300,10 +300,9 @@ public class SnippetUtil {
                 continue;
             }
 
-            String relativePath = VfsUtil.findRelativePath(views, parent, '/');
-
+            String relativePath = VfsUtil.getRelativePath(parent, views);
             if(relativePath != null) {
-                return relativePath + "/" + file.getVirtualFile().getNameWithoutExtension();
+                return relativePath + "/" + file.getNameWithoutExtension();
             }
         }
 
