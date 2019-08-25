@@ -256,17 +256,35 @@ public class TemplateUtil {
 
         return false;
     }
+
     @Nullable
-    public static String getTemplateName(Project project, VirtualFile virtualFile) {
+    public static String getTemplateName(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         return getTemplateName(project, virtualFile, "frontend", "backend", "widgets");
     }
 
+    /**
+     * Find on Theme.php scope: "foo/Theme.php" => "frontend/plugins/payment/sepa"
+     * Find on Plugin.php scope: "foo/Plugin.php" => "Resources/views/frontend/plugins/payment/sepa"
+     */
     @Nullable
-    public static String getTemplateName(Project project, VirtualFile virtualFile, String... modules) {
+    public static String getTemplateNameViaPath(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+        String fileNamespaceViaPath = SnippetUtil.getFileNamespaceViaPath(project, virtualFile);
 
+        return fileNamespaceViaPath != null
+            ? fileNamespaceViaPath + "." + virtualFile.getExtension()
+            : null;
+    }
+
+    @Nullable
+    public static String getTemplateName(@NotNull Project project, @NotNull VirtualFile virtualFile, @NotNull String... modules) {
+        String templateNameViaPath = getTemplateNameViaPath(project, virtualFile);
+        if (templateNameViaPath != null) {
+            return templateNameViaPath;
+        }
+
+        // Shopware <= 5.1 "/templates/[emotion_black]/frontend"
         String frontendName = VfsUtil.getRelativePath(virtualFile, project.getBaseDir(), '/');
         if(frontendName == null) {
-
             // search for possible indexed files
             String path = virtualFile.toString();
             int i = path.lastIndexOf("/templates/");
@@ -277,6 +295,7 @@ public class TemplateUtil {
             frontendName = path.substring(i + "/templates/".length());
         }
 
+        // find "frontend" or any other given module inside the path
         for(String module: modules) {
             int i = frontendName.indexOf(module);
             if(i > 0) {
@@ -285,7 +304,6 @@ public class TemplateUtil {
         }
 
         return null;
-
     }
 
     public static String cleanTemplateName(String templateName) {
