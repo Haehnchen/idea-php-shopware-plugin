@@ -29,7 +29,39 @@ public class SmartyFileCompletionProviderTest extends ShopwareLightCodeInsightFi
     public void testCompletionForSnippetNamespace() {
         assertCompletionContains(
             SmartyFileType.INSTANCE,
+            "{s namespace=<caret>}{/s}",
+            "foobar/widgets"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{s namespace=\"<caret>\"}{/s}",
+            "foobar/widgets"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
             "{s namespace='<caret>'}{/s}",
+            "foobar/widgets"
+        );
+    }
+
+    public void testCompletionForSnippetNamespaceInFile() {
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{namespace name=<caret>}",
+            "foobar/widgets"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{namespace name='<caret>'}",
+            "foobar/widgets"
+        );
+
+        assertCompletionContains(
+            SmartyFileType.INSTANCE,
+            "{namespace name=\"<caret>\"}",
             "foobar/widgets"
         );
     }

@@ -122,7 +122,10 @@ public class SmartyPattern {
     }
 
     public static ElementPattern<PsiElement> getNamespacePattern() {
-        return getTagAttributePattern("s", "namespace");
+        return PlatformPatterns.or(
+            SmartyPattern.getTagAttributePattern("namespace", "name"),
+            getTagAttributePattern("s", "namespace")
+        );
     }
 
     public static PsiElementPattern.Capture<PsiElement> getVariableReference() {

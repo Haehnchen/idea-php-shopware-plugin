@@ -71,6 +71,14 @@ public class SmartyFileGoToDeclarationHandler implements GotoDeclarationHandler 
             }
         }
 
+        if(SmartyPattern.getSmartyTagPattern("namespace").accepts(sourceElement)) {
+            for (PsiElement child : YamlHelper.getChildrenFix(sourceElement.getParent())) {
+                if (SmartyPattern.getNamespacePattern().accepts(child)) {
+                    attachSnippetNamespaceTagGoto(child, targets);
+                }
+            }
+        }
+
         // {extends file="frontend/register/index.tpl"}
         if(SmartyPattern.getFilePattern().accepts(sourceElement)) {
             attachExtendsFileGoto(sourceElement, targets);
