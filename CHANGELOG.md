@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.0.0
+* Add javascript / admin snippets completion and references (Daniel Espendiller)
+* Add javascript / admin snippets index (Daniel Espendiller)
+* Support controller template references via Symfony plugin (Daniel Espendiller)
+* Implement translation provider for json snippets for supporting all Symfony features (Daniel Espendiller)
+* Provide internal translation completion for custom Symfony trans: "Shopware\\Storefront\\Controller\\StorefrontController::trans" (Daniel Espendiller)
+* Add snippet indexer (Daniel Espendiller)
+* Add completion for sw_thumbnails (Daniel Espendiller)
+* Add Shopware platform icon (Daniel Espendiller)
+* Add sw_icon completion and references (Daniel Espendiller)
+* Twig template completion support for "sw_include" and "sw_extends" (Daniel Espendiller)
+
 ## 3.3.0
 * snippet file namespace navigation and autocomplete (Daniel Espendiller)
 * support Shopware\_Components\_Plugin\_Bootstrap::Views folder for snippet namespace scope (Daniel Espendiller)

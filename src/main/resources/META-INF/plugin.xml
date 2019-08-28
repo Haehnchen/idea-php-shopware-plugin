@@ -11,7 +11,7 @@
     <depends optional="true">de.espend.idea.php.toolbox</depends>
 
   <description><![CDATA[
-      Support for Shopware
+      Support for Shopware Version <= 5, 6+ and extended Symfony framework integration
 
       <br/>
       <a href="https://github.com/Haehnchen/idea-php-shopware-plugin/issues">Issues</a> | <a href="https://www.paypal.me/DanielEspendiller">Donate</a>
@@ -23,7 +23,18 @@
         <li>(Optional) Install <a href="https://plugins.jetbrains.com/plugin/8133">PHP Toolbox</a></li>
       </ul>
 
-      <h2>Features</h2>
+      <h2>Shopware 6+ / Symfony Integration</h2>
+      <ul>
+        <li>Javascript / Administration: snippets completion and references</li>
+        <li>PHP: Support controller template references via Symfony plugin </li>
+        <li>Twig / PHP: Translation provider for json snippets for supporting all Symfony features</li>
+        <li>PHP: Translation completion for custom Symfony trans eg "Shopware\\Storefront\\Controller\\StorefrontController::trans"</li>
+        <li>Twig: Completion for sw_thumbnails</li>
+        <li>Twig / Javascript / Administration: sw_icon completion and references</li>
+        <li>Twig: Template completion support for "sw_include" and "sw_extends"</li>
+      </ul>
+
+      <h2>Shopware <= 5</h2>
       <ul>
         <li>PHP: Subscriber name completion for controller/hooks/events</li>
         <li>PHP: Type provider for Manager::getResources</li>
