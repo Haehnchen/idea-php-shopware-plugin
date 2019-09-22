@@ -43,6 +43,8 @@ We have an automated build script via Gradle that includes upload to JetBrains p
 Screenshots
 ---------------------
 
+![Shopware 6](https://plugins.jetbrains.com/files/7410/screenshot_20293.png)
+![Translations](https://plugins.jetbrains.com/files/7410/screenshot_16607.png)
 ![Events](http://plugins.jetbrains.com/files/7410/screenshot_14428.png)
 ![Smarty](http://plugins.jetbrains.com/files/7410/screenshot_14426.png)
 
