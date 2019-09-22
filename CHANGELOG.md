@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1.0
+* Fully resolve "sw_extends" and "sw_include" for Symfony plugin; allows support for full Twig template support (Daniel Espendiller)
+
 ## 4.0.0
 * Add javascript / admin snippets completion and references (Daniel Espendiller)
 * Add javascript / admin snippets index (Daniel Espendiller)
