@@ -63,6 +63,10 @@ public class ShopwareProjectComponent implements ProjectComponent {
                     final Collection<VirtualFile> containingFiles = new HashSet<>();
 
                     ApplicationManager.getApplication().runReadAction(() -> {
+                        if (DumbService.getInstance(project).isDumb()) {
+                            return;
+                        }
+
                         for(String methodName : EventConfigGoToIndex.METHOD_NAMES) {
                             FileBasedIndexImpl.getInstance().getFilesWithKey(EventConfigGoToIndex.KEY, new HashSet<>(Collections.singletonList(methodName)), virtualFile -> {
                                 containingFiles.add(virtualFile);
