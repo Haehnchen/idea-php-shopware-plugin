@@ -258,6 +258,10 @@ public class SnippetUtil {
         // "foo/Theme.php" => "frontend/plugins/payment/sepa"
         for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Theme")) {
             VirtualFile virtualFile = phpClass.getContainingFile().getVirtualFile().getParent();
+            if(virtualFile == null) {
+                continue;
+            }
+
             String relativePath = VfsUtil.getRelativePath(parent, virtualFile);
 
             if(relativePath != null) {
