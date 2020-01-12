@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.1.2
+* Fix missing nullable check for parent file check indexing on template path [#110](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/110) (Daniel Espendiller)
+
+## 4.1.1
+* Fix background job to run not on index process [#89](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/89) (Daniel Espendiller)
+
 ## 4.1.0
 * Fully resolve "sw_extends" and "sw_include" for Symfony plugin; allows support for full Twig template support (Daniel Espendiller)
 
