@@ -254,6 +254,9 @@ public class SnippetUtil {
     @Nullable
     public static String getFileNamespaceViaPath(@NotNull Project project, @NotNull VirtualFile file) {
         VirtualFile parent = file.getParent();
+        if (parent == null) {
+            return null;
+        }
 
         // "foo/Theme.php" => "frontend/plugins/payment/sepa"
         for(PhpClass phpClass: PhpIndex.getInstance(project).getAllSubclasses("\\Shopware\\Components\\Theme")) {

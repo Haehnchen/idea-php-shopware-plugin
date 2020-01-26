@@ -283,7 +283,12 @@ public class TemplateUtil {
         }
 
         // Shopware <= 5.1 "/templates/[emotion_black]/frontend"
-        String frontendName = VfsUtil.getRelativePath(virtualFile, project.getBaseDir(), '/');
+        VirtualFile baseDir = project.getBaseDir();
+        if (baseDir == null) {
+            return null;
+        }
+
+        String frontendName = VfsUtil.getRelativePath(virtualFile, baseDir, '/');
         if(frontendName == null) {
             // search for possible indexed files
             String path = virtualFile.toString();
