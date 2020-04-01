@@ -57,7 +57,7 @@ public class ShopwareInstallerUtil {
 
             // @TODO: PhpStorm9:
             // simple replacement for: com.intellij.util.io.HttpRequests
-            URL url = new URL("http://update-api.shopware.com/v1/releases/install");
+            URL url = new URL("http://update-api.shopware.com/v1/releases/install?major=6");
             URLConnection conn = url.openConnection();
             conn.setRequestProperty("User-Agent", userAgent);
             conn.connect();
