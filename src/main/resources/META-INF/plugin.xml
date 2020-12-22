@@ -2,7 +2,7 @@
   <id>de.espend.idea.shopware</id>
   <name>Shopware</name>
   <version>3.3.0</version>
-  <vendor email="daniel@espendiller.net" url="http://espend.de">Daniel Espendiller</vendor>
+  <vendor email="daniel@espendiller.net" url="http://espend.de?p=de.espend.idea.shopware">espend_de</vendor>
 
     <depends>com.jetbrains.php</depends>
     <depends>com.intellij.modules.platform</depends>
