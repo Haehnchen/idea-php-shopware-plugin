@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1.5
+* Fix "IndexNotReadyException" on background event indexing and provide a visible background task in task bar when running (Daniel Espendiller)
+
 ## 4.1.4
 * Provide shopware 6 project installer support Daniel Espendiller (Daniel Espendiller) [#114](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/114)
 
