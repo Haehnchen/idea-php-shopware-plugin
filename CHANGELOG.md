@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.1.4
+* Provide shopware 6 project installer support Daniel Espendiller (Daniel Espendiller) [#114](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/114)
+
+## 4.1.3
+* Check nullable folders for template root dir (Daniel Espendiller) [#112](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/112)
+
 ## 4.1.2
 * Fix missing nullable check for parent file check indexing on template path [#110](https://github.com/Haehnchen/idea-php-shopware-plugin/issues/110) (Daniel Espendiller)
 
