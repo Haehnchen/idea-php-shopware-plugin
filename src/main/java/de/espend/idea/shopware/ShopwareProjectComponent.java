@@ -112,21 +112,21 @@ public class ShopwareProjectComponent implements ProjectComponent {
                 ProgressManager.getInstance().run(new Task.Backgroundable(project, "Shopware: Event indexer", false) {
                     @Override
                     public void run(@NotNull ProgressIndicator progressIndicator) {
-                        final Map<String, Collection<String>> events = new HashMap<>();
-                        final Set<String> configs = new HashSet<>();
-
-                        final Collection<VirtualFile> containingFiles = new HashSet<>();
-
-                        for (String methodName : EventConfigGoToIndex.METHOD_NAMES) {
-                            ApplicationManager.getApplication().runReadAction(() -> {
-                                FileBasedIndex.getInstance().getFilesWithKey(EventConfigGoToIndex.KEY, new HashSet<>(Collections.singletonList(methodName)), virtualFile -> {
-                                    containingFiles.add(virtualFile);
-                                    return true;
-                                }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(project), PhpFileType.INSTANCE));
-                            });
-                        }
-
                         DumbService.getInstance(project).smartInvokeLater(() -> {
+                            final Map<String, Collection<String>> events = new HashMap<>();
+                            final Set<String> configs = new HashSet<>();
+
+                            final Collection<VirtualFile> containingFiles = new HashSet<>();
+
+                            for (String methodName : EventConfigGoToIndex.METHOD_NAMES) {
+                                ApplicationManager.getApplication().runReadAction(() -> {
+                                    FileBasedIndex.getInstance().getFilesWithKey(EventConfigGoToIndex.KEY, new HashSet<>(Collections.singletonList(methodName)), virtualFile -> {
+                                        containingFiles.add(virtualFile);
+                                        return true;
+                                    }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(project), PhpFileType.INSTANCE));
+                                });
+                            }
+
                             for (VirtualFile virtualFile : containingFiles) {
                                 ApplicationManager.getApplication().runReadAction(new PsiParameterStorageRunnable(project, virtualFile, events, configs));
                             }
