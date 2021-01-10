@@ -8,8 +8,12 @@ plugins {
 def htmlFixer = { htmlFile -> file(htmlFile).text.replace('<html>', '').replace('</html>', '') }
 
 apply plugin: 'idea'
-apply plugin: 'org.jetbrains.intellij'
+
 apply plugin: 'java'
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+apply plugin: 'org.jetbrains.intellij'
 
 intellij {
     version ideaVersion
@@ -43,7 +47,7 @@ publishPlugin {
 }
 
 patchPluginXml {
-    sinceBuild '192'
+    sinceBuild '203'
     changeNotes = htmlFixer('src/main/resources/META-INF/change-notes.html')
 }
 

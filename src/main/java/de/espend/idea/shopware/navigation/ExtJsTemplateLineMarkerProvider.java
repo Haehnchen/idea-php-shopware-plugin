@@ -24,14 +24,15 @@ import java.util.*;
  */
 public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
 
+
     @Nullable
     @Override
-    public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement psiElement) {
+    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement psiElement) {
         return null;
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
+    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> psiElements, @NotNull Collection<? super LineMarkerInfo<?>> lineMarkerInfos) {
         if(psiElements.size() == 0 || !ShopwareProjectComponent.isValidForProject(psiElements.get(0))) {
             return;
         }
@@ -53,7 +54,7 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
         }
     }
 
-    private void attachDefineTargets(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos, boolean attachController) {
+    private void attachDefineTargets(PsiElement psiElement, Collection<? super LineMarkerInfo<?>> lineMarkerInfos, boolean attachController) {
         if(!ShopwareProjectComponent.isValidForProject(psiElement)) {
             return;
         }
@@ -136,7 +137,7 @@ public class ExtJsTemplateLineMarkerProvider implements LineMarkerProvider {
 
     }
 
-    private void attachControllerAction(PsiElement sourceElement, Collection<LineMarkerInfo> lineMarkerInfos) {
+    private void attachControllerAction(PsiElement sourceElement, Collection<? super LineMarkerInfo<?>> lineMarkerInfos) {
 
         if(!ShopwareProjectComponent.isValidForProject(sourceElement)) {
             return;
