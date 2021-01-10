@@ -29,14 +29,13 @@ import java.util.*;
  * @author Daniel Espendiller <daniel@espendiller.net>
  */
 public class PhpLineMarkerProvider implements LineMarkerProvider {
-    @Nullable
     @Override
-    public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement psiElement) {
+    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement psiElement) {
         return null;
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, final @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
+    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> psiElements, @NotNull Collection<? super LineMarkerInfo<?>> lineMarkerInfos) {
         if(psiElements.size() == 0 || !ShopwareProjectComponent.isValidForProject(psiElements.get(0))) {
             return;
         }
@@ -51,7 +50,7 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
         collectSubscriberTargets(psiElements, lineMarkerInfos);
     }
 
-    private void collectBootstrapSubscriber(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> lineMarkerInfos, PsiFile containingFile) {
+    private void collectBootstrapSubscriber(@NotNull List<? extends PsiElement> psiElements, @NotNull Collection<? super LineMarkerInfo<?>> lineMarkerInfos, PsiFile containingFile) {
         Map<String, Method> methods = new HashMap<>();
 
         // we dont want multiple line markers, so wrap all into one here
@@ -122,7 +121,7 @@ public class PhpLineMarkerProvider implements LineMarkerProvider {
         }
     }
 
-    private void collectSubscriberTargets(@NotNull List<PsiElement> psiElements, final @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
+    private void collectSubscriberTargets(@NotNull List<? extends PsiElement> psiElements, final @NotNull Collection<? super LineMarkerInfo<?>> lineMarkerInfos) {
         Collection<PhpClass> phpClasses = new ArrayList<>();
 
         for (PsiElement psiElement : psiElements) {
