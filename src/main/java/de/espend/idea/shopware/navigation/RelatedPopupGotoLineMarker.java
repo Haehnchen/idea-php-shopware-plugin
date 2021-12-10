@@ -86,7 +86,7 @@ public class RelatedPopupGotoLineMarker {
 
     }
 
-    public static RelatedItemLineMarkerInfo<PsiElement> getSingleLineMarker(SmartyFile smartyFile, Collection<LineMarkerInfo> lineMarkerInfos, GotoRelatedItem gotoRelatedItem) {
+    public static RelatedItemLineMarkerInfo<PsiElement> getSingleLineMarker(SmartyFile smartyFile, GotoRelatedItem gotoRelatedItem) {
 
         // hell: find any possible small icon
         Icon icon = null;

@@ -47,8 +47,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
-
+    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> psiElements, @NotNull Collection<? super LineMarkerInfo<?>> lineMarkerInfos) {
         if(psiElements.size() == 0 || !ShopwareProjectComponent.isValidForProject(psiElements.get(0))) {
             return;
         }
@@ -80,7 +79,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
 
     }
 
-    private void attachFileContextMaker(SmartyFile smartyFile, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
+    private void attachFileContextMaker(SmartyFile smartyFile, @NotNull Collection<? super LineMarkerInfo<?>> lineMarkerInfos) {
         List<GotoRelatedItem> gotoRelatedItems = new ArrayList<>();
 
         attachController(smartyFile, gotoRelatedItems);
@@ -93,22 +92,22 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
 
         // only one item dont need popover
         if(gotoRelatedItems.size() == 1) {
-            lineMarkerInfos.add(RelatedPopupGotoLineMarker.getSingleLineMarker(smartyFile, lineMarkerInfos, gotoRelatedItems.get(0)));
+            lineMarkerInfos.add(RelatedPopupGotoLineMarker.getSingleLineMarker(smartyFile, gotoRelatedItems.get(0)));
             return;
         }
 
-        lineMarkerInfos.add(getRelatedPopover("Related Files", "", smartyFile, gotoRelatedItems));
+        lineMarkerInfos.add(getRelatedPopover(smartyFile, gotoRelatedItems));
 
     }
 
-    private LineMarkerInfo getRelatedPopover(String singleItemTitle, String singleItemTooltipPrefix, PsiElement lineMarkerTarget, List<GotoRelatedItem> gotoRelatedItems) {
+    private LineMarkerInfo<?> getRelatedPopover(PsiElement lineMarkerTarget, List<GotoRelatedItem> gotoRelatedItems) {
 
         // single item has no popup
-        String title = singleItemTitle;
+        String title = "Related Files";
         if(gotoRelatedItems.size() == 1) {
             String customName = gotoRelatedItems.get(0).getCustomName();
             if(customName != null) {
-                title = String.format(singleItemTooltipPrefix, customName);
+                title = customName;
             }
         }
 
@@ -122,7 +121,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
         );
     }
 
-    private void attachImplementsBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos, Set<VirtualFile> virtualFiles) {
+    private void attachImplementsBlocks(PsiElement psiElement, Collection<? super LineMarkerInfo<?>> lineMarkerInfos, Set<VirtualFile> virtualFiles) {
         if(virtualFiles.size() == 0) {
             return;
         }
@@ -191,7 +190,7 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
         }, GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.allScope(project), SmartyFileType.INSTANCE));
     }
 
-    public void attachTemplateBlocks(PsiElement psiElement, Collection<LineMarkerInfo> lineMarkerInfos) {
+    public void attachTemplateBlocks(PsiElement psiElement, Collection<? super LineMarkerInfo<?>> lineMarkerInfos) {
 
         SmartyBlockGoToHandler goToHandler = new SmartyBlockGoToHandler();
         PsiElement[] gotoDeclarationTargets = goToHandler.getGotoDeclarationTargets(psiElement, 0, null);
