@@ -113,13 +113,12 @@ public class SmartyTemplateLineMarkerProvider implements LineMarkerProvider {
         }
 
         return new LineMarkerInfo<>(
-            lineMarkerTarget,
-            lineMarkerTarget.getTextRange(),
-            ShopwarePluginIcons.SHOPWARE_LINEMARKER,
-            6,
-            new ConstantFunction<>(title),
-            new fr.adrienbrault.idea.symfony2plugin.dic.RelatedPopupGotoLineMarker.NavigationHandler(gotoRelatedItems),
-            GutterIconRenderer.Alignment.RIGHT
+                lineMarkerTarget,
+                lineMarkerTarget.getTextRange(),
+                ShopwarePluginIcons.SHOPWARE_LINEMARKER,
+                new ConstantFunction<>(title),
+                new fr.adrienbrault.idea.symfony2plugin.dic.RelatedPopupGotoLineMarker.NavigationHandler(gotoRelatedItems),
+                GutterIconRenderer.Alignment.RIGHT
         );
     }
 
