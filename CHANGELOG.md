@@ -1,5 +1,23 @@
 # Changelog
 
+## 4.3.1
+
+* #124 fix ""#LineMarkerInfo(T, TextRange, Icon, int, Function, GutterIconNavigationHandler, Alignment)' is deprecated" (Daniel Espendiller)
+
+## 4.3.0
+* add twig "seoUrl" support (Daniel Espendiller)
+* add twig "theme_config" support (Daniel Espendiller)
+* add sw_icon index (Daniel Espendiller)
+* config completion (Daniel Espendiller)
+* support ""{{ $tc('') }}" in vue.js (Daniel Espendiller)
+* add support for translations via "$tc" twig parameter inside "vue.js" (Daniel Espendiller)
+* fix sw_icon path (Daniel Espendiller)
+* fake storefront translations key (Daniel Espendiller)
+* change plugin active switch (Daniel Espendiller)
+* fix and support new structure for plugin creation dialog (Daniel Espendiller)
+* better shopware version 6 detection (Daniel Espendiller)
+* some PhpStorm 2021.x api fixes (Daniel Espendiller)
+
 ## 4.1.5
 * Fix "IndexNotReadyException" on background event indexing and provide a visible background task in task bar when running (Daniel Espendiller)
 
