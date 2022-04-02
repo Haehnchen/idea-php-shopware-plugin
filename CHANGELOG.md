@@ -1,7 +1,15 @@
 # Changelog
 
-## 4.3.1
+## 4.4.1
+* Add "sw_csrf" completion support (Daniel Espendiller)
+* sw_extends and sw_include prioritized completion list (Daniel Espendiller)
 
+## 4.4.0
+* provide incomplete Twig completion for "sw_icon" (Daniel Espendiller)
+* provide incomplete Twig completion for "config" (Daniel Espendiller)
+* provide incomplete Twig tag completion for sw_extends and sw_include tags (Daniel Espendiller)
+
+## 4.3.1
 * #124 fix ""#LineMarkerInfo(T, TextRange, Icon, int, Function, GutterIconNavigationHandler, Alignment)' is deprecated" (Daniel Espendiller)
 
 ## 4.3.0
