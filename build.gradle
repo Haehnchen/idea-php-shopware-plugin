@@ -43,7 +43,7 @@ publishPlugin {
 }
 
 patchPluginXml {
-    sinceBuild '192'
+    sinceBuild '203'
     changeNotes = htmlFixer('src/main/resources/META-INF/change-notes.html')
 }
 
