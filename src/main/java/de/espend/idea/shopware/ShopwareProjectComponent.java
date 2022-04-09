@@ -1,7 +1,7 @@
 package de.espend.idea.shopware;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -28,47 +28,47 @@ import java.util.*;
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
  */
-public class ShopwareProjectComponent implements ProjectComponent {
+public class ShopwareProjectComponent {
+    public static class PostStartupActivity implements com.intellij.openapi.startup.StartupActivity {
+        @Override
+        public void runActivity(@NotNull Project project) {
+            if(!Symfony2ProjectComponent.isEnabled(project)) {
+                return;
+            }
 
-    private static final int DUMPER_PERIODE = 600 * 1000;
-
-    private final Project project;
-    private Timer timer;
-
-    public ShopwareProjectComponent(Project project) {
-        this.project = project;
-    }
-
-    @Override
-    public void projectOpened() {
-
-        if(!Symfony2ProjectComponent.isEnabled(project)) {
-            return;
-        }
-
-        StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> {
-            timer = new Timer();
-            timer.schedule(new MyTimerTask(), 0, DUMPER_PERIODE);
-        });
-    }
-
-    @Override
-    public void projectClosed() {
-        if(this.timer != null) {
-            this.timer.cancel();
-            timer.purge();
-            timer = null;
+            project.getService(ProjectCloseService.class).start();
         }
     }
 
-    @Override
-    public void initComponent() {
+    public static class ProjectCloseService implements Disposable {
+        private static final int DUMPER_PERIODE = 600 * 1000;
 
-    }
+        private final Project project;
+        private Timer timer;
 
-    @Override
-    public void disposeComponent() {
+        public ProjectCloseService(@NotNull Project project) {
+            this.project = project;
+        }
 
+        public void start() {
+            if(!Symfony2ProjectComponent.isEnabled(project)) {
+                return;
+            }
+
+            StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> {
+                timer = new Timer();
+                timer.schedule(new MyTimerTask(project), 0, DUMPER_PERIODE);
+            });
+        }
+
+        @Override
+        public void dispose() {
+            if (this.timer != null) {
+                this.timer.cancel();
+                this.timer.purge();
+                this.timer = null;
+            }
+        }
     }
 
     public static boolean isValidForProject(@Nullable PsiElement psiElement) {
@@ -91,14 +91,14 @@ public class ShopwareProjectComponent implements ProjectComponent {
         return PhpElementsUtil.getClassInterface(project, "\\Enlight_Controller_Action") != null;
     }
 
+    private static class MyTimerTask extends TimerTask {
+        @NotNull
+        private final Project project;
 
-    @NotNull
-    @Override
-    public String getComponentName() {
-        return "Shopware Plugin";
-    }
+        public MyTimerTask(@NotNull Project project) {
+            this.project = project;
+        }
 
-    private class MyTimerTask extends TimerTask {
         public void run() {
             DumbService.getInstance(project).smartInvokeLater(() -> {
                 if (DumbService.getInstance(project).isDumb()) {

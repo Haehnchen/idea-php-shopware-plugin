@@ -70,7 +70,7 @@
     ]]></description>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="191.0"/>
+  <idea-version since-build="203"/>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider3 implementation="de.espend.idea.shopware.types.ShopwareApiResourcesTypeProvider"/>
@@ -129,6 +129,8 @@
                            nonDefaultProject="true"
       />
 
+      <postStartupActivity implementation="de.espend.idea.shopware.ShopwareProjectComponent$PostStartupActivity"/>
+      <projectService serviceImplementation="de.espend.idea.shopware.ShopwareProjectComponent$ProjectCloseService"/>
   </extensions>
 
     <extensions defaultExtensionNs="fr.adrienbrault.idea.symfony2plugin.extension">
@@ -144,16 +146,6 @@
     <extensions defaultExtensionNs="de.espend.idea.php.toolbox.extension">
         <JsonStreamResource implementation="de.espend.idea.shopware.external.InternalJsonStreamResource"/>
     </extensions>
-
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
-
-    <project-components>
-        <component>
-            <implementation-class>de.espend.idea.shopware.ShopwareProjectComponent</implementation-class>
-        </component>
-    </project-components>
 
   <actions>
       <group id="ShopwareGroup" text="Shopware" popup="false">
