@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.4.2
+* Support dynamic plugin feature (Daniel Espendiller)
+
 ## 4.4.1
 * Add "sw_csrf" completion support (Daniel Espendiller)
 * sw_extends and sw_include prioritized completion list (Daniel Espendiller)
