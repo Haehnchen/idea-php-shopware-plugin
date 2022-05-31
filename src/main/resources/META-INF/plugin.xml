@@ -129,6 +129,8 @@
                            nonDefaultProject="true"
       />
 
+      <errorHandler implementation="de.espend.idea.shopware.util.ide.PluginErrorReporterSubmitter"/>
+
       <postStartupActivity implementation="de.espend.idea.shopware.ShopwareProjectComponent$PostStartupActivity"/>
       <projectService serviceImplementation="de.espend.idea.shopware.ShopwareProjectComponent$ProjectCloseService"/>
   </extensions>
