@@ -1,5 +1,14 @@
 # Changelog
 
+## 5.0.0
+* Support for PhpStorm 2024.2 (Daniel Espendiller)
+* Add references for "sw_csrf" as routes (Daniel Espendiller)
+* Add references for "sw_csrf" (Daniel Espendiller)
+* Add plugin error submitter (Daniel Espendiller)
+
+## 4.4.3
+* Support more translation files (Daniel Espendiller)
+
 ## 4.4.2
 * Support dynamic plugin feature (Daniel Espendiller)
 
