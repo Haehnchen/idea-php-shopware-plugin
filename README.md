@@ -8,12 +8,20 @@ IntelliJ IDEA / PhpStorm Shopware Plugin
 
 IntelliJ IDEA / PhpStorm Plugin for [Shopware](http://www.shopware.de/ "Shopware")
 
+The plugin focuses on the Shopware 6 Platform and supports legacy Shopware 5 projects.
+
 Key                  | Value
 -------------------  | -------------------
 Plugin Url           | https://plugins.jetbrains.com/plugin/7410
+Documentation        | https://espend.de/phpstorm/plugin/shopware
 ID                   | de.espend.idea.shopware
 Changelog            | [CHANGELOG](CHANGELOG.md)
 Build and Deployment | [MAINTENANCE](MAINTENANCE.md)
+
+Freemium
+---------------------
+
+Freemium access includes a grace period and Friday Free access. Buy a license through the [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/7410).
 
 Dependencies
 ---------------------
@@ -24,8 +32,9 @@ Dependencies
 Versions
 ---------------------
 
-* **4.x** >= Shopware 5 + Shopware 6 (Platform) 
-* **3.x** <= Shopware 5
+* **2019.1.x** Shopware 6 Platform focus + legacy Shopware 5 support (closed)
+* **5.x / 4.x** Shopware 6 Platform + legacy Shopware 5 support (open-source)
+* **3.x** Shopware 5 legacy (open-source)
 
 Documentation and tutorials
 ---------------------
@@ -47,4 +56,3 @@ Screenshots
 ![Translations](https://plugins.jetbrains.com/files/7410/screenshot_16607.png)
 ![Events](http://plugins.jetbrains.com/files/7410/screenshot_14428.png)
 ![Smarty](http://plugins.jetbrains.com/files/7410/screenshot_14426.png)
-
