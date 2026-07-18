@@ -1,5 +1,9 @@
 # Changelog
 
+## 2019.1.1
+* Fix compatiblity changes for 2026.2 api changes in Twig (Daniel Espendiller)
+* fix 2026.2 api via smarty plugin bundled plugin (Daniel Espendiller)
+
 ## 2019.1.0
 * Port automatic release changelog generation (Daniel Espendiller)
 * Add Shopware MCP extensions tool (Daniel Espendiller)
