@@ -1,5 +1,8 @@
 # Changelog
 
+## 2019.1.2
+* Make Smarty integration optional for IntelliJ IDEA (Daniel Espendiller)
+
 ## 2019.1.1
 * Fix compatiblity changes for 2026.2 api changes in Twig (Daniel Espendiller)
 * fix 2026.2 api via smarty plugin bundled plugin (Daniel Espendiller)
